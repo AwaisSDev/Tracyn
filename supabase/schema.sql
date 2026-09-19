@@ -328,6 +328,25 @@ create table subscriptions (
 );
 
 -- =========================================================================
+-- EMAIL VERIFICATION RATE LIMITING
+-- =========================================================================
+-- One row per verification email actually dispatched (signup or resend).
+-- Not tied to a workspace or even an existing auth.users row -- signup
+-- itself is what this gates, so the user may not exist yet at insert time.
+-- routers/auth_rate_limit.py checks/writes this before the dashboard is
+-- allowed to call Supabase's own signUp()/resend(), which is what
+-- actually sends the email -- this table only enforces "at most 5 per
+-- email per rolling 24h", independent of Supabase's own (per-project,
+-- not per-email) rate limit.
+
+create table verification_email_sends (
+  id         uuid primary key default gen_random_uuid(),
+  email      text not null,
+  created_at timestamptz not null default now()
+);
+create index idx_verification_email_sends_email on verification_email_sends(email, created_at desc);
+
+-- =========================================================================
 -- ROW LEVEL SECURITY
 -- =========================================================================
 -- Design: the backend (FastAPI) talks to Postgres with the Supabase

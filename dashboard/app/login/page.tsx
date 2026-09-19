@@ -3,10 +3,29 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ForceLightTheme } from "@/components/force-light-theme";
+
+// Called before every Supabase signUp()/resend() -- those are what actually
+// send the email, and they're called directly from the browser with the
+// anon key, so this is the only thing standing between a bored user and an
+// unlimited number of emails to one address. Supabase's own send limit is
+// per-project, not per-email, so it doesn't cover this case.
+async function checkVerificationRateLimit(email: string) {
+  try {
+    await api.post("/v1/auth/verification-send", { email });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "";
+    if (message.startsWith("429")) {
+      throw new Error("Too many verification emails sent to this address today. Please try again tomorrow.");
+    }
+    // Any other failure (e.g. the backend being briefly unreachable)
+    // shouldn't block a real signup/resend -- fail open.
+  }
+}
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -36,12 +55,27 @@ export default function LoginPage() {
         // The admin API (used here previously) creates the user just fine
         // but never sends that email at all -- confirmed live before
         // switching this over.
+        await checkVerificationRateLimit(email);
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
         setStep("verify");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          // Supabase rejects the password check itself with this message
+          // when the account exists but was never confirmed -- previously
+          // that just left the user stuck on this form with a red error and
+          // no way forward, so send them back into the code flow instead
+          // (with a fresh code waiting, since any earlier one may have
+          // expired by now).
+          if (error.message.toLowerCase().includes("not confirmed")) {
+            setStep("verify");
+            await checkVerificationRateLimit(email);
+            await supabase.auth.resend({ type: "signup", email });
+            return;
+          }
+          throw error;
+        }
         router.push("/dashboard");
         router.refresh();
       }
@@ -72,6 +106,7 @@ export default function LoginPage() {
     setError(null);
     setResent(false);
     try {
+      await checkVerificationRateLimit(email);
       const { error } = await supabase.auth.resend({ type: "signup", email });
       if (error) throw error;
       setResent(true);
