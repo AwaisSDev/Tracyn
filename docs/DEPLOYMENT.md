@@ -46,6 +46,9 @@ REDIS_URL
 ANTHROPIC_API_KEY
 ANTHROPIC_SONNET_MODEL=claude-sonnet-4-6
 ANTHROPIC_HAIKU_MODEL=claude-haiku-4-5-20251001
+OLLAMA_API_KEY  # powers the plain-English policy drafter only -- get a key at ollama.com/settings/keys
+OLLAMA_BASE_URL=https://ollama.com/v1
+OLLAMA_MODEL=gemma4:31b
 SLACK_BOT_TOKEN
 SLACK_SIGNING_SECRET
 RESEND_API_KEY
