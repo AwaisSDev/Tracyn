@@ -5,35 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Confirm your email</title>
 </head>
-<body style="margin:0; padding:0; background-color:#eef0f2; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#eef0f2; padding:40px 16px;">
+<body style="margin:0; padding:0; background-color:#f7f7f5; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f7f7f5; padding:48px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px; width:100%; background-color:#ffffff; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(20,20,20,0.10);">
+        <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px; width:100%; background-color:#ffffff; border:1px solid #e9e9e7; border-radius:10px;">
 
-          <!-- brand band -->
+          <!-- logo -->
           <tr>
-            <td style="background:linear-gradient(135deg,#1e2a5e 0%,#2f52c2 55%,#5b8cf0 100%); padding:32px 40px 28px 40px; text-align:center;">
-              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
-                <tr>
-                  <td style="width:52px; height:52px; background-color:rgba(255,255,255,0.16); border-radius:14px; text-align:center; vertical-align:middle;">
-                    <img src="https://tracyn.online/logo-white.png" width="28" height="28" alt="Tracyn" style="display:block; margin:12px;" />
-                  </td>
-                </tr>
-              </table>
-              <p style="margin:16px 0 0 0; font-size:13px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.85);">
-                Tracyn
-              </p>
+            <td style="padding:40px 40px 0 40px;">
+              <img src="https://tracyn.online/logo.png" width="24" height="24" alt="" style="display:block;" />
             </td>
           </tr>
 
           <!-- heading -->
           <tr>
-            <td style="padding:32px 40px 0 40px; text-align:center;">
-              <h1 style="margin:0; font-size:22px; line-height:29px; font-weight:700; color:#111318; letter-spacing:-0.01em;">
+            <td style="padding:20px 40px 0 40px;">
+              <h1 style="margin:0; font-size:20px; line-height:27px; font-weight:600; color:#191919;">
                 Confirm your email
               </h1>
-              <p style="margin:8px 0 0 0; font-size:14.5px; line-height:22px; color:#3f434c;">
+              <p style="margin:6px 0 0 0; font-size:14px; line-height:21px; color:#787774;">
                 Enter this code to finish setting up your Tracyn account.
               </p>
             </td>
@@ -41,11 +32,11 @@
 
           <!-- code -->
           <tr>
-            <td style="padding:26px 40px 4px 40px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff4e0; border:1.5px solid #ffcf7d; border-radius:14px;">
+            <td style="padding:24px 40px 0 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f7f6f3; border:1px solid #e9e9e7; border-radius:6px;">
                 <tr>
-                  <td style="padding:24px 20px; text-align:center;">
-                    <span style="font-family:'SFMono-Regular',Consolas,Menlo,monospace; font-size:32px; font-weight:800; letter-spacing:0.3em; color:#8a4b00;">
+                  <td style="padding:20px; text-align:center;">
+                    <span style="font-family:'SFMono-Regular',Consolas,Menlo,monospace; font-size:28px; font-weight:600; letter-spacing:0.28em; color:#191919;">
                       {{ .Token }}
                     </span>
                   </td>
@@ -56,28 +47,28 @@
 
           <!-- meta -->
           <tr>
-            <td style="padding:18px 40px 0 40px; text-align:center;">
-              <p style="margin:0; font-size:13.5px; line-height:20px; color:#4b5058;">
-                This code expires shortly, so enter it soon after requesting it.<br />
-                Sent to <span style="color:#111318; font-weight:600;">{{ .Email }}</span>.
+            <td style="padding:16px 40px 0 40px;">
+              <p style="margin:0; font-size:13px; line-height:20px; color:#787774;">
+                This code expires shortly, so enter it soon after requesting it. Sent to
+                <span style="color:#191919; font-weight:500;">{{ .Email }}</span>.
               </p>
             </td>
           </tr>
 
           <!-- divider -->
           <tr>
-            <td style="padding:30px 40px 0 40px;">
-              <div style="border-top:1px solid #e4e6ea;"></div>
+            <td style="padding:32px 40px 0 40px;">
+              <div style="border-top:1px solid #e9e9e7;"></div>
             </td>
           </tr>
 
           <!-- footer -->
           <tr>
-            <td style="padding:20px 40px 36px 40px; text-align:center;">
-              <p style="margin:0; font-size:12.5px; line-height:19px; color:#5b6068;">
+            <td style="padding:20px 40px 40px 40px;">
+              <p style="margin:0; font-size:12.5px; line-height:19px; color:#6b6b68;">
                 If you didn't try to sign up for Tracyn, you can safely ignore this email.
               </p>
-              <p style="margin:12px 0 0 0; font-size:12.5px; line-height:19px; color:#787e87; font-weight:600;">
+              <p style="margin:10px 0 0 0; font-size:12.5px; line-height:19px; color:#6b6b68;">
                 Tracyn &middot; compliance infrastructure for AI agent teams
               </p>
             </td>
