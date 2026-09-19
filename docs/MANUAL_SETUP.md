@@ -14,6 +14,21 @@ order; later steps depend on earlier ones.
 5. Storage → create a new **private** bucket named `questionnaires` (used by F4's upload flow).
 6. Authentication → Providers: enable **Email** (magic link) — it's on by default. Authentication → URL Configuration: add
    `http://localhost:3000/auth/callback` and `https://tracyn.online/auth/callback` as redirect URLs.
+7. Authentication → Sign In / Providers → Email: confirm **Confirm email** is
+   ON. Signup now depends on this — the dashboard calls `supabase.auth.signUp()`
+   directly (not through the backend), which only sends a confirmation email
+   at all when this is enabled.
+8. Authentication → Emails → **Confirm signup** template: replace the HTML
+   with [`docs/email-templates/confirm-signup.html`](email-templates/confirm-signup.html)
+   (shows `{{ .Token }}`, a 6-digit code, instead of the default magic-link
+   button — the login page's verify step expects a code, not a link).
+9. Authentication → Emails → **SMTP Settings**: switch on **custom SMTP** and
+   point it at your Resend account (same one used for approval-notification
+   emails — Resend supports SMTP relay, credentials are on their dashboard
+   under Domains → \[your domain\] → SMTP). Confirmed live: Supabase's own
+   default mailer hit `over_email_send_rate_limit` after two test signups in
+   quick succession — fine for local dev, not for a real launch where several
+   people might sign up around the same time.
 
 ## 2. Anthropic
 
