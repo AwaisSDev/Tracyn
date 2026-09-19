@@ -11,20 +11,38 @@
       <td align="center">
         <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px; width:100%; background-color:#ffffff; border:1px solid #e9e9e7; border-radius:10px;">
 
-          <!-- logo -->
+          <!-- logo + wordmark, centered -->
           <tr>
-            <td style="padding:40px 40px 0 40px;">
-              <img src="https://tracyn.online/logo.png" width="24" height="24" alt="" style="display:block;" />
+            <td style="padding:40px 40px 0 40px; text-align:center;">
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                <tr>
+                  <td style="vertical-align:middle; padding-right:8px;">
+                    <img src="https://tracyn.online/logo.png" width="22" height="22" alt="" style="display:block;" />
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <span style="font-size:16px; font-weight:600; color:#191919; letter-spacing:-0.01em;">Tracyn</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- eyebrow badge -->
+          <tr>
+            <td style="padding:24px 40px 0 40px; text-align:center;">
+              <span style="display:inline-block; background-color:#e3ddf1; color:#4a3d78; font-size:11.5px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; padding:5px 12px; border-radius:99px;">
+                Account verification
+              </span>
             </td>
           </tr>
 
           <!-- heading -->
           <tr>
-            <td style="padding:20px 40px 0 40px;">
+            <td style="padding:16px 40px 0 40px; text-align:center;">
               <h1 style="margin:0; font-size:20px; line-height:27px; font-weight:600; color:#191919;">
                 Confirm your email
               </h1>
-              <p style="margin:6px 0 0 0; font-size:14px; line-height:21px; color:#787774;">
+              <p style="margin:6px 0 0 0; font-size:14px; line-height:21px; color:#5f5e5b;">
                 Enter this code to finish setting up your Tracyn account.
               </p>
             </td>
@@ -33,10 +51,10 @@
           <!-- code -->
           <tr>
             <td style="padding:24px 40px 0 40px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f7f6f3; border:1px solid #e9e9e7; border-radius:6px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#dbedd9; border:1px solid #c5e0c2; border-radius:8px;">
                 <tr>
                   <td style="padding:20px; text-align:center;">
-                    <span style="font-family:'SFMono-Regular',Consolas,Menlo,monospace; font-size:28px; font-weight:600; letter-spacing:0.28em; color:#191919;">
+                    <span style="font-family:'SFMono-Regular',Consolas,Menlo,monospace; font-size:28px; font-weight:700; letter-spacing:0.28em; color:#2f5d3a;">
                       {{ .Token }}
                     </span>
                   </td>
@@ -47,8 +65,8 @@
 
           <!-- meta -->
           <tr>
-            <td style="padding:16px 40px 0 40px;">
-              <p style="margin:0; font-size:13px; line-height:20px; color:#787774;">
+            <td style="padding:16px 40px 0 40px; text-align:center;">
+              <p style="margin:0; font-size:13px; line-height:20px; color:#5f5e5b;">
                 This code expires shortly, so enter it soon after requesting it. Sent to
                 <span style="color:#191919; font-weight:500;">{{ .Email }}</span>.
               </p>
@@ -64,7 +82,7 @@
 
           <!-- footer -->
           <tr>
-            <td style="padding:20px 40px 40px 40px;">
+            <td style="padding:20px 40px 40px 40px; text-align:center;">
               <p style="margin:0; font-size:12.5px; line-height:19px; color:#6b6b68;">
                 If you didn't try to sign up for Tracyn, you can safely ignore this email.
               </p>
