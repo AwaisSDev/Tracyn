@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.arq_pool import close_arq_pool, get_arq_pool
 from app.config import get_settings
-from app.routers import agents, approvals, auth, billing, events, ingest, mcp_data, oauth, policies, questionnaires, slack, soc2, workspaces
+from app.routers import agents, approvals, billing, events, ingest, mcp_data, oauth, policies, questionnaires, slack, soc2, workspaces
 from app.services.mcp_oauth_provider import get_oauth_provider
 from app.services.mcp_provider import BackendDataProvider
 
@@ -73,7 +73,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router)
 app.include_router(ingest.router)
 app.include_router(approvals.router)
 app.include_router(policies.router)

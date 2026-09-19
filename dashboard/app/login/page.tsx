@@ -8,14 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ForceLightTheme } from "@/components/force-light-theme";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
-
 export default function LoginPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  // "verify" only ever follows a fresh signup -- confirming the code Supabase
+  // just emailed is what actually creates the session (verifyOtp returns one
+  // directly), so there's no separate "log in after verifying" step.
+  const [step, setStep] = useState<"form" | "verify">("form");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resent, setResent] = useState(false);
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
 
@@ -25,26 +29,104 @@ export default function LoginPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const res = await fetch(`${API_BASE}/v1/auth/signup`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({ detail: res.statusText }));
-          throw new Error(body.detail || "Sign up failed");
-        }
+        // Deliberately not going through our own backend -- Supabase's own
+        // signUp() is what triggers its "Confirm signup" email (a 6-digit
+        // code, per the template configured in the Supabase dashboard).
+        // The admin API (used here previously) creates the user just fine
+        // but never sends that email at all -- confirmed live before
+        // switching this over.
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        setStep("verify");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        router.push("/dashboard");
+        router.refresh();
       }
-
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      router.push("/dashboard");
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleVerify(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({ email, token: code, type: "signup" });
+      if (error) throw error;
+      router.push("/dashboard");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "That code didn't work. Check it and try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResend() {
+    setError(null);
+    setResent(false);
+    try {
+      const { error } = await supabase.auth.resend({ type: "signup", email });
+      if (error) throw error;
+      setResent(true);
+      setTimeout(() => setResent(false), 4000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't resend the code. Please try again.");
+    }
+  }
+
+  if (step === "verify") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-sidebar px-4">
+        <ForceLightTheme />
+        <div className="w-full max-w-[360px]">
+          <div className="mb-6 flex flex-col items-center text-center">
+            {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
+            <img src="/logo.png" alt="" width={36} height={36} className="mb-3 rounded-md" />
+            <h1 className="text-lg font-semibold tracking-tight">Check your email</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              We sent a 6-digit code to <span className="font-medium text-foreground">{email}</span>.
+            </p>
+          </div>
+
+          <Card className="p-5 shadow-subtle">
+            <form onSubmit={handleVerify} className="space-y-2.5">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-muted-foreground">Verification code</label>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  required
+                  autoFocus
+                  maxLength={6}
+                  placeholder="123456"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                  className="text-center text-lg tracking-[0.3em]"
+                />
+              </div>
+              {error && <p className="text-[13px] text-error">{error}</p>}
+              <Button type="submit" className="w-full !mt-4" disabled={loading || code.length !== 6}>
+                {loading ? "Verifying..." : "Verify and continue"}
+              </Button>
+            </form>
+          </Card>
+
+          <button
+            type="button"
+            onClick={handleResend}
+            className="mt-4 w-full text-center text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {resent ? "Code resent — check your email" : "Didn't get it? Resend code"}
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -58,7 +140,7 @@ export default function LoginPage() {
             {mode === "signin" ? "Log in to Tracyn" : "Create your Tracyn account"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "signin" ? "Welcome back." : "No email verification needed. You're in instantly."}
+            {mode === "signin" ? "Welcome back." : "We'll email you a 6-digit code to confirm it's really you."}
           </p>
         </div>
 
