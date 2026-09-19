@@ -376,6 +376,9 @@ export function Landing() {
               <Link href="/login" className="hover:text-[var(--lp-fg)]">
                 Log in
               </Link>
+              <Link href="/about" className="hover:text-[var(--lp-fg)]">
+                About
+              </Link>
               <Link href="/privacy" className="hover:text-[var(--lp-fg)]">
                 Privacy
               </Link>

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-// Shared chrome for /privacy and /terms: same header/footer as the landing
-// page but without the `.lp` motion system, since these are static
+// Shared chrome for /about, /privacy, and /terms: same header/footer as the
+// landing page but without the `.lp` motion system, since these are static
 // text pages that don't need the scroll-scrubbed hero.
 export function LegalPage({
   title,
@@ -10,7 +10,7 @@ export function LegalPage({
   children,
 }: {
   title: string;
-  lastUpdated: string;
+  lastUpdated?: string;
   children: ReactNode;
 }) {
   return (
@@ -24,6 +24,9 @@ export function LegalPage({
             <span className="text-[15px] font-semibold tracking-[-0.01em]">Tracyn</span>
           </Link>
           <nav className="flex items-center gap-5 text-[13px] text-muted-foreground">
+            <Link href="/about" className="hover:text-foreground">
+              About
+            </Link>
             <Link href="/privacy" className="hover:text-foreground">
               Privacy
             </Link>
@@ -36,7 +39,7 @@ export function LegalPage({
 
       <main className="mx-auto max-w-[760px] px-6 py-16">
         <h1 className="text-[28px] font-semibold tracking-[-0.01em]">{title}</h1>
-        <p className="mt-2 text-[13px] text-muted-foreground">Last updated: {lastUpdated}</p>
+        {lastUpdated && <p className="mt-2 text-[13px] text-muted-foreground">Last updated: {lastUpdated}</p>}
         <div className="legal-prose mt-10 space-y-6 text-[15px] leading-7 text-foreground/90">
           {children}
         </div>
