@@ -40,15 +40,14 @@ function AppShellSkeleton() {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { workspaces, isLoading } = useWorkspace();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  // Wide list/table-style pages get extra breathing room. Settings uses
-  // the default (non-wide) width too, but bumped its own inner max-w from
-  // 2xl to 4xl directly (see its page.tsx) rather than going all the way
-  // to 1400px, which would stretch its stacked single-column form cards
-  // (a toggle row, a couple of buttons) too thin. Also excluded: the OAuth
-  // consent screen (a small centered card) and a single questionnaire's
-  // Q&A detail (long text answers read worse at 1400px line length).
+  // Wide list/table-style pages get extra breathing room. Excluded: the
+  // OAuth consent screen (a small centered card) and a single
+  // questionnaire's Q&A detail (long text answers read worse at 1400px
+  // line length than at 4xl).
   const pathname = usePathname();
-  const isWidePage = ["/dashboard", "/approvals", "/policy", "/soc2", "/questionnaires"].includes(pathname);
+  const isWidePage = ["/dashboard", "/approvals", "/policy", "/soc2", "/questionnaires", "/settings"].includes(
+    pathname
+  );
 
   // Client-side navigation (next/link) never re-runs the theme-init
   // script, so arriving here from a forced-always-light page (landing,
