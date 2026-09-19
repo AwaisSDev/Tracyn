@@ -60,10 +60,16 @@ export default function AboutPage() {
       <P>
         I like problems that are properly hard, things like multi agent AI systems, ICU
         deterioration detection, and flood response models, and I care about turning them into
-        things people can actually use. I recently finished my matric board exams with a 93.7%
-        STEM aggregate.
+        things people can actually use.
       </P>
       <P>I&rsquo;m always open to new opportunities, collaborations, and interesting problems to build for.</P>
+      <P>
+        For more about me and my other products, visit{" "}
+        <a href="https://awaissiddique.vercel.app/" className="underline" target="_blank" rel="noopener noreferrer">
+          awaissiddique.vercel.app
+        </a>
+        .
+      </P>
       <P>
         Reach me at <a href="mailto:mawais9171@gmail.com" className="underline">mawais9171@gmail.com</a>.
       </P>
