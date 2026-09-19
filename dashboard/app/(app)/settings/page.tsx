@@ -25,7 +25,7 @@ const PLANS = [
 
 export default function SettingsPage() {
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-4xl space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
       <BillingCard />
       <AppearanceCard />
@@ -237,26 +237,26 @@ function ApiKeysCard() {
           </p>
         )}
 
-        <Table>
+        <Table className="text-[15px]">
           <THead>
             <TR>
-              <TH>Name</TH>
-              <TH>Prefix</TH>
-              <TH>Type</TH>
-              <TH>Created</TH>
-              <TH>Last used</TH>
-              <TH />
+              <TH className="h-11 text-sm">Name</TH>
+              <TH className="h-11 text-sm">Prefix</TH>
+              <TH className="h-11 text-sm">Type</TH>
+              <TH className="h-11 text-sm">Created</TH>
+              <TH className="h-11 text-sm">Last used</TH>
+              <TH className="h-11" />
             </TR>
           </THead>
           <TBody>
             {keys.map((k) => (
               <TR key={k.id}>
-                <TD>{k.name}</TD>
-                <TD className="font-mono text-xs">{k.key_prefix}...</TD>
-                <TD>{k.can_review ? <Badge variant="warning">reviewer</Badge> : <Badge variant="secondary">agent</Badge>}</TD>
-                <TD className="text-xs text-muted-foreground">{formatDate(k.created_at)}</TD>
-                <TD className="text-xs text-muted-foreground">{k.last_used_at ? formatDate(k.last_used_at) : "never"}</TD>
-                <TD>
+                <TD className="py-4">{k.name}</TD>
+                <TD className="py-4 font-mono text-sm">{k.key_prefix}...</TD>
+                <TD className="py-4">{k.can_review ? <Badge variant="warning">reviewer</Badge> : <Badge variant="secondary">agent</Badge>}</TD>
+                <TD className="py-4 text-sm text-muted-foreground">{formatDate(k.created_at)}</TD>
+                <TD className="py-4 text-sm text-muted-foreground">{k.last_used_at ? formatDate(k.last_used_at) : "never"}</TD>
+                <TD className="py-4">
                   {k.revoked_at ? (
                     <Badge variant="secondary">revoked</Badge>
                   ) : (
