@@ -130,29 +130,31 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <Card className="p-5 shadow-subtle">
-            <form onSubmit={handleVerify} className="space-y-2.5">
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Verification code</label>
-                <Input
-                  type="text"
-                  inputMode="numeric"
-                  required
-                  autoFocus
-                  // Supabase's own OTP length isn't a fixed 6 -- confirmed
-                  // live it sends 8 digits by default. Not hardcoding a
-                  // specific length here beyond "clearly not empty", so
-                  // this doesn't silently truncate/block a valid code
-                  // again if that length ever changes.
-                  maxLength={10}
-                  placeholder="Enter the code"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                  className="text-center text-lg tracking-[0.3em]"
-                />
-              </div>
-              {error && <p className="text-[13px] text-error">{error}</p>}
-              <Button type="submit" className="w-full !mt-4" disabled={loading || code.length < 6}>
+          <Card className="p-6 shadow-subtle">
+            <form onSubmit={handleVerify} className="space-y-4">
+              <Input
+                type="text"
+                inputMode="numeric"
+                required
+                autoFocus
+                // Supabase's own OTP length isn't a fixed 6 -- confirmed
+                // live it sends 8 digits by default. Not hardcoding a
+                // specific length here beyond "clearly not empty", so
+                // this doesn't silently truncate/block a valid code
+                // again if that length ever changes.
+                maxLength={10}
+                placeholder="• • • • • • • •"
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                className="h-14 rounded-lg border-[#c5e0c2] bg-[#f2f8f1] text-center font-mono text-2xl font-semibold tracking-[0.4em] text-[#2f5d3a] placeholder:text-[#9dbb98] focus-visible:border-[#2f5d3a] focus-visible:ring-[#2f5d3a]/20"
+              />
+              {error &&
+                (error.toLowerCase().includes("security purposes") ? (
+                  <p className="text-center text-[13px] text-muted-foreground">{error}</p>
+                ) : (
+                  <p className="text-center text-[13px] text-error">{error}</p>
+                ))}
+              <Button type="submit" className="w-full" disabled={loading || code.length < 6}>
                 {loading ? "Verifying..." : "Verify and continue"}
               </Button>
             </form>
