@@ -45,7 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // questionnaire's Q&A detail (long text answers read worse at 1400px
   // line length than at 4xl).
   const pathname = usePathname();
-  const isWidePage = ["/dashboard", "/approvals", "/policy", "/soc2", "/questionnaires", "/settings"].includes(
+  const isWidePage = ["/dashboard", "/approvals", "/policy", "/soc2", "/questionnaires", "/settings", "/admin"].includes(
     pathname
   );
 

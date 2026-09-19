@@ -68,6 +68,11 @@ class Settings(BaseSettings):
     sentry_dsn: str = ""
     sentry_environment: str = "production"
 
+    # Founder-only analytics page (routers/admin.py) -- comma-separated
+    # allowlist checked against the logged-in user's email server-side, not
+    # just hidden from the sidebar client-side.
+    admin_emails: str = "awais201001@gmail.com"
+
     # App -- backend stays on the HF Space URL; tracyn.online is the
     # dashboard's custom domain (attached in Vercel, DNS verified).
     app_base_url: str = "https://awais1290-auditagent.hf.space"
@@ -78,6 +83,10 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def admin_email_list(self) -> list[str]:
+        return [e.strip().lower() for e in self.admin_emails.split(",") if e.strip()]
 
 
 @lru_cache

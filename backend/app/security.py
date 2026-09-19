@@ -74,6 +74,17 @@ async def require_workspace_member(workspace_id: str, user: CurrentUser = Depend
     return user
 
 
+async def require_admin(user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+    """Gates the founder-only analytics page (routers/admin.py). Checked
+    server-side against config.py's admin_emails allowlist -- not just a
+    hidden frontend route, since that alone wouldn't stop a workspace
+    member from calling the API directly."""
+    settings = get_settings()
+    if not user.email or user.email.lower() not in settings.admin_email_list:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+    return user
+
+
 def hash_api_key(secret: str) -> str:
     return hashlib.sha256(secret.encode()).hexdigest()
 
