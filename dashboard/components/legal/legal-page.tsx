@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ForceLightTheme } from "@/components/force-light-theme";
 
 // Shared chrome for /about, /privacy, and /terms: same header/footer as the
 // landing page but without the `.lp` motion system, since these are static
@@ -15,12 +16,12 @@ export function LegalPage({
 }) {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <ForceLightTheme />
       <header className="border-b border-border">
         <div className="mx-auto flex h-16 max-w-[760px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5">
             {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
-            <img src="/logo.png" alt="" width={22} height={22} className="dark:hidden" />
-            <img src="/logo-white.png" alt="" width={22} height={22} className="hidden dark:block" />
+            <img src="/logo.png" alt="" width={22} height={22} />
             <span className="text-[15px] font-semibold tracking-[-0.01em]">Tracyn</span>
           </Link>
           <nav className="flex items-center gap-5 text-[13px] text-muted-foreground">

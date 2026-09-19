@@ -220,7 +220,7 @@ function Promo({
 
 /* ---------- floating install card (Wallet's "scan to get the app") ---------- */
 
-function InstallCard() {
+function InstallCard({ nearFooter }: { nearFooter: boolean }) {
   const [copied, setCopied] = useState(false);
   const cmd = "pip install tracyn";
 
@@ -235,7 +235,9 @@ function InstallCard() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 hidden w-[252px] rounded-2xl border border-[var(--lp-line)] bg-white p-4 shadow-[0_8px_24px_-8px_rgb(55_53_47/0.3)] lg:block">
+    <div
+      className={`fixed bottom-5 right-5 z-40 hidden w-[252px] rounded-2xl border border-[var(--lp-line)] bg-white p-4 shadow-[0_8px_24px_-8px_rgb(55_53_47/0.3)] transition-opacity duration-150 lg:block ${nearFooter ? "pointer-events-none opacity-0" : "opacity-100"}`}
+    >
       <div className="text-[12px] font-medium text-[var(--lp-fg-3)]">Install the SDK</div>
       <button
         type="button"
@@ -257,8 +259,22 @@ function InstallCard() {
 /* ---------- page ---------- */
 
 export function Landing() {
+  const footerRef = useRef<HTMLElement | null>(null);
+  const [footerVisible, setFooterVisible] = useState(false);
+
   useEffect(() => {
     forceLightTheme();
+  }, []);
+
+  useEffect(() => {
+    const el = footerRef.current;
+    if (!el) return;
+    // The install card is `fixed` to the viewport corner, so without this
+    // it stays pinned on top of the footer once you scroll that far --
+    // hide it while the footer it would overlap is actually in view.
+    const io = new IntersectionObserver(([entry]) => setFooterVisible(entry.isIntersecting), { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   return (
@@ -362,7 +378,7 @@ export function Landing() {
           </div>
         </Reveal>
 
-        <footer className="border-t border-[var(--lp-line)] bg-[var(--lp-band)]">
+        <footer ref={footerRef} className="border-t border-[var(--lp-line)] bg-[var(--lp-band)]">
           <div className="mx-auto flex max-w-[1200px] flex-col gap-4 px-6 py-8 text-[13px] text-[var(--lp-fg-3)] sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element -- see header */}
@@ -392,7 +408,7 @@ export function Landing() {
           </div>
         </footer>
       </main>
-      <InstallCard />
+      <InstallCard nearFooter={footerVisible} />
     </div>
   );
 }
