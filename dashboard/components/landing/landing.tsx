@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Check, Copy } from "lucide-react";
+import { ArrowUpRight, Check, Copy, Github } from "lucide-react";
 import { forceLightTheme } from "@/lib/theme";
 import { Hero } from "./hero";
 import { Reveal } from "./reveal";
@@ -256,6 +256,33 @@ function InstallCard({ nearFooter }: { nearFooter: boolean }) {
   );
 }
 
+/* ---------- footer ---------- */
+
+function FooterColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+  return (
+    <div>
+      <div className="text-[12px] font-semibold uppercase tracking-wide text-[var(--lp-fg)]">{title}</div>
+      <ul className="mt-3 space-y-2.5">
+        {links.map((l) =>
+          l.href.startsWith("/") ? (
+            <li key={l.label}>
+              <Link href={l.href} className="text-[13px] text-[var(--lp-fg-3)] hover:text-[var(--lp-fg)]">
+                {l.label}
+              </Link>
+            </li>
+          ) : (
+            <li key={l.label}>
+              <a href={l.href} className="text-[13px] text-[var(--lp-fg-3)] hover:text-[var(--lp-fg)]">
+                {l.label}
+              </a>
+            </li>
+          )
+        )}
+      </ul>
+    </div>
+  );
+}
+
 /* ---------- page ---------- */
 
 export function Landing() {
@@ -379,31 +406,59 @@ export function Landing() {
         </Reveal>
 
         <footer ref={footerRef} className="border-t border-[var(--lp-line)] bg-[var(--lp-band)]">
-          <div className="mx-auto flex max-w-[1200px] flex-col gap-4 px-6 py-8 text-[13px] text-[var(--lp-fg-3)] sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element -- see header */}
-              <img src="/logo.png" alt="" width={18} height={18} />
-              <span>Tracyn · compliance infrastructure for AI agent teams</span>
+          <div className="mx-auto max-w-[1200px] px-6 py-14">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-5">
+              <div className="col-span-2 sm:col-span-1">
+                <div className="flex items-center gap-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- see header */}
+                  <img src="/logo.png" alt="" width={20} height={20} />
+                  <span className="text-[15px] font-semibold text-[var(--lp-fg)]">Tracyn</span>
+                </div>
+                <p className="mt-3 max-w-[200px] text-[13px] leading-relaxed text-[var(--lp-fg-3)]">
+                  Compliance infrastructure for AI agent teams.
+                </p>
+                <a
+                  href="https://github.com/AwaisSDev/Tracyn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub"
+                  className="mt-4 inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--lp-line)] text-[var(--lp-fg-3)] transition-colors hover:border-[var(--lp-fg)] hover:text-[var(--lp-fg)]"
+                >
+                  <Github className="h-4 w-4" />
+                </a>
+              </div>
+
+              <FooterColumn
+                title="Product"
+                links={[
+                  { label: "Docs", href: DOCS_URL },
+                  { label: "Get started", href: "/login" },
+                  { label: "Log in", href: "/login" },
+                ]}
+              />
+              <FooterColumn
+                title="Company"
+                links={[
+                  { label: "About", href: "/about" },
+                  { label: "Contact", href: "mailto:mawais9171@gmail.com" },
+                ]}
+              />
+              <FooterColumn
+                title="Legal"
+                links={[
+                  { label: "Privacy", href: "/privacy" },
+                  { label: "Terms", href: "/terms" },
+                ]}
+              />
+              <div>
+                <div className="text-[12px] font-semibold uppercase tracking-wide text-[var(--lp-fg)]">Stack</div>
+                <p className="mt-3 text-[13px] text-[var(--lp-fg-3)]">Coming soon</p>
+              </div>
             </div>
-            <div className="flex gap-5">
-              <Link href={DOCS_URL} className="hover:text-[var(--lp-fg)]">
-                Docs
-              </Link>
-              <Link href="/login" className="hover:text-[var(--lp-fg)]">
-                Log in
-              </Link>
-              <Link href="/about" className="hover:text-[var(--lp-fg)]">
-                About
-              </Link>
-              <Link href="/privacy" className="hover:text-[var(--lp-fg)]">
-                Privacy
-              </Link>
-              <Link href="/terms" className="hover:text-[var(--lp-fg)]">
-                Terms
-              </Link>
-              <a href="mailto:mawais9171@gmail.com" className="hover:text-[var(--lp-fg)]">
-                Contact
-              </a>
+
+            <div className="mt-12 flex flex-col gap-3 border-t border-[var(--lp-line)] pt-6 text-[13px] text-[var(--lp-fg-3)] sm:flex-row sm:items-center sm:justify-between">
+              <span>© {new Date().getFullYear()} Tracyn. All rights reserved.</span>
+              <span>Built by Awais Siddique</span>
             </div>
           </div>
         </footer>
