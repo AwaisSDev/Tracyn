@@ -30,8 +30,9 @@ export default function LoginPage() {
     try {
       if (mode === "signup") {
         // Deliberately not going through our own backend -- Supabase's own
-        // signUp() is what triggers its "Confirm signup" email (a 6-digit
-        // code, per the template configured in the Supabase dashboard).
+        // signUp() is what triggers its "Confirm signup" email (a numeric
+        // code -- 8 digits by default, confirmed live -- per the template
+        // configured in the Supabase dashboard).
         // The admin API (used here previously) creates the user just fine
         // but never sends that email at all -- confirmed live before
         // switching this over.
@@ -90,7 +91,7 @@ export default function LoginPage() {
             <img src="/logo.png" alt="" width={36} height={36} className="mb-3 rounded-md" />
             <h1 className="text-lg font-semibold tracking-tight">Check your email</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              We sent a 6-digit code to <span className="font-medium text-foreground">{email}</span>.
+              We sent a verification code to <span className="font-medium text-foreground">{email}</span>.
             </p>
           </div>
 
@@ -103,15 +104,20 @@ export default function LoginPage() {
                   inputMode="numeric"
                   required
                   autoFocus
-                  maxLength={6}
-                  placeholder="123456"
+                  // Supabase's own OTP length isn't a fixed 6 -- confirmed
+                  // live it sends 8 digits by default. Not hardcoding a
+                  // specific length here beyond "clearly not empty", so
+                  // this doesn't silently truncate/block a valid code
+                  // again if that length ever changes.
+                  maxLength={10}
+                  placeholder="Enter the code"
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
                   className="text-center text-lg tracking-[0.3em]"
                 />
               </div>
               {error && <p className="text-[13px] text-error">{error}</p>}
-              <Button type="submit" className="w-full !mt-4" disabled={loading || code.length !== 6}>
+              <Button type="submit" className="w-full !mt-4" disabled={loading || code.length < 6}>
                 {loading ? "Verifying..." : "Verify and continue"}
               </Button>
             </form>
@@ -140,7 +146,7 @@ export default function LoginPage() {
             {mode === "signin" ? "Log in to Tracyn" : "Create your Tracyn account"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "signin" ? "Welcome back." : "We'll email you a 6-digit code to confirm it's really you."}
+            {mode === "signin" ? "Welcome back." : "We'll email you a code to confirm it's really you."}
           </p>
         </div>
 
