@@ -3,11 +3,12 @@ proposal is never handed back unless it actually parses as a valid policy
 (services/policy_engine.py), and no API key / a transient failure /
 unparseable output all fail closed with proposed_yaml=None rather than
 crashing or returning something the dashboard would show as a ready-to-
-apply diff."""
+apply diff. Runs against Ollama Cloud's OpenAI-compatible endpoint, not
+Anthropic -- mocks httpx.AsyncClient accordingly."""
 
 import json
 from types import SimpleNamespace
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -18,7 +19,26 @@ CURRENT_YAML = "rules:\n  - match:\n      action_type: external\n    require_app
 
 
 def _settings(api_key: str) -> SimpleNamespace:
-    return SimpleNamespace(anthropic_api_key=api_key, anthropic_sonnet_model="claude-sonnet-4-6")
+    return SimpleNamespace(ollama_api_key=api_key, ollama_base_url="https://ollama.com/v1", ollama_model="gemma4:31b")
+
+
+def _mock_ollama_response(payload: dict) -> MagicMock:
+    """A fake httpx.Response for a successful Ollama Cloud chat completion."""
+    fake_response = MagicMock()
+    fake_response.raise_for_status = MagicMock()
+    fake_response.json.return_value = {"choices": [{"message": {"content": json.dumps(payload)}}]}
+    return fake_response
+
+
+def _patch_client(fake_response=None, side_effect=None):
+    mock_client = AsyncMock()
+    mock_client.__aenter__.return_value = mock_client
+    mock_client.__aexit__.return_value = False
+    if side_effect is not None:
+        mock_client.post = AsyncMock(side_effect=side_effect)
+    else:
+        mock_client.post = AsyncMock(return_value=fake_response)
+    return patch("app.services.policy_drafter.httpx.AsyncClient", return_value=mock_client)
 
 
 @pytest.mark.anyio
@@ -28,17 +48,14 @@ async def test_draft_policy_degrades_gracefully_with_no_api_key(monkeypatch):
     result = await draft_policy("require approval for refunds", CURRENT_YAML)
 
     assert result.proposed_yaml is None
-    assert "yaml" in result.explanation.lower()
+    assert "ollama" in result.explanation.lower()
 
 
 @pytest.mark.anyio
 async def test_draft_policy_degrades_gracefully_on_api_error(monkeypatch):
-    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-ant-fake"))
+    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-fake"))
 
-    with patch("app.services.policy_drafter.AsyncAnthropic") as mock_cls:
-        mock_client = mock_cls.return_value
-        mock_client.messages.create = AsyncMock(side_effect=RuntimeError("simulated Anthropic outage"))
-
+    with _patch_client(side_effect=RuntimeError("simulated Ollama outage")):
         result = await draft_policy("require approval for deletes", CURRENT_YAML)
 
     assert result.proposed_yaml is None
@@ -47,17 +64,14 @@ async def test_draft_policy_degrades_gracefully_on_api_error(monkeypatch):
 
 @pytest.mark.anyio
 async def test_draft_policy_applies_a_successful_valid_response(monkeypatch):
-    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-ant-fake"))
+    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-fake"))
 
     new_yaml = "rules:\n  - match:\n      action_name: delete_*\n    require_approval: true\n  - match:\n      action_type: external\n    require_approval: true\n"
-    payload = json.dumps({"proposed_yaml": new_yaml, "explanation": "Added a rule requiring approval for delete actions."})
-    fake_block = SimpleNamespace(type="text", text=payload)
-    fake_response = SimpleNamespace(content=[fake_block])
+    fake_response = _mock_ollama_response(
+        {"proposed_yaml": new_yaml, "explanation": "Added a rule requiring approval for delete actions."}
+    )
 
-    with patch("app.services.policy_drafter.AsyncAnthropic") as mock_cls:
-        mock_client = mock_cls.return_value
-        mock_client.messages.create = AsyncMock(return_value=fake_response)
-
+    with _patch_client(fake_response=fake_response):
         result = await draft_policy("also require approval for deletes", CURRENT_YAML)
 
     assert result.proposed_yaml == new_yaml
@@ -65,16 +79,30 @@ async def test_draft_policy_applies_a_successful_valid_response(monkeypatch):
 
 
 @pytest.mark.anyio
+async def test_draft_policy_sends_the_api_key_and_model_to_ollama(monkeypatch):
+    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-fake-key"))
+    fake_response = _mock_ollama_response({"proposed_yaml": None, "explanation": "no-op"})
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__.return_value = mock_client
+    mock_client.__aexit__.return_value = False
+    mock_client.post = AsyncMock(return_value=fake_response)
+
+    with patch("app.services.policy_drafter.httpx.AsyncClient", return_value=mock_client):
+        await draft_policy("do something", CURRENT_YAML)
+
+    args, kwargs = mock_client.post.call_args
+    assert args[0] == "https://ollama.com/v1/chat/completions"
+    assert kwargs["headers"]["Authorization"] == "Bearer sk-fake-key"
+    assert kwargs["json"]["model"] == "gemma4:31b"
+
+
+@pytest.mark.anyio
 async def test_draft_policy_rejects_a_response_claiming_yaml_that_doesnt_actually_parse(monkeypatch):
-    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-ant-fake"))
+    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-fake"))
+    fake_response = _mock_ollama_response({"proposed_yaml": "not: valid: policy: [[", "explanation": "Done."})
 
-    fake_block = SimpleNamespace(type="text", text='{"proposed_yaml": "not: valid: policy: [[", "explanation": "Done."}')
-    fake_response = SimpleNamespace(content=[fake_block])
-
-    with patch("app.services.policy_drafter.AsyncAnthropic") as mock_cls:
-        mock_client = mock_cls.return_value
-        mock_client.messages.create = AsyncMock(return_value=fake_response)
-
+    with _patch_client(fake_response=fake_response):
         result = await draft_policy("do something", CURRENT_YAML)
 
     assert result.proposed_yaml is None
@@ -83,18 +111,12 @@ async def test_draft_policy_rejects_a_response_claiming_yaml_that_doesnt_actuall
 
 @pytest.mark.anyio
 async def test_draft_policy_explains_when_the_instruction_cant_be_expressed(monkeypatch):
-    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-ant-fake"))
-
-    fake_block = SimpleNamespace(
-        type="text",
-        text='{"proposed_yaml": null, "explanation": "Refund amounts aren\'t something this policy engine can match on."}',
+    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-fake"))
+    fake_response = _mock_ollama_response(
+        {"proposed_yaml": None, "explanation": "Refund amounts aren't something this policy engine can match on."}
     )
-    fake_response = SimpleNamespace(content=[fake_block])
 
-    with patch("app.services.policy_drafter.AsyncAnthropic") as mock_cls:
-        mock_client = mock_cls.return_value
-        mock_client.messages.create = AsyncMock(return_value=fake_response)
-
+    with _patch_client(fake_response=fake_response):
         result = await draft_policy("require approval for refunds over $500", CURRENT_YAML)
 
     assert result.proposed_yaml is None
@@ -103,15 +125,12 @@ async def test_draft_policy_explains_when_the_instruction_cant_be_expressed(monk
 
 @pytest.mark.anyio
 async def test_draft_policy_degrades_gracefully_on_unparseable_response(monkeypatch):
-    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-ant-fake"))
+    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-fake"))
+    fake_response = MagicMock()
+    fake_response.raise_for_status = MagicMock()
+    fake_response.json.return_value = {"choices": [{"message": {"content": "not json at all"}}]}
 
-    fake_block = SimpleNamespace(type="text", text="not json at all")
-    fake_response = SimpleNamespace(content=[fake_block])
-
-    with patch("app.services.policy_drafter.AsyncAnthropic") as mock_cls:
-        mock_client = mock_cls.return_value
-        mock_client.messages.create = AsyncMock(return_value=fake_response)
-
+    with _patch_client(fake_response=fake_response):
         result = await draft_policy("do something", CURRENT_YAML)
 
     assert result.proposed_yaml is None

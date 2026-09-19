@@ -30,6 +30,17 @@ class Settings(BaseSettings):
     anthropic_sonnet_model: str = "claude-sonnet-4-6"
     anthropic_haiku_model: str = "claude-haiku-4-5-20251001"
 
+    # Ollama Cloud -- powers the plain-English policy drafter specifically
+    # (services/policy_drafter.py), kept separate from the Anthropic key
+    # above which backs everything else (redaction, evidence drafting).
+    # This is a backend setting: it belongs in this service's own env
+    # (Hugging Face Space secrets, or backend/.env locally), NOT in
+    # Vercel -- the dashboard never calls an LLM directly, only this
+    # backend does, so a key set in Vercel would never be read.
+    ollama_api_key: str = ""
+    ollama_base_url: str = "https://ollama.com/v1"
+    ollama_model: str = "gemma4:31b"
+
     # Slack
     slack_bot_token: str = ""
     slack_signing_secret: str = ""
