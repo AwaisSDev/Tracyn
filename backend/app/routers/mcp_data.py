@@ -12,7 +12,7 @@ from app.db import get_db, run_db
 from app.models.schemas import ApprovalDecision
 from app.security import WorkspaceKeyAuth, get_api_key_auth
 from app.services.approvals_service import ApprovalAlreadyDecidedError, apply_decision
-from app.services.claude_client import draft_answer
+from app.services.evidence_drafter import draft_answer
 
 router = APIRouter(prefix="/v1/mcp", tags=["mcp"])
 

@@ -3,7 +3,7 @@ import re
 from datetime import datetime, timezone
 
 from app.db import get_db, run_db as _db
-from app.services.claude_client import draft_answer
+from app.services.evidence_drafter import draft_answer
 from app.services.classification import redact_with_llm
 from app.services.email_client import send_timeout_notice
 from app.services.questionnaire_parser import parse_questionnaire

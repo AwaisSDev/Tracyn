@@ -10,7 +10,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from app.services.claude_client import DraftedAnswer
+from app.services.evidence_drafter import DraftedAnswer
 from app.worker.tasks import (
     GENESIS_HASH,
     _get_or_create_agent,

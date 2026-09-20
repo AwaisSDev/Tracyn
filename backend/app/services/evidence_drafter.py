@@ -1,12 +1,16 @@
-"""F4 — drafts questionnaire answers with Claude Sonnet, grounded in the
-workspace's actual logged events. The model is only ever shown *already
-redacted* event data and is explicitly told to cite by event id — answers
-are drafts a human reviews and edits before anything is exported (see
-routers/questionnaires.py; nothing here ever auto-submits anywhere)."""
+"""F4 -- drafts questionnaire answers, grounded in the workspace's actual
+logged events. The model is only ever shown *already redacted* event data
+and is explicitly told to cite by event id -- answers are drafts a human
+reviews and edits before anything is exported (see routers/questionnaires.py;
+nothing here ever auto-submits anywhere).
+
+Runs on Ollama Cloud (OpenAI-compatible /v1/chat/completions), same as
+policy_drafter.py -- this workspace only pays for one LLM provider, not two.
+"""
 
 import json
 
-from anthropic import AsyncAnthropic
+import httpx
 from pydantic import BaseModel
 
 from app.config import get_settings
@@ -25,7 +29,8 @@ the human reviewer should add.
 - Cite evidence by event id, using the exact ids given — never invent an id.
 - Keep answers to 2-4 sentences; questionnaires are read by busy security reviewers.
 
-Reply with ONLY a JSON object: {"answer": "...", "cited_event_ids": ["...", ...]}"""
+Reply with ONLY a JSON object, no other text, no markdown fences: \
+{"answer": "...", "cited_event_ids": ["...", ...]}"""
 
 
 class DraftedAnswer(BaseModel):
@@ -36,7 +41,7 @@ class DraftedAnswer(BaseModel):
 async def draft_answer(question: str, candidate_events: list[dict]) -> DraftedAnswer:
     settings = get_settings()
 
-    if not settings.anthropic_api_key:
+    if not settings.ollama_api_key:
         # Documented as an optional, gracefully-degrading feature (see
         # config.py / backend/README.md) — without a key, still parse the
         # file and match evidence, just skip the drafted wording rather than
@@ -44,7 +49,7 @@ async def draft_answer(question: str, candidate_events: list[dict]) -> DraftedAn
         # wraps every question in one try/except, so one hard failure here
         # used to abort every other question in the file too).
         return DraftedAnswer(
-            answer="Draft generation is unavailable (no Anthropic API key configured) — please write this answer manually.",
+            answer="Draft generation is unavailable (no Ollama API key configured) — please write this answer manually.",
             cited_event_ids=[],
         )
 
@@ -62,29 +67,36 @@ async def draft_answer(question: str, candidate_events: list[dict]) -> DraftedAn
     user_content = json.dumps({"question": question, "candidate_events": events_for_prompt})
 
     try:
-        client = AsyncAnthropic(api_key=settings.anthropic_api_key, timeout=30.0)
-        response = await client.messages.create(
-            model=settings.anthropic_sonnet_model,
-            max_tokens=1024,
-            system=_SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_content}],
-        )
-        text = "".join(block.text for block in response.content if block.type == "text").strip()
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                f"{settings.ollama_base_url}/chat/completions",
+                headers={"Authorization": f"Bearer {settings.ollama_api_key}"},
+                json={
+                    "model": settings.ollama_model,
+                    "messages": [
+                        {"role": "system", "content": _SYSTEM_PROMPT},
+                        {"role": "user", "content": user_content},
+                    ],
+                    "temperature": 0.2,
+                },
+            )
+            response.raise_for_status()
+        text = response.json()["choices"][0]["message"]["content"].strip()
         if text.startswith("```"):
             text = text.strip("`").removeprefix("json").strip()
         parsed = json.loads(text)
         valid_ids = {e["id"] for e in candidate_events}
         cited = [eid for eid in parsed.get("cited_event_ids", []) if eid in valid_ids]
         return DraftedAnswer(answer=parsed["answer"], cited_event_ids=cited)
-    except (json.JSONDecodeError, KeyError):
+    except (json.JSONDecodeError, KeyError, IndexError):
         return DraftedAnswer(
             answer="Draft generation failed to parse — please write this answer manually.",
             cited_event_ids=[],
         )
     except Exception:
         # Same "fail closed, keep going" contract as classification.py's
-        # redact_with_llm: a transient Anthropic outage or timeout for one
-        # question must not take the rest of the questionnaire down with it.
+        # redact_with_llm: a transient outage or timeout for one question
+        # must not take the rest of the questionnaire down with it.
         return DraftedAnswer(
             answer="Draft generation failed (a temporary error) — please write this answer manually.",
             cited_event_ids=[],

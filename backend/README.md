@@ -39,7 +39,8 @@ Optional, each feature degrades gracefully without it:
 
 | Name | Enables |
 | --- | --- |
-| `ANTHROPIC_API_KEY` | second-pass PII redaction and evidence-pack drafting |
+| `ANTHROPIC_API_KEY` | second-pass PII redaction |
+| `OLLAMA_API_KEY` | plain-English policy editing and evidence-pack drafting (Ollama Cloud) |
 | `SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET` | approvals in Slack (otherwise email) |
 | `RESEND_API_KEY`, `EMAIL_FROM` | email approvals |
 | `WHOP_*` | billing |

@@ -11,11 +11,13 @@ not expressible here, and silently inventing a `match` field the engine
 never checks would produce a rule that looks right and does nothing --
 worse than refusing. The prompt below tells the model to say so instead.
 
-Runs on Ollama Cloud (OpenAI-compatible /v1/chat/completions), not
-Anthropic -- deliberately separate from claude_client.py, which still
-backs redaction and evidence-pack drafting. This is a backend setting
-(app/config.py's ollama_* fields): the key belongs on this service, not
-on the dashboard/Vercel side, which never calls an LLM directly.
+Runs on Ollama Cloud (OpenAI-compatible /v1/chat/completions), same
+provider as evidence_drafter.py (both features share one LLM key now --
+only classification.py's per-event PII redaction pass still runs on
+Anthropic Haiku, unrelated to either drafting feature). This is a backend
+setting (app/config.py's ollama_* fields): the key belongs on this
+service, not on the dashboard/Vercel side, which never calls an LLM
+directly.
 """
 
 import json
@@ -119,7 +121,7 @@ async def draft_policy(instruction: str, current_yaml: str) -> PolicyDraft:
     except (json.JSONDecodeError, KeyError, IndexError):
         return PolicyDraft(proposed_yaml=None, explanation="Draft generation failed to parse -- please edit the YAML directly.")
     except Exception:
-        # Same "fail closed" contract as claude_client.draft_answer -- a
+        # Same "fail closed" contract as evidence_drafter.draft_answer -- a
         # transient provider outage must surface as "try again", not a 500.
         return PolicyDraft(proposed_yaml=None, explanation="Draft generation failed (a temporary error) -- please try again.")
 
