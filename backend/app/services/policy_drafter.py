@@ -69,6 +69,19 @@ broader one in the list.
 "data_access", but any string is allowed). `action_name` is a free-text action label \
 (e.g. "send_email", "delete_user", "send_refund").
 
+Exact names vs. vague descriptions -- these are handled differently:
+- If the instruction directly names a specific action_type/action_name (e.g. "require approval \
+for prescribe_medication", "block delete_patient_record"), use that value EXACTLY as given, even \
+if it does not appear anywhere in the logged actions below. A policy governs actions before they \
+happen -- a brand-new customer who has never logged a single event yet still needs to be able to \
+write a rule for an action they know their own agent will take. Do not refuse or demand \
+"grounding" for a name the user already typed literally.
+- Only the grounding/matching process below applies to a VAGUE, non-exact description ("money \
+related stuff", "anything like a background check") that contains no literal action identifier \
+of its own -- there, you have nothing concrete to build a rule from except the workspace's real \
+logged actions, so matching against that list is the only way to avoid inventing a match field \
+that doesn't correspond to anything real.
+
 Matching a vague description to real actions:
 - You will be given a list of the action_type/action_name pairs this workspace has actually \
 logged. Match the instruction's plain-English description against that list by REAL-WORLD \
