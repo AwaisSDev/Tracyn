@@ -11,6 +11,12 @@ not expressible here, and silently inventing a `match` field the engine
 never checks would produce a rule that looks right and does nothing --
 worse than refusing. The prompt below tells the model to say so instead.
 
+Callers should pass `known_actions` -- the workspace's actually-logged
+action_type/action_name pairs (see routers/policies.py) -- so a vague,
+non-technical description ("money related stuff") can be matched against
+real action names by meaning, instead of the model asking the user for an
+exact identifier they have no way of knowing.
+
 Runs on Ollama Cloud (OpenAI-compatible /v1/chat/completions), same
 provider as evidence_drafter.py (both features share one LLM key now --
 only classification.py's per-event PII redaction pass still runs on
@@ -28,11 +34,19 @@ from pydantic import BaseModel
 from app.config import get_settings
 from app.services.policy_engine import PolicyParseError, parse_policy
 
-_SYSTEM_PROMPT = """You edit Tracyn policy YAML from a plain-English instruction. \
-Tracyn lets an AI agent's actions run automatically or blocks on a human approval, \
-decided by this policy. A policy mistake either lets a risky action run unattended or \
-blocks a harmless one -- getting this wrong is a real security/operational issue, not a \
-cosmetic one, so be conservative rather than clever.
+_SYSTEM_PROMPT = """You edit Tracyn policy YAML from a plain-English instruction. Most people \
+writing these instructions are NOT engineers and have no idea what their own agent's internal \
+action_type/action_name strings are -- they describe things the way a human would ("money \
+related stuff", "anything that emails a customer"), not by exact identifier. Your job is to map \
+that description onto the workspace's REAL, already-logged actions (given to you below) rather \
+than asking the user for identifiers they don't have.
+
+Tracyn lets an AI agent's actions run automatically or blocks on a human approval, decided by \
+this policy. A policy mistake either lets a risky action run unattended or blocks a harmless \
+one -- getting this wrong is a real security/operational issue, not a cosmetic one, so be \
+conservative rather than clever about WHICH DIRECTION a rule goes (require_approval true/false). \
+But be generous and helpful about WHICH ACTIONS a vague description should match -- that part is \
+what makes this feature usable by non-technical people at all.
 
 The exact schema (nothing else is valid):
 
@@ -46,7 +60,7 @@ Rules:
 field -- the engine never looks at an event's inputs/output/cost/amount/customer/etc., only \
 these two strings. If the instruction needs anything else (an amount, a customer name, \
 content of the request), it CANNOT be expressed here.
-- Pattern values support `*` glob wildcards (fnmatch), e.g. "delete_*".
+- Pattern values support `*` glob wildcards (fnmatch), e.g. "delete_*" or "*refund*".
 - Rules are evaluated top to bottom; the FIRST matching rule wins and the rest are never \
 checked. An event that matches no rule runs automatically (no approval). When adding a rule \
 that should override a broader existing one, place the more specific rule BEFORE the \
@@ -54,6 +68,22 @@ broader one in the list.
 - `action_type` is whatever the SDK caller labels it (commonly "internal", "external", or \
 "data_access", but any string is allowed). `action_name` is a free-text action label \
 (e.g. "send_email", "delete_user", "send_refund").
+
+Matching a vague description to real actions:
+- You will be given a list of the action_type/action_name pairs this workspace has actually \
+logged. Match the instruction's plain-English description against that list by MEANING, not \
+literal words -- "money related stuff" should match things like "send_refund", \
+"process_payment", or "charge_card" if those appear in the list, even though none of those \
+strings contain the word "money".
+- If one or more logged actions plausibly fit the description, propose rules for all of them \
+(a glob covering several similarly-named actions is fine, e.g. "*refund*", if that's a tighter \
+fit than listing each one) and say in `explanation` which actions you matched, so the user can \
+correct you if you picked the wrong ones.
+- If NOTHING in the given list plausibly fits, do NOT ask the user for "the exact action name" \
+-- they don't know it either, that's the entire reason they're using plain English. Instead set \
+proposed_yaml to null and, in `explanation`, list the actual action names/types this workspace \
+has logged so far, so they have something concrete to pick from or rephrase against. If the \
+list is empty, say plainly that no actions have been logged in this workspace yet.
 
 Strictness rules -- follow these even when they make the answer more conservative than a \
 literal reading of the instruction:
@@ -64,21 +94,24 @@ approval" explicitly.
 a rule that currently requires approval, unless the instruction explicitly and \
 unambiguously asks to let that specific action run automatically. "Make things easier" or \
 "reduce approvals" or similar vague loosening requests are NOT explicit enough -- refuse \
-(set proposed_yaml to null) and explain that you need the exact action to loosen, rather \
-than guessing which approval requirement to remove.
+(set proposed_yaml to null) and explain that you need to know specifically which action to \
+loosen, rather than guessing which approval requirement to remove. (This is about DIRECTION, \
+not about which actions match -- keep matching actions by meaning as above.)
 3. If an instruction could plausibly be read as either tightening or loosening a rule, \
-treat it as not expressible (null) and ask for the specific action_type/action_name and \
-direction, rather than picking the more permissive interpretation.
+treat it as not expressible (null) and ask which direction is intended, rather than picking \
+the more permissive interpretation.
 
-You will be given the workspace's current policy YAML and an instruction. Reply with ONLY \
-a JSON object, no other text, no markdown fences:
+You will be given the workspace's current policy YAML, the workspace's actually-logged \
+action_type/action_name pairs, and an instruction. Reply with ONLY a JSON object, no other \
+text, no markdown fences:
 
     {"proposed_yaml": "<full new rules_yaml>" or null, "explanation": "<one or two sentences>"}
 
-Set `proposed_yaml` to null (with `explanation` saying why, in plain English) when the \
-instruction can't be expressed with only action_type/action_name matching, or when strictness \
-rule 2 or 3 applies. Otherwise `proposed_yaml` must be the COMPLETE new policy (not a \
-diff/fragment) -- carry over every existing rule the instruction doesn't ask to change."""
+Set `proposed_yaml` to null (with `explanation` saying why, in plain English -- and, per above, \
+listing real logged actions when nothing matched) when the instruction can't be expressed with \
+only action_type/action_name matching, or when strictness rule 2 or 3 applies. Otherwise \
+`proposed_yaml` must be the COMPLETE new policy (not a diff/fragment) -- carry over every \
+existing rule the instruction doesn't ask to change."""
 
 
 class PolicyDraft(BaseModel):
@@ -86,7 +119,7 @@ class PolicyDraft(BaseModel):
     explanation: str
 
 
-async def draft_policy(instruction: str, current_yaml: str) -> PolicyDraft:
+async def draft_policy(instruction: str, current_yaml: str, known_actions: list[dict] | None = None) -> PolicyDraft:
     settings = get_settings()
 
     if not settings.ollama_api_key:
@@ -95,7 +128,13 @@ async def draft_policy(instruction: str, current_yaml: str) -> PolicyDraft:
             explanation="Plain-English policy editing is unavailable (no Ollama API key configured) -- edit the YAML directly below.",
         )
 
-    user_content = json.dumps({"current_policy_yaml": current_yaml, "instruction": instruction})
+    user_content = json.dumps(
+        {
+            "current_policy_yaml": current_yaml,
+            "logged_actions": known_actions or [],
+            "instruction": instruction,
+        }
+    )
 
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:

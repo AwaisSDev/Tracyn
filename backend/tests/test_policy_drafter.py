@@ -98,6 +98,41 @@ async def test_draft_policy_sends_the_api_key_and_model_to_ollama(monkeypatch):
 
 
 @pytest.mark.anyio
+async def test_draft_policy_sends_known_actions_so_vague_descriptions_can_be_matched(monkeypatch):
+    # The whole point of known_actions: a non-technical instruction like
+    # "money related stuff" has no exact action name in it at all -- the
+    # model can only map it to something real if the workspace's actually-
+    # logged actions are in the request.
+    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-fake"))
+    fake_response = _mock_ollama_response({"proposed_yaml": None, "explanation": "no-op"})
+    known_actions = [{"action_type": "external", "action_name": "send_refund"}]
+
+    mock_client = AsyncMock()
+    mock_client.__aenter__.return_value = mock_client
+    mock_client.__aexit__.return_value = False
+    mock_client.post = AsyncMock(return_value=fake_response)
+
+    with patch("app.services.policy_drafter.httpx.AsyncClient", return_value=mock_client):
+        await draft_policy("any money related stuff should need approval", CURRENT_YAML, known_actions)
+
+    sent_user_message = mock_client.post.call_args.kwargs["json"]["messages"][1]["content"]
+    assert "send_refund" in sent_user_message
+
+
+@pytest.mark.anyio
+async def test_draft_policy_defaults_to_no_known_actions_when_omitted(monkeypatch):
+    # Callers that don't pass known_actions (or an empty workspace) must
+    # still produce a valid request rather than crashing on a None.
+    monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-fake"))
+    fake_response = _mock_ollama_response({"proposed_yaml": None, "explanation": "no-op"})
+
+    with _patch_client(fake_response=fake_response):
+        result = await draft_policy("do something", CURRENT_YAML)
+
+    assert result.explanation == "no-op"
+
+
+@pytest.mark.anyio
 async def test_draft_policy_rejects_a_response_claiming_yaml_that_doesnt_actually_parse(monkeypatch):
     monkeypatch.setattr(policy_drafter, "get_settings", lambda: _settings("sk-fake"))
     fake_response = _mock_ollama_response({"proposed_yaml": "not: valid: policy: [[", "explanation": "Done."})

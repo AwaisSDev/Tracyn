@@ -82,5 +82,37 @@ async def draft_policy_from_instruction(
     workspace_id: str, body: PolicyDraftIn, user: CurrentUser = Depends(require_workspace_member)
 ) -> PolicyDraftOut:
     current = await get_policy(workspace_id, user)
-    draft = await draft_policy(body.instruction, current["rules_yaml"])
+    known_actions = await _recent_known_actions(workspace_id)
+    draft = await draft_policy(body.instruction, current["rules_yaml"], known_actions)
     return PolicyDraftOut(proposed_yaml=draft.proposed_yaml, explanation=draft.explanation)
+
+
+async def _recent_known_actions(workspace_id: str) -> list[dict]:
+    """The distinct action_type/action_name pairs this workspace has
+    actually logged, so the drafter can match a vague, non-technical
+    instruction ("money related stuff") to real action names instead of
+    demanding an exact identifier the user has no way of knowing.
+
+    PostgREST has no native DISTINCT, so this samples the most recent 200
+    events and dedupes in Python -- the same "recent sample, not a full
+    table scan" tradeoff evidence drafting already makes for candidate
+    events (see routers/mcp_data.py)."""
+    db = get_db()
+    rows = (
+        await run_db(
+            lambda: db.table("events")
+            .select("action_type, action_name")
+            .eq("workspace_id", workspace_id)
+            .order("created_at", desc=True)
+            .limit(200)
+            .execute()
+        )
+    ).data
+    seen = set()
+    deduped = []
+    for row in rows:
+        key = (row["action_type"], row["action_name"])
+        if key not in seen:
+            seen.add(key)
+            deduped.append({"action_type": row["action_type"], "action_name": row["action_name"]})
+    return deduped

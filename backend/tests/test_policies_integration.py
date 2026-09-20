@@ -38,6 +38,9 @@ class _FakeQuery:
         self.limit_n = n
         return self
 
+    def order(self, *_a, **_kw):
+        return self
+
     def execute(self):
         rows = self.table.rows
 
@@ -159,7 +162,7 @@ def test_sdk_policy_endpoint_requires_an_api_key(fake_db):
 def test_draft_policy_endpoint_returns_the_drafter_result(client, monkeypatch):
     from app.services.policy_drafter import PolicyDraft
 
-    async def _fake_draft(instruction, current_yaml):
+    async def _fake_draft(instruction, current_yaml, known_actions=None):
         assert instruction == "require approval for deletes"
         assert current_yaml == DEFAULT_POLICY_YAML  # no policy stored yet -> falls back to default
         return PolicyDraft(proposed_yaml="rules: []\n", explanation="did the thing")
@@ -182,3 +185,34 @@ def test_draft_policy_endpoint_never_writes_to_the_stored_policy(client, fake_db
     # default row on first read -- that's the only row draft should cause.
     assert len(fake_db._tables["policies"]) == 1
     assert fake_db._tables["policies"][next(iter(fake_db._tables["policies"]))]["rules_yaml"] == DEFAULT_POLICY_YAML
+
+
+def test_draft_policy_endpoint_passes_deduped_logged_actions_to_the_drafter(client, fake_db, monkeypatch):
+    from app.services.policy_drafter import PolicyDraft
+
+    # Same action_type/action_name pair logged twice -- a vague instruction
+    # like "money related stuff" needs the real, deduped action list to
+    # match against, not raw event rows.
+    fake_db._tables["events"] = {
+        "e1": {"workspace_id": WORKSPACE_ID, "action_type": "external", "action_name": "send_refund", "created_at": "2026-01-02T00:00:00Z"},
+        "e2": {"workspace_id": WORKSPACE_ID, "action_type": "external", "action_name": "send_refund", "created_at": "2026-01-01T00:00:00Z"},
+        "e3": {"workspace_id": WORKSPACE_ID, "action_type": "internal", "action_name": "summarize_ticket", "created_at": "2026-01-01T00:00:00Z"},
+    }
+
+    captured = {}
+
+    async def _fake_draft(instruction, current_yaml, known_actions=None):
+        captured["known_actions"] = known_actions
+        return PolicyDraft(proposed_yaml=None, explanation="x")
+
+    monkeypatch.setattr("app.routers.policies.draft_policy", _fake_draft)
+
+    client.post(f"/v1/workspaces/{WORKSPACE_ID}/policy/draft", json={"instruction": "money related stuff"})
+
+    assert sorted(captured["known_actions"], key=str) == sorted(
+        [
+            {"action_type": "external", "action_name": "send_refund"},
+            {"action_type": "internal", "action_name": "summarize_ticket"},
+        ],
+        key=str,
+    )
