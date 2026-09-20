@@ -83,7 +83,8 @@ async def draft_policy_from_instruction(
 ) -> PolicyDraftOut:
     current = await get_policy(workspace_id, user)
     known_actions = await _recent_known_actions(workspace_id)
-    draft = await draft_policy(body.instruction, current["rules_yaml"], known_actions)
+    base_yaml = body.base_yaml or current["rules_yaml"]
+    draft = await draft_policy(body.instruction, base_yaml, known_actions, body.previous_explanation)
     return PolicyDraftOut(proposed_yaml=draft.proposed_yaml, explanation=draft.explanation)
 
 

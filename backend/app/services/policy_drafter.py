@@ -17,6 +17,13 @@ non-technical description ("money related stuff") can be matched against
 real action names by meaning, instead of the model asking the user for an
 exact identifier they have no way of knowing.
 
+This is meant to be used as a chat, not a one-shot form: the dashboard's
+policy page keeps sending each unapplied proposal back as the next
+`current_yaml` (via routers/policies.py's `base_yaml`) and the last
+`explanation` as `previous_explanation`, so "no, only the refund one" reads
+as a correction of what was just proposed rather than a fresh request
+starting over from the real saved policy.
+
 Runs on Ollama Cloud (OpenAI-compatible /v1/chat/completions), same
 provider as evidence_drafter.py (both features share one LLM key now --
 only classification.py's per-event PII redaction pass still runs on
@@ -128,9 +135,19 @@ not about which actions match -- keep matching actions by meaning as above.)
 treat it as not expressible (null) and ask which direction is intended, rather than picking \
 the more permissive interpretation.
 
-You will be given the workspace's current policy YAML, the workspace's actually-logged \
-action_type/action_name pairs, and an instruction. Reply with ONLY a JSON object, no other \
-text, no markdown fences:
+This is a back-and-forth chat: the user may send a follow-up nudge ("no, only refunds over $50" \
+-- well, only the action, amounts still can't be matched; or "don't include the card one", or \
+"yes also add X") reacting to what you JUST proposed, not a fresh unrelated request. When you're \
+given your own previous explanation from the last turn, read the new instruction as a correction \
+or extension of that -- e.g. if you last proposed a rule for "send_refund" and "charge_card" and \
+the user says "don't include the card one", remove the charge_card rule from current_policy_yaml \
+(which already reflects your last proposal) and keep the rest. If the new instruction is clearly \
+a brand new, unrelated request, treat it as such instead of forcing a connection.
+
+You will be given the workspace's current policy YAML (which already reflects any earlier \
+unapplied proposal in this chat, if there was one), the workspace's actually-logged \
+action_type/action_name pairs, your own previous explanation if this is a follow-up, and the \
+new instruction. Reply with ONLY a JSON object, no other text, no markdown fences:
 
     {"proposed_yaml": "<full new rules_yaml>" or null, "explanation": "<one or two sentences>"}
 
@@ -146,7 +163,12 @@ class PolicyDraft(BaseModel):
     explanation: str
 
 
-async def draft_policy(instruction: str, current_yaml: str, known_actions: list[dict] | None = None) -> PolicyDraft:
+async def draft_policy(
+    instruction: str,
+    current_yaml: str,
+    known_actions: list[dict] | None = None,
+    previous_explanation: str | None = None,
+) -> PolicyDraft:
     settings = get_settings()
 
     if not settings.ollama_api_key:
@@ -159,6 +181,7 @@ async def draft_policy(instruction: str, current_yaml: str, known_actions: list[
         {
             "current_policy_yaml": current_yaml,
             "logged_actions": known_actions or [],
+            "your_previous_explanation": previous_explanation,
             "instruction": instruction,
         }
     )

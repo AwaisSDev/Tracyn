@@ -162,7 +162,7 @@ def test_sdk_policy_endpoint_requires_an_api_key(fake_db):
 def test_draft_policy_endpoint_returns_the_drafter_result(client, monkeypatch):
     from app.services.policy_drafter import PolicyDraft
 
-    async def _fake_draft(instruction, current_yaml, known_actions=None):
+    async def _fake_draft(instruction, current_yaml, known_actions=None, previous_explanation=None):
         assert instruction == "require approval for deletes"
         assert current_yaml == DEFAULT_POLICY_YAML  # no policy stored yet -> falls back to default
         return PolicyDraft(proposed_yaml="rules: []\n", explanation="did the thing")
@@ -187,6 +187,36 @@ def test_draft_policy_endpoint_never_writes_to_the_stored_policy(client, fake_db
     assert fake_db._tables["policies"][next(iter(fake_db._tables["policies"]))]["rules_yaml"] == DEFAULT_POLICY_YAML
 
 
+def test_draft_policy_endpoint_uses_base_yaml_as_a_follow_up_nudge(client, monkeypatch):
+    # The policy chat: a follow-up like "no, don't include the card one"
+    # must build on the PREVIOUS unapplied proposal, not the real saved
+    # policy -- otherwise every nudge silently forgets what was just
+    # proposed.
+    from app.services.policy_drafter import PolicyDraft
+
+    captured = {}
+    pending_draft_yaml = "rules:\n  - match:\n      action_name: \"*refund*\"\n    require_approval: true\n"
+
+    async def _fake_draft(instruction, current_yaml, known_actions=None, previous_explanation=None):
+        captured["current_yaml"] = current_yaml
+        captured["previous_explanation"] = previous_explanation
+        return PolicyDraft(proposed_yaml=None, explanation="x")
+
+    monkeypatch.setattr("app.routers.policies.draft_policy", _fake_draft)
+
+    client.post(
+        f"/v1/workspaces/{WORKSPACE_ID}/policy/draft",
+        json={
+            "instruction": "actually don't include the card one",
+            "base_yaml": pending_draft_yaml,
+            "previous_explanation": "Matched send_refund and charge_card.",
+        },
+    )
+
+    assert captured["current_yaml"] == pending_draft_yaml  # not DEFAULT_POLICY_YAML
+    assert captured["previous_explanation"] == "Matched send_refund and charge_card."
+
+
 def test_draft_policy_endpoint_passes_deduped_logged_actions_to_the_drafter(client, fake_db, monkeypatch):
     from app.services.policy_drafter import PolicyDraft
 
@@ -201,7 +231,7 @@ def test_draft_policy_endpoint_passes_deduped_logged_actions_to_the_drafter(clie
 
     captured = {}
 
-    async def _fake_draft(instruction, current_yaml, known_actions=None):
+    async def _fake_draft(instruction, current_yaml, known_actions=None, previous_explanation=None):
         captured["known_actions"] = known_actions
         return PolicyDraft(proposed_yaml=None, explanation="x")
 

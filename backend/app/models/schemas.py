@@ -89,6 +89,13 @@ class PolicyOut(BaseModel):
 
 class PolicyDraftIn(BaseModel):
     instruction: str
+    # Set by the dashboard's policy chat when this is a follow-up nudge
+    # ("no, only refunds") on a draft the user hasn't applied yet -- lets
+    # each turn build on the previous unapplied proposal instead of
+    # re-starting from the saved policy every time. None on the first
+    # message of a chat, which falls back to the real saved policy.
+    base_yaml: str | None = None
+    previous_explanation: str | None = None
 
 
 class PolicyDraftOut(BaseModel):
