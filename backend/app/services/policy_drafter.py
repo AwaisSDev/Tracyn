@@ -71,19 +71,33 @@ broader one in the list.
 
 Matching a vague description to real actions:
 - You will be given a list of the action_type/action_name pairs this workspace has actually \
-logged. Match the instruction's plain-English description against that list by MEANING, not \
-literal words -- "money related stuff" should match things like "send_refund", \
-"process_payment", or "charge_card" if those appear in the list, even though none of those \
-strings contain the word "money".
-- If one or more logged actions plausibly fit the description, propose rules for all of them \
-(a glob covering several similarly-named actions is fine, e.g. "*refund*", if that's a tighter \
-fit than listing each one) and say in `explanation` which actions you matched, so the user can \
-correct you if you picked the wrong ones.
-- If NOTHING in the given list plausibly fits, do NOT ask the user for "the exact action name" \
--- they don't know it either, that's the entire reason they're using plain English. Instead set \
+logged. Match the instruction's plain-English description against that list by REAL-WORLD \
+MEANING -- "money related stuff" should match things like "send_refund", "process_payment", or \
+"charge_card" if those appear in the list, even though none of those strings contain the word \
+"money".
+- Matching by meaning is NOT the same as matching by a shared word or substring. A generic word \
+appearing in both the instruction and an action name (e.g. "check") is a coincidence, not \
+evidence they're the same thing -- "check_system_health", "connectivity_check", and \
+"check_order_status" all contain "check" but are unrelated system/infra health probes, not \
+whatever a "human background check" or "bp check" instruction is describing. Before including an \
+action, ask yourself: is this action ACTUALLY the real-world thing the instruction describes, or \
+does it merely share a word with it? Only include it if the former.
+- Never build a rule from a bare generic-word glob (e.g. `"*check*"`, `"*send*"`, `"*update*"`) \
+just because that word appears in the instruction -- these match far more than intended and \
+silently pull in unrelated actions the user never meant to affect. Match on the SPECIFIC shared \
+concept instead (`"*refund*"` for refund-related actions is fine because "refund" itself is the \
+specific concept, not a generic verb).
+- If one or more logged actions truly fit the description, propose rules for exactly those \
+(a glob is fine when it precisely covers a set of same-concept action names, e.g. "*refund*" \
+across "send_refund"/"process_refund") and say in `explanation` which actions you matched, so \
+the user can correct you if you picked the wrong ones.
+- If NOTHING in the given list truly fits, do NOT ask the user for "the exact action name" -- \
+they don't know it either, that's the entire reason they're using plain English. Instead set \
 proposed_yaml to null and, in `explanation`, list the actual action names/types this workspace \
 has logged so far, so they have something concrete to pick from or rephrase against. If the \
-list is empty, say plainly that no actions have been logged in this workspace yet.
+list is empty, say plainly that no actions have been logged in this workspace yet. This is the \
+correct answer for a description that resembles a real logged action only by a shared generic \
+word -- refusing and showing the real list beats silently overmatching.
 
 Strictness rules -- follow these even when they make the answer more conservative than a \
 literal reading of the instruction:
