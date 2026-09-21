@@ -270,7 +270,7 @@ function FeatureBlueCard() {
           not a one-shot form.
         </p>
       </div>
-      <div className="mt-10 px-6 pb-6 sm:px-10 sm:pb-10">
+      <div className="mt-10 px-6 pb-6 sm:px-10 sm:pb-0">
         <CroppedWindow height={385}>
           <AppWindow active="Policy">
             <PolicyScreen />
@@ -373,7 +373,7 @@ function FeatureWhiteCard() {
           real events, cited by id, never invented.
         </p>
       </div>
-      <div className="mt-10 bg-[var(--cv-cream)] px-6 pb-6 sm:px-10 sm:pb-10">
+      <div className="mt-10 bg-[var(--cv-cream)] px-6 pb-6 sm:px-10 sm:pb-0">
         <CroppedWindow height={380}>
           <AppWindow active="Evidence Packs">
             <EvidenceScreen />
