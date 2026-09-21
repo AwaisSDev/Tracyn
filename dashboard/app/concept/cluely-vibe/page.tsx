@@ -144,7 +144,7 @@ function Hero() {
         </div>
       </div>
 
-      <div className="relative mx-auto mt-16 max-w-6xl rounded-[32px] bg-white/50 p-4 shadow-[0_1px_1px_rgba(26,29,43,0.04)] backdrop-blur-sm sm:p-6">
+      <div className="relative mx-auto mt-16 max-w-6xl rounded-[24px] bg-white/50 p-4 shadow-[0_1px_1px_rgba(26,29,43,0.04)] backdrop-blur-sm sm:p-6">
         <CroppedWindow height={400} fadeTo="#fdfdfe">
           <AppWindow active="Timeline">
             <TimelineScreen />
@@ -163,7 +163,7 @@ function Hero() {
 // like it's dissolving into its own background, not a mismatched box.
 function CroppedWindow({ height, fadeTo, children }: { height: number; fadeTo: string; children: React.ReactNode }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl" style={{ height }}>
+    <div className="relative overflow-hidden rounded-[18px]" style={{ height }}>
       {children}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
@@ -180,7 +180,7 @@ function CroppedWindow({ height, fadeTo, children }: { height: number; fadeTo: s
 // card's own edge), so its rounded corners never collide with a parent's.
 function AppWindow({ active, children }: { active: string; children: React.ReactNode }) {
   return (
-    <div className="cv-window overflow-hidden rounded-2xl border border-[var(--cv-line)] bg-white">
+    <div className="cv-window overflow-hidden rounded-[18px] border border-[var(--cv-line)] bg-white">
       <div className="flex items-center gap-1.5 border-b border-[var(--cv-line)] bg-[var(--cv-cream)] px-4 py-2.5">
         <span className="h-2.5 w-2.5 rounded-full bg-[#e6b8b0]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#e8d9a8]" />
@@ -264,7 +264,7 @@ function TimelineScreen() {
 
 function FeatureBlueCard() {
   return (
-    <div className="cv-glow-card overflow-hidden rounded-[28px] text-white">
+    <div className="cv-glow-card overflow-hidden rounded-[24px] text-white">
       <div className="mx-auto max-w-lg px-6 pt-16 text-center sm:px-10">
         <h2 className="text-[32px] font-semibold leading-tight tracking-tight sm:text-[40px]">
           Tracyn <span className="cv-pill mx-1 rounded-full px-2.5 py-0.5 text-[28px] sm:text-[34px]">nudges</span>{" "}
@@ -368,7 +368,7 @@ function PolicyScreen() {
 
 function FeatureWhiteCard() {
   return (
-    <div className="overflow-hidden rounded-[28px] border border-[var(--cv-line)] bg-white">
+    <div className="overflow-hidden rounded-[24px] border border-[var(--cv-line)] bg-white">
       <div className="mx-auto max-w-lg px-6 pt-16 text-center sm:px-10">
         <h2 className="text-[32px] font-semibold leading-tight tracking-tight sm:text-[40px]">
           Every action becomes real evidence
