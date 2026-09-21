@@ -145,7 +145,7 @@ function Hero() {
       </div>
 
       <div className="relative mx-auto mt-16 max-w-6xl rounded-[24px] bg-white/50 p-4 shadow-[0_1px_1px_rgba(26,29,43,0.04)] backdrop-blur-sm sm:p-6">
-        <CroppedWindow height={400} fadeTo="#fdfdfe">
+        <CroppedWindow height={400}>
           <AppWindow active="Timeline">
             <TimelineScreen />
           </AppWindow>
@@ -156,19 +156,14 @@ function Hero() {
 }
 
 // Cluely's own screenshots never show a full page top-to-bottom -- they
-// show a large, real slice of the product and let it fade out before the
-// natural bottom, so it reads as "here's the real thing" rather than a
-// small isolated widget. `fadeTo` should match whatever sits behind this
-// (the hero gradient, the blue card, the cream panel) so the fade looks
-// like it's dissolving into its own background, not a mismatched box.
-function CroppedWindow({ height, fadeTo, children }: { height: number; fadeTo: string; children: React.ReactNode }) {
+// show a large, real slice of the product, cropped at a fixed height, so
+// it reads as "here's the real thing" rather than a small isolated
+// widget. A hard crop (no fade overlay) keeps every visible pixel of the
+// real screenshot crisp, right up to the cut.
+function CroppedWindow({ height, children }: { height: number; children: React.ReactNode }) {
   return (
     <div className="relative overflow-hidden rounded-[18px]" style={{ height }}>
       {children}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
-        style={{ background: `linear-gradient(to top, ${fadeTo}, transparent)` }}
-      />
     </div>
   );
 }
@@ -276,7 +271,7 @@ function FeatureBlueCard() {
         </p>
       </div>
       <div className="mt-10 px-6 pb-6 sm:px-10 sm:pb-10">
-        <CroppedWindow height={330} fadeTo="#233680">
+        <CroppedWindow height={330}>
           <AppWindow active="Policy">
             <PolicyScreen />
           </AppWindow>
@@ -379,7 +374,7 @@ function FeatureWhiteCard() {
         </p>
       </div>
       <div className="mt-10 bg-[var(--cv-cream)] px-6 pb-6 sm:px-10 sm:pb-10">
-        <CroppedWindow height={380} fadeTo="#f2f4fb">
+        <CroppedWindow height={380}>
           <AppWindow active="Evidence Packs">
             <EvidenceScreen />
           </AppWindow>
