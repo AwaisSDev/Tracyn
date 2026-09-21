@@ -262,7 +262,7 @@ function FeatureBlueCard() {
           not a one-shot form.
         </p>
       </div>
-      <div className="mt-10 rounded-t-[28px] bg-[#1b1f3d] p-4 sm:p-6">
+      <div className="mt-10 px-4 pb-4 sm:px-8 sm:pb-8">
         <AppWindow active="Policy">
           <PolicyScreen />
         </AppWindow>
@@ -369,7 +369,7 @@ function FeatureWhiteCard() {
           real events, cited by id, never invented.
         </p>
       </div>
-      <div className="mt-10 rounded-t-[28px] bg-[var(--cv-cream)] p-4 sm:p-6">
+      <div className="mt-10 bg-[var(--cv-cream)] px-4 pb-4 sm:px-8 sm:pb-8">
         <AppWindow active="Evidence Packs">
           <EvidenceScreen />
         </AppWindow>
@@ -378,32 +378,48 @@ function FeatureWhiteCard() {
   );
 }
 
+const EVIDENCE_QA = [
+  {
+    q: "Does the system log every agent action?",
+    a: "Yes. Every action is recorded with a tamper-evident, chained hash as it happens, not reconstructed after the fact.",
+    cited: ["evt_a91f", "evt_28ce", "evt_7d10"],
+  },
+  {
+    q: "How are risky actions handled before they run?",
+    a: "A workspace policy decides. Matching actions pause for a human approval before they execute.",
+    cited: ["evt_5c2e"],
+  },
+  {
+    q: "Is there an audit trail an external auditor can review?",
+    a: "Yes. Every event chains to the previous one by hash, so tampering is visible, and the whole chain exports to CSV or a formatted evidence document.",
+    cited: ["evt_9b41", "evt_0d17"],
+  },
+];
+
 function EvidenceScreen() {
   return (
     <div>
-      <div className="border-b border-[var(--cv-line)] px-6 py-4">
-        <h3 className="text-[17px] font-semibold tracking-tight">Evidence Packs</h3>
-        <p className="mt-0.5 text-[12.5px] text-[var(--cv-fg-2)]">SOC2-Questionnaire-2026.csv</p>
+      <div className="flex items-center justify-between border-b border-[var(--cv-line)] px-6 py-4">
+        <div>
+          <h3 className="text-[17px] font-semibold tracking-tight">Evidence Packs</h3>
+          <p className="mt-0.5 text-[12.5px] text-[var(--cv-fg-2)]">SOC2-Questionnaire-2026.csv</p>
+        </div>
+        <Badge variant="success">3 of 3 answered</Badge>
       </div>
-      <div className="p-6">
-        <div className="rounded-lg border border-[var(--cv-line)] p-4">
-          <p className="text-[13.5px] font-medium">Does the system log every agent action?</p>
-          <p className="mt-2 text-[13px] leading-relaxed text-[var(--cv-fg-2)]">
-            Yes. Every action is recorded with a tamper-evident, chained hash as it happens, not reconstructed
-            after the fact.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            <Badge variant="secondary">evt_a91f</Badge>
-            <Badge variant="secondary">evt_28ce</Badge>
-            <Badge variant="secondary">evt_7d10</Badge>
+      <div className="space-y-4 p-6">
+        {EVIDENCE_QA.map((item) => (
+          <div key={item.q} className="rounded-lg border border-[var(--cv-line)] p-4">
+            <p className="text-[13.5px] font-medium">{item.q}</p>
+            <p className="mt-2 text-[13px] leading-relaxed text-[var(--cv-fg-2)]">{item.a}</p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {item.cited.map((id) => (
+                <Badge key={id} variant="secondary">
+                  {id}
+                </Badge>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="mt-4 rounded-lg border border-[var(--cv-line)] p-4">
-          <p className="text-[13.5px] font-medium">How are risky actions handled before they run?</p>
-          <p className="mt-2 text-[13px] leading-relaxed text-[var(--cv-fg-2)]">
-            A workspace policy decides. Matching actions pause for a human approval before they execute.
-          </p>
-        </div>
+        ))}
       </div>
     </div>
   );
