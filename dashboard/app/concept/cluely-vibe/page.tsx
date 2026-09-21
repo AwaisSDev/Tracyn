@@ -7,7 +7,6 @@ import {
   ArrowRight,
   Check,
   ChevronDown,
-  MessageCircle,
   Github,
   History,
   CircleCheck,
@@ -133,14 +132,14 @@ function Hero() {
   return (
     <section className="cv-hero-bg relative overflow-hidden px-6 pb-24 pt-16 sm:px-10 sm:pt-24">
       <div className="mx-auto max-w-3xl text-center">
-        <h1 className="cv-serif text-[40px] leading-[1.1] tracking-tight sm:text-[58px]">
-          Every action your agents take.
+        <h1 className="cv-serif text-[46px] leading-[1.05] tracking-tight sm:text-[68px]">
+          It&rsquo;s not a log.
           <br />
-          Proven, not promised.
+          It&rsquo;s evidence.
         </h1>
-        <p className="mx-auto mt-6 max-w-xl text-[16px] leading-relaxed text-[var(--cv-fg-2)] sm:text-[18px]">
-          Tracyn logs every action your AI agents take, pauses the risky ones for a person, and turns the trail into
-          audit-ready evidence, automatically.
+        <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-[var(--cv-fg-2)] sm:text-[20px]">
+          Tracyn keeps a record of everything your AI agents do, asks a person before the risky parts, and turns it
+          all into evidence your auditors accept.
         </p>
         <div className="mt-8 flex items-center justify-center gap-3">
           <button className="flex items-center gap-1.5 rounded-full bg-[var(--cv-fg)] px-6 py-3 text-[14px] font-medium text-white shadow-lg transition-transform hover:scale-[1.03] active:scale-[0.98]">
@@ -152,7 +151,7 @@ function Hero() {
         </div>
       </div>
 
-      <div className="relative mx-auto mt-16 max-w-6xl">
+      <div className="relative mx-auto mt-16 max-w-6xl rounded-[32px] bg-white/50 p-3 shadow-[0_1px_1px_rgba(26,29,43,0.04)] backdrop-blur-sm sm:p-4">
         <AppWindow active="Timeline">
           <TimelineScreen />
         </AppWindow>
@@ -163,7 +162,9 @@ function Hero() {
 
 // A faithful, full-scale recreation of the real dashboard chrome (see
 // components/nav/sidebar.tsx and app-shell.tsx) -- same nav items, same
-// icons, same order -- not a cropped or shrunk widget.
+// icons, same order -- not a cropped or shrunk widget. Always framed by a
+// padded, differently-colored panel in its caller (never flush against a
+// card's own edge), so its rounded corners never collide with a parent's.
 function AppWindow({ active, children }: { active: string; children: React.ReactNode }) {
   return (
     <div className="cv-window overflow-hidden rounded-2xl border border-[var(--cv-line)] bg-white">
@@ -250,18 +251,18 @@ function TimelineScreen() {
 
 function FeatureBlueCard() {
   return (
-    <div className="cv-glow-card overflow-hidden rounded-[28px] px-6 pb-0 pt-14 text-white sm:px-10">
-      <div className="mx-auto max-w-lg text-center">
-        <h2 className="text-[28px] font-semibold leading-tight tracking-tight sm:text-[34px]">
-          Tracyn <span className="cv-pill mx-1 rounded-full px-2.5 py-0.5 text-[24px] sm:text-[28px]">nudges</span>{" "}
+    <div className="cv-glow-card overflow-hidden rounded-[28px] text-white">
+      <div className="mx-auto max-w-lg px-6 pt-16 text-center sm:px-10">
+        <h2 className="text-[32px] font-semibold leading-tight tracking-tight sm:text-[40px]">
+          Tracyn <span className="cv-pill mx-1 rounded-full px-2.5 py-0.5 text-[28px] sm:text-[34px]">nudges</span>{" "}
           until the policy is right
         </h2>
-        <p className="mx-auto mt-4 max-w-sm text-[15px] leading-relaxed text-white/80">
+        <p className="mx-auto mt-4 max-w-sm text-[16px] leading-relaxed text-white/80">
           Describe what should need approval in plain English. Push back, refine, and apply. It's a conversation,
           not a one-shot form.
         </p>
       </div>
-      <div className="mx-auto mt-10 max-w-6xl">
+      <div className="mt-10 rounded-t-[28px] bg-[#1b1f3d] p-4 sm:p-6">
         <AppWindow active="Policy">
           <PolicyScreen />
         </AppWindow>
@@ -303,38 +304,52 @@ function PolicyScreen() {
         ))}
       </div>
 
-      <div className="absolute bottom-6 right-6 w-[320px] overflow-hidden rounded-xl border border-[var(--cv-line)] bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[var(--cv-line)] px-3.5 py-2.5">
-          <div className="flex items-center gap-1.5">
-            <MessageCircle className="h-3.5 w-3.5 text-[var(--cv-blue)]" />
-            <span className="text-[12.5px] font-semibold">Policy assistant</span>
+      {/* Pixel-matched to the real components/policy/policy-chat.tsx widget:
+          same 380px width, same bubble/diff styling, including the diff's
+          hardcoded Notion-style green (it isn't theme blue in the real
+          app either -- see components/ui/badge.tsx's "success" variant). */}
+      <div className="absolute bottom-6 right-6 flex w-[380px] max-w-[calc(100%-3rem)] flex-col overflow-hidden rounded-xl border border-[var(--cv-line)] bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-[var(--cv-line)] px-4 py-3">
+          <div>
+            <p className="text-[14px] font-semibold text-[var(--cv-fg)]">Policy assistant</p>
+            <p className="text-[12px] text-[var(--cv-fg-2)]">Describe what should need approval</p>
           </div>
-          <X className="h-3.5 w-3.5 text-[var(--cv-fg-2)]" />
+          <X className="h-4 w-4 text-[var(--cv-fg-2)]" />
         </div>
-        <div className="space-y-2 p-3">
+        <div className="space-y-3 p-3">
           <div className="flex justify-end">
-            <div className="max-w-[85%] rounded-2xl bg-[var(--cv-fg)] px-2.5 py-1.5 text-[11.5px] text-white">
+            <div className="max-w-[85%] rounded-2xl bg-[var(--cv-fg)] px-3 py-2 text-[13px] leading-relaxed text-white">
               Require approval for send_refund and charge_card
             </div>
           </div>
           <div className="flex justify-start">
-            <div className="w-[92%] space-y-1.5">
-              <div className="rounded-2xl bg-[var(--cv-cream)] px-2.5 py-1.5 text-[11.5px]">
+            <div className="w-[88%] space-y-2">
+              <div className="rounded-2xl bg-[var(--cv-cream)] px-3 py-2 text-[13px] leading-relaxed text-[var(--cv-fg)]">
                 Added specific rules for send_refund and charge_card.
               </div>
-              <div className="rounded-lg border border-[var(--cv-line)] bg-white p-1.5 font-mono text-[10px] leading-relaxed">
-                <div className="rounded bg-[var(--cv-blue-soft)] px-1 text-[var(--cv-blue)]">+ action_name: &quot;*refund*&quot;</div>
-                <div className="rounded bg-[var(--cv-blue-soft)] px-1 text-[var(--cv-blue)]">+ action_name: &quot;*card*&quot;</div>
+              <div className="overflow-hidden rounded-lg border border-[var(--cv-line)]">
+                <pre className="px-2.5 py-2 font-mono text-[11px] leading-relaxed">
+                  <div className="rounded bg-[#DBEDDB] px-1 text-[#2F5D3A]">+ action_name: &quot;*refund*&quot;</div>
+                  <div className="rounded bg-[#DBEDDB] px-1 text-[#2F5D3A]">+ action_name: &quot;*card*&quot;</div>
+                </pre>
+                <div className="flex justify-end gap-2 border-t border-[var(--cv-line)] bg-[var(--cv-cream)]/60 px-2.5 py-1.5">
+                  <span className="rounded-md border border-[var(--cv-line)] bg-white px-2.5 py-1 text-[11px] font-medium text-[var(--cv-fg)]">
+                    Discard
+                  </span>
+                  <span className="flex items-center gap-1 rounded-md bg-[var(--cv-fg)] px-2.5 py-1 text-[11px] font-medium text-white">
+                    <Check className="h-3 w-3" /> Apply
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 border-t border-[var(--cv-line)] p-2">
-          <div className="flex-1 rounded-md border border-[var(--cv-line)] px-2.5 py-1.5 text-[11.5px] text-[var(--cv-fg-2)]">
+        <div className="flex items-center gap-2 border-t border-[var(--cv-line)] p-2.5">
+          <div className="flex-1 rounded-md border border-[var(--cv-line)] px-2.5 py-1.5 text-[13px] text-[var(--cv-fg-2)]">
             Describe a policy change...
           </div>
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--cv-fg)]">
-            <Send className="h-3.5 w-3.5 text-white" />
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[var(--cv-fg)]">
+            <Send className="h-4 w-4 text-white" />
           </span>
         </div>
       </div>
@@ -344,17 +359,17 @@ function PolicyScreen() {
 
 function FeatureWhiteCard() {
   return (
-    <div className="overflow-hidden rounded-[28px] border border-[var(--cv-line)] bg-white pt-12">
-      <div className="mx-auto max-w-lg px-6 text-center">
-        <h2 className="text-[28px] font-semibold leading-tight tracking-tight sm:text-[34px]">
+    <div className="overflow-hidden rounded-[28px] border border-[var(--cv-line)] bg-white">
+      <div className="mx-auto max-w-lg px-6 pt-16 text-center sm:px-10">
+        <h2 className="text-[32px] font-semibold leading-tight tracking-tight sm:text-[40px]">
           Every action becomes real evidence
         </h2>
-        <p className="mx-auto mt-4 max-w-sm text-[15px] leading-relaxed text-[var(--cv-fg-2)]">
+        <p className="mx-auto mt-4 max-w-sm text-[16px] leading-relaxed text-[var(--cv-fg-2)]">
           Evidence Packs turn your logged actions into drafted answers for security questionnaires, grounded in
           real events, cited by id, never invented.
         </p>
       </div>
-      <div className="mx-auto mt-10 max-w-6xl px-0 sm:px-0">
+      <div className="mt-10 rounded-t-[28px] bg-[var(--cv-cream)] p-4 sm:p-6">
         <AppWindow active="Evidence Packs">
           <EvidenceScreen />
         </AppWindow>
@@ -408,7 +423,7 @@ function StatRows() {
             <r.icon className="h-[18px] w-[18px] text-[var(--cv-blue)]" />
           </div>
           <div>
-            <p className="text-[19px] font-semibold tracking-tight">{r.label}</p>
+            <p className="text-[21px] font-semibold tracking-tight">{r.label}</p>
             <p className="mt-1 text-[14px] leading-relaxed text-[var(--cv-fg-2)]">{r.desc}</p>
           </div>
         </div>
@@ -421,7 +436,7 @@ function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   return (
     <div>
-      <h2 className="mb-6 text-center text-[26px] font-semibold tracking-tight">Frequently asked questions</h2>
+      <h2 className="mb-6 text-center text-[30px] font-semibold tracking-tight">Frequently asked questions</h2>
       <div className="divide-y divide-[var(--cv-line)] rounded-xl border border-[var(--cv-line)] bg-white">
         {FAQS.map((f, i) => {
           const open = openIndex === i;
@@ -429,7 +444,7 @@ function Faq() {
             <div key={i}>
               <button
                 onClick={() => setOpenIndex(open ? null : i)}
-                className="flex w-full items-center justify-between px-5 py-4 text-left text-[14.5px] font-medium"
+                className="flex w-full items-center justify-between px-5 py-4 text-left text-[16px] font-medium"
               >
                 {f.q}
                 <ChevronDown className={`h-4 w-4 shrink-0 text-[var(--cv-fg-2)] transition-transform ${open ? "rotate-180" : ""}`} />
@@ -446,10 +461,10 @@ function Faq() {
 function FinalCta() {
   return (
     <section className="cv-final-bg px-6 py-24 text-center sm:px-10">
-      <h2 className="cv-serif mx-auto max-w-md text-[32px] leading-tight sm:text-[40px]">
+      <h2 className="cv-serif mx-auto max-w-md text-[38px] leading-tight sm:text-[46px]">
         Start logging in five minutes.
       </h2>
-      <p className="mt-3 text-[15px] text-[var(--cv-fg-2)]">No credit card. Free plan built for trying it out.</p>
+      <p className="mt-3 text-[16px] text-[var(--cv-fg-2)]">No credit card. Free plan built for trying it out.</p>
       <button className="mx-auto mt-7 flex items-center gap-1.5 rounded-full bg-[var(--cv-fg)] px-6 py-3 text-[14px] font-medium text-white shadow-lg transition-transform hover:scale-[1.03] active:scale-[0.98]">
         <Check className="h-3.5 w-3.5" /> Get started free
       </button>
