@@ -1,0 +1,68 @@
+/* Cluely-vibe concept page — an isolated, unlinked experiment, not the
+   live landing page. Reuses the real site's reveal-on-scroll mechanism
+   (see components/landing/landing.css) with its own scoped tokens so
+   nothing here can leak into or collide with the real page. */
+
+.cv {
+  --cv-fg: #232019;
+  --cv-fg-2: #5f5a4f;
+  --cv-line: #e7e0d2;
+  --cv-cream: #f7f2e7;
+  --cv-green: #2f5d3a;
+  --cv-green-soft: #dbedd9;
+  --cv-green-deep: #234a2c;
+  color: var(--cv-fg);
+  background: #fdfbf6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.cv-serif {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+}
+
+/* ---------- reveal-on-scroll (same mechanism as the real landing page) ---------- */
+
+.cv [data-fade] [data-fade-order] {
+  opacity: 0;
+  transform: translateY(28px);
+  will-change: opacity, transform;
+}
+.cv [data-fade][data-scrolled] [data-fade-order] {
+  opacity: 1;
+  transform: none;
+  transition-property: opacity, transform;
+  transition-duration: 0.9s;
+  transition-timing-function: ease-out;
+}
+.cv [data-fade][data-scrolled] [data-fade-order="2"] { transition-delay: 0.15s; }
+.cv [data-fade][data-scrolled] [data-fade-order="3"] { transition-delay: 0.3s; }
+
+/* ---------- hero atmosphere ---------- */
+
+.cv-hero-bg {
+  background:
+    radial-gradient(ellipse 60% 50% at 50% -10%, rgba(219, 237, 217, 0.9), transparent 60%),
+    radial-gradient(ellipse 45% 40% at 85% 15%, rgba(47, 93, 58, 0.14), transparent 65%),
+    radial-gradient(ellipse 50% 45% at 10% 20%, rgba(47, 93, 58, 0.1), transparent 65%),
+    linear-gradient(180deg, #f7f2e7 0%, #fdfbf6 55%, #fdfbf6 100%);
+}
+
+.cv-window {
+  box-shadow: 0 1px 2px rgba(35, 32, 25, 0.06), 0 30px 60px -20px rgba(35, 32, 25, 0.22), 0 0 0 1px rgba(35, 32, 25, 0.06);
+}
+
+.cv-glow-card {
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(255, 255, 255, 0.16), transparent 55%),
+    linear-gradient(155deg, #2f5d3a 0%, #234a2c 100%);
+}
+
+.cv-pill {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(6px);
+}
+
+.cv-final-bg {
+  background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(219, 237, 217, 0.8), transparent 65%), #f7f2e7;
+}
