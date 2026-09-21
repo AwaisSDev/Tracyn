@@ -138,8 +138,8 @@ function Hero() {
         </div>
       </div>
 
-      <div className="relative mx-auto mt-16 max-w-6xl rounded-[32px] bg-white/50 p-3 shadow-[0_1px_1px_rgba(26,29,43,0.04)] backdrop-blur-sm sm:p-4">
-        <CroppedWindow height={430} fadeTo="#fdfdfe">
+      <div className="relative mx-auto mt-16 max-w-6xl rounded-[32px] bg-white/50 p-3 pb-16 shadow-[0_1px_1px_rgba(26,29,43,0.04)] backdrop-blur-sm sm:p-4 sm:pb-24">
+        <CroppedWindow height={360} fadeTo="#fdfdfe">
           <AppWindow active="Timeline">
             <TimelineScreen />
           </AppWindow>
@@ -157,10 +157,10 @@ function Hero() {
 // like it's dissolving into its own background, not a mismatched box.
 function CroppedWindow({ height, fadeTo, children }: { height: number; fadeTo: string; children: React.ReactNode }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl" style={{ height }}>
+    <div className="relative overflow-hidden rounded-t-2xl" style={{ height }}>
       {children}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-28"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-44"
         style={{ background: `linear-gradient(to top, ${fadeTo}, transparent)` }}
       />
     </div>
@@ -269,8 +269,8 @@ function FeatureBlueCard() {
           not a one-shot form.
         </p>
       </div>
-      <div className="mt-10 px-4 pb-4 sm:px-8 sm:pb-8">
-        <CroppedWindow height={310} fadeTo="#233680">
+      <div className="mt-10 px-4 pb-20 sm:px-8 sm:pb-28">
+        <CroppedWindow height={340} fadeTo="#233680">
           <AppWindow active="Policy">
             <PolicyScreen />
           </AppWindow>
@@ -378,8 +378,8 @@ function FeatureWhiteCard() {
           real events, cited by id, never invented.
         </p>
       </div>
-      <div className="mt-10 bg-[var(--cv-cream)] px-4 pb-4 sm:px-8 sm:pb-8">
-        <CroppedWindow height={480} fadeTo="#f2f4fb">
+      <div className="mt-10 bg-[var(--cv-cream)] px-4 pb-20 sm:px-8 sm:pb-28">
+        <CroppedWindow height={400} fadeTo="#f2f4fb">
           <AppWindow active="Evidence Packs">
             <EvidenceScreen />
           </AppWindow>
