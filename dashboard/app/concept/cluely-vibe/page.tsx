@@ -271,7 +271,7 @@ function FeatureBlueCard() {
         </p>
       </div>
       <div className="mt-10 px-6 pb-6 sm:px-10 sm:pb-10">
-        <CroppedWindow height={295}>
+        <CroppedWindow height={385}>
           <AppWindow active="Policy">
             <PolicyScreen />
           </AppWindow>
