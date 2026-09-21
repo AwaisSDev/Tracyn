@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Fraunces } from "next/font/google";
 import {
   ArrowRight,
@@ -69,7 +68,6 @@ export default function CluelyVibeConceptPage() {
   return (
     <div className={`${fraunces.variable} cv`}>
       <ForceLightTheme />
-      <ConceptBanner />
       <Nav />
       <Hero />
 
@@ -85,23 +83,12 @@ export default function CluelyVibeConceptPage() {
         <StatRows />
       </Reveal>
 
-      <Reveal className="mx-auto max-w-2xl px-6 pb-28 sm:px-10">
+      <Reveal className="mx-auto max-w-3xl px-6 pb-28 sm:px-10">
         <Faq />
       </Reveal>
 
       <FinalCta />
       <Footer />
-    </div>
-  );
-}
-
-function ConceptBanner() {
-  return (
-    <div className="border-b border-[var(--cv-line)] bg-[var(--cv-cream)] px-4 py-2 text-center text-[12.5px] text-[var(--cv-fg-2)]">
-      Concept preview. A design exploration, not the live Tracyn site.{" "}
-      <Link href="/" className="font-medium text-[var(--cv-fg)] underline underline-offset-2">
-        See the real site
-      </Link>
     </div>
   );
 }
@@ -152,11 +139,31 @@ function Hero() {
       </div>
 
       <div className="relative mx-auto mt-16 max-w-6xl rounded-[32px] bg-white/50 p-3 shadow-[0_1px_1px_rgba(26,29,43,0.04)] backdrop-blur-sm sm:p-4">
-        <AppWindow active="Timeline">
-          <TimelineScreen />
-        </AppWindow>
+        <CroppedWindow height={430} fadeTo="#fdfdfe">
+          <AppWindow active="Timeline">
+            <TimelineScreen />
+          </AppWindow>
+        </CroppedWindow>
       </div>
     </section>
+  );
+}
+
+// Cluely's own screenshots never show a full page top-to-bottom -- they
+// show a large, real slice of the product and let it fade out before the
+// natural bottom, so it reads as "here's the real thing" rather than a
+// small isolated widget. `fadeTo` should match whatever sits behind this
+// (the hero gradient, the blue card, the cream panel) so the fade looks
+// like it's dissolving into its own background, not a mismatched box.
+function CroppedWindow({ height, fadeTo, children }: { height: number; fadeTo: string; children: React.ReactNode }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl" style={{ height }}>
+      {children}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-28"
+        style={{ background: `linear-gradient(to top, ${fadeTo}, transparent)` }}
+      />
+    </div>
   );
 }
 
@@ -263,9 +270,11 @@ function FeatureBlueCard() {
         </p>
       </div>
       <div className="mt-10 px-4 pb-4 sm:px-8 sm:pb-8">
-        <AppWindow active="Policy">
-          <PolicyScreen />
-        </AppWindow>
+        <CroppedWindow height={310} fadeTo="#233680">
+          <AppWindow active="Policy">
+            <PolicyScreen />
+          </AppWindow>
+        </CroppedWindow>
       </div>
     </div>
   );
@@ -370,9 +379,11 @@ function FeatureWhiteCard() {
         </p>
       </div>
       <div className="mt-10 bg-[var(--cv-cream)] px-4 pb-4 sm:px-8 sm:pb-8">
-        <AppWindow active="Evidence Packs">
-          <EvidenceScreen />
-        </AppWindow>
+        <CroppedWindow height={480} fadeTo="#f2f4fb">
+          <AppWindow active="Evidence Packs">
+            <EvidenceScreen />
+          </AppWindow>
+        </CroppedWindow>
       </div>
     </div>
   );
@@ -452,20 +463,22 @@ function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   return (
     <div>
-      <h2 className="mb-6 text-center text-[30px] font-semibold tracking-tight">Frequently asked questions</h2>
-      <div className="divide-y divide-[var(--cv-line)] rounded-xl border border-[var(--cv-line)] bg-white">
+      <h2 className="mb-8 text-left text-[36px] font-semibold tracking-tight sm:text-[42px]">
+        Frequently asked questions
+      </h2>
+      <div className="divide-y divide-[var(--cv-line)]">
         {FAQS.map((f, i) => {
           const open = openIndex === i;
           return (
             <div key={i}>
               <button
                 onClick={() => setOpenIndex(open ? null : i)}
-                className="flex w-full items-center justify-between px-5 py-4 text-left text-[16px] font-medium"
+                className="flex w-full items-center justify-between py-5 text-left text-[19px] font-medium"
               >
                 {f.q}
                 <ChevronDown className={`h-4 w-4 shrink-0 text-[var(--cv-fg-2)] transition-transform ${open ? "rotate-180" : ""}`} />
               </button>
-              {open && <p className="px-5 pb-4 text-[13.5px] leading-relaxed text-[var(--cv-fg-2)]">{f.a}</p>}
+              {open && <p className="pb-5 text-[15px] leading-relaxed text-[var(--cv-fg-2)]">{f.a}</p>}
             </div>
           );
         })}
@@ -497,10 +510,11 @@ function Footer() {
           <img src="/logo.png" alt="" width={18} height={18} className="rounded" />
           <span className="font-medium text-[var(--cv-fg)]">Tracyn</span>
         </div>
-        <p>Design concept only. Not connected to your account.</p>
-        <Link href="/" className="underline underline-offset-2">
-          Back to the real site
-        </Link>
+        <p>&copy; 2026 Tracyn. All rights reserved.</p>
+        <div className="flex items-center gap-4">
+          <span>Privacy</span>
+          <span>Terms</span>
+        </div>
       </div>
     </footer>
   );
