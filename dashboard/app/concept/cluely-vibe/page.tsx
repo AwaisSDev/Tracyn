@@ -43,6 +43,12 @@ const TIMELINE_ROWS = [
   { when: "Sep 20, 02:22 PM", action: "send_receipt_email", type: "external", status: "completed" },
   { when: "Sep 20, 02:22 PM", action: "lookup_order", type: "external", status: "completed" },
   { when: "Sep 20, 02:22 PM", action: "check_system_health", type: "internal", status: "completed" },
+  { when: "Sep 20, 02:22 PM", action: "restart_service", type: "internal", status: "completed" },
+  { when: "Sep 20, 02:21 PM", action: "schedule_interview", type: "external", status: "completed" },
+  { when: "Sep 20, 02:21 PM", action: "send_offer_reminder", type: "external", status: "completed" },
+  { when: "Sep 20, 02:21 PM", action: "connectivity_check", type: "internal", status: "completed" },
+  { when: "Sep 20, 02:21 PM", action: "close_ticket", type: "external", status: "completed" },
+  { when: "Sep 20, 02:20 PM", action: "qualify_lead", type: "external", status: "completed" },
 ];
 
 const FAQS = [
@@ -138,8 +144,8 @@ function Hero() {
         </div>
       </div>
 
-      <div className="relative mx-auto mt-16 max-w-6xl rounded-[32px] bg-white/50 p-3 shadow-[0_1px_1px_rgba(26,29,43,0.04)] backdrop-blur-sm sm:p-4">
-        <CroppedWindow height={410} fadeTo="#fdfdfe">
+      <div className="relative mx-auto mt-16 max-w-6xl rounded-[32px] bg-white/50 p-4 shadow-[0_1px_1px_rgba(26,29,43,0.04)] backdrop-blur-sm sm:p-6">
+        <CroppedWindow height={400} fadeTo="#fdfdfe">
           <AppWindow active="Timeline">
             <TimelineScreen />
           </AppWindow>
@@ -157,10 +163,10 @@ function Hero() {
 // like it's dissolving into its own background, not a mismatched box.
 function CroppedWindow({ height, fadeTo, children }: { height: number; fadeTo: string; children: React.ReactNode }) {
   return (
-    <div className="relative overflow-hidden rounded-t-2xl" style={{ height }}>
+    <div className="relative overflow-hidden rounded-2xl" style={{ height }}>
       {children}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-10"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-16"
         style={{ background: `linear-gradient(to top, ${fadeTo}, transparent)` }}
       />
     </div>
@@ -269,8 +275,8 @@ function FeatureBlueCard() {
           not a one-shot form.
         </p>
       </div>
-      <div className="mt-10 px-4 pb-6 sm:px-8 sm:pb-10">
-        <CroppedWindow height={360} fadeTo="#233680">
+      <div className="mt-10 px-6 pb-6 sm:px-10 sm:pb-10">
+        <CroppedWindow height={330} fadeTo="#233680">
           <AppWindow active="Policy">
             <PolicyScreen />
           </AppWindow>
@@ -312,53 +318,47 @@ function PolicyScreen() {
           </div>
         ))}
       </div>
+      <div className="flex items-center gap-1.5 border-t border-[var(--cv-line)] px-6 py-4 text-[13px] font-medium text-[var(--cv-fg-2)]">
+        <ChevronDown className="h-3.5 w-3.5 -rotate-90" />
+        Advanced: edit the underlying rules as code
+      </div>
 
-      {/* Pixel-matched to the real components/policy/policy-chat.tsx widget:
-          same 380px width, same bubble/diff styling, including the diff's
-          hardcoded Notion-style green (it isn't theme blue in the real
-          app either -- see components/ui/badge.tsx's "success" variant). */}
-      <div className="absolute bottom-6 right-6 flex w-[380px] max-w-[calc(100%-3rem)] flex-col overflow-hidden rounded-xl border border-[var(--cv-line)] bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[var(--cv-line)] px-4 py-3">
-          <div>
-            <p className="text-[14px] font-semibold text-[var(--cv-fg)]">Policy assistant</p>
-            <p className="text-[12px] text-[var(--cv-fg-2)]">Describe what should need approval</p>
-          </div>
-          <X className="h-4 w-4 text-[var(--cv-fg-2)]" />
+      {/* A smaller, lighter footprint than the real widget's 380px --
+          this is meant to peek in from the corner, not dominate the
+          screenshot. Still keeps the real hardcoded Notion-green diff
+          colors (see components/ui/badge.tsx's "success" variant). */}
+      <div className="absolute bottom-4 right-4 flex w-[260px] max-w-[calc(100%-2rem)] flex-col overflow-hidden rounded-lg border border-[var(--cv-line)] bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-[var(--cv-line)] px-3 py-2">
+          <p className="text-[12px] font-semibold text-[var(--cv-fg)]">Policy assistant</p>
+          <X className="h-3.5 w-3.5 text-[var(--cv-fg-2)]" />
         </div>
-        <div className="space-y-3 p-3">
+        <div className="space-y-2 p-2.5">
           <div className="flex justify-end">
-            <div className="max-w-[85%] rounded-2xl bg-[var(--cv-fg)] px-3 py-2 text-[13px] leading-relaxed text-white">
+            <div className="max-w-[90%] rounded-xl bg-[var(--cv-fg)] px-2.5 py-1.5 text-[11px] leading-relaxed text-white">
               Require approval for send_refund and charge_card
             </div>
           </div>
-          <div className="flex justify-start">
-            <div className="w-[88%] space-y-2">
-              <div className="rounded-2xl bg-[var(--cv-cream)] px-3 py-2 text-[13px] leading-relaxed text-[var(--cv-fg)]">
-                Added specific rules for send_refund and charge_card.
-              </div>
-              <div className="overflow-hidden rounded-lg border border-[var(--cv-line)]">
-                <pre className="px-2.5 py-2 font-mono text-[11px] leading-relaxed">
-                  <div className="rounded bg-[#DBEDDB] px-1 text-[#2F5D3A]">+ action_name: &quot;*refund*&quot;</div>
-                  <div className="rounded bg-[#DBEDDB] px-1 text-[#2F5D3A]">+ action_name: &quot;*card*&quot;</div>
-                </pre>
-                <div className="flex justify-end gap-2 border-t border-[var(--cv-line)] bg-[var(--cv-cream)]/60 px-2.5 py-1.5">
-                  <span className="rounded-md border border-[var(--cv-line)] bg-white px-2.5 py-1 text-[11px] font-medium text-[var(--cv-fg)]">
-                    Discard
-                  </span>
-                  <span className="flex items-center gap-1 rounded-md bg-[var(--cv-fg)] px-2.5 py-1 text-[11px] font-medium text-white">
-                    <Check className="h-3 w-3" /> Apply
-                  </span>
-                </div>
-              </div>
+          <div className="overflow-hidden rounded-lg border border-[var(--cv-line)]">
+            <pre className="px-2 py-1.5 font-mono text-[10px] leading-relaxed">
+              <div className="rounded bg-[#DBEDDB] px-1 text-[#2F5D3A]">+ action_name: &quot;*refund*&quot;</div>
+              <div className="rounded bg-[#DBEDDB] px-1 text-[#2F5D3A]">+ action_name: &quot;*card*&quot;</div>
+            </pre>
+            <div className="flex justify-end gap-1.5 border-t border-[var(--cv-line)] bg-[var(--cv-cream)]/60 px-2 py-1">
+              <span className="rounded border border-[var(--cv-line)] bg-white px-2 py-0.5 text-[10px] font-medium text-[var(--cv-fg)]">
+                Discard
+              </span>
+              <span className="flex items-center gap-1 rounded bg-[var(--cv-fg)] px-2 py-0.5 text-[10px] font-medium text-white">
+                <Check className="h-2.5 w-2.5" /> Apply
+              </span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 border-t border-[var(--cv-line)] p-2.5">
-          <div className="flex-1 rounded-md border border-[var(--cv-line)] px-2.5 py-1.5 text-[13px] text-[var(--cv-fg-2)]">
+        <div className="flex items-center gap-1.5 border-t border-[var(--cv-line)] p-2">
+          <div className="flex-1 rounded-md border border-[var(--cv-line)] px-2 py-1 text-[11px] text-[var(--cv-fg-2)]">
             Describe a policy change...
           </div>
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[var(--cv-fg)]">
-            <Send className="h-4 w-4 text-white" />
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[var(--cv-fg)]">
+            <Send className="h-3 w-3 text-white" />
           </span>
         </div>
       </div>
@@ -378,8 +378,8 @@ function FeatureWhiteCard() {
           real events, cited by id, never invented.
         </p>
       </div>
-      <div className="mt-10 bg-[var(--cv-cream)] px-4 pb-6 sm:px-8 sm:pb-10">
-        <CroppedWindow height={430} fadeTo="#f2f4fb">
+      <div className="mt-10 bg-[var(--cv-cream)] px-6 pb-6 sm:px-10 sm:pb-10">
+        <CroppedWindow height={380} fadeTo="#f2f4fb">
           <AppWindow active="Evidence Packs">
             <EvidenceScreen />
           </AppWindow>
@@ -405,6 +405,11 @@ const EVIDENCE_QA = [
     a: "Yes. Every event chains to the previous one by hash, so tampering is visible, and the whole chain exports to CSV or a formatted evidence document.",
     cited: ["evt_9b41", "evt_0d17"],
   },
+  {
+    q: "Who reviews a drafted answer before it ships?",
+    a: "A human on your team. Drafts cite the exact events they're based on and are always editable before export, nothing is submitted automatically.",
+    cited: ["evt_3f88"],
+  },
 ];
 
 function EvidenceScreen() {
@@ -415,7 +420,7 @@ function EvidenceScreen() {
           <h3 className="text-[17px] font-semibold tracking-tight">Evidence Packs</h3>
           <p className="mt-0.5 text-[12.5px] text-[var(--cv-fg-2)]">SOC2-Questionnaire-2026.csv</p>
         </div>
-        <Badge variant="success">3 of 3 answered</Badge>
+        <Badge variant="success">4 of 4 answered</Badge>
       </div>
       <div className="space-y-4 p-6">
         {EVIDENCE_QA.map((item) => (
