@@ -4,10 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { api } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { ForceLightTheme } from "@/components/force-light-theme";
+import { AuthShell, authButtonClass, authInputClass, authLinkClass } from "@/components/home/auth-shell";
 import { safeNext } from "@/lib/safe-next";
 
 // Called before every Supabase signUp()/resend() -- those are what actually
@@ -130,118 +127,115 @@ export default function LoginPage() {
 
   if (step === "verify") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-sidebar px-4">
-        <ForceLightTheme />
-        <div className="w-full max-w-[360px]">
-          <div className="mb-6 flex flex-col items-center text-center">
-            {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
-            <img src="/logo.png" alt="" width={36} height={36} className="mb-3 rounded-md" />
-            <h1 className="text-lg font-semibold tracking-tight">Check your email</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              We sent a verification code to <span className="font-medium text-foreground">{email}</span>.
-            </p>
-          </div>
-
-          <Card className="p-6 shadow-subtle">
-            <form onSubmit={handleVerify} className="space-y-4">
-              <Input
-                type="text"
-                inputMode="numeric"
-                required
-                autoFocus
-                // Supabase's own OTP length isn't a fixed 6 -- confirmed
-                // live it sends 8 digits by default. Not hardcoding a
-                // specific length here beyond "clearly not empty", so
-                // this doesn't silently truncate/block a valid code
-                // again if that length ever changes.
-                maxLength={10}
-                placeholder="• • • • • • • •"
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                className="h-14 rounded-lg border-[#c5e0c2] bg-[#f2f8f1] text-center font-mono text-2xl font-semibold tracking-[0.4em] text-[#2f5d3a] placeholder:text-[#9dbb98] focus-visible:border-[#2f5d3a] focus-visible:ring-[#2f5d3a]/20"
-              />
-              {error &&
-                (error.toLowerCase().includes("security purposes") ? (
-                  <p className="text-center text-[13px] text-muted-foreground">{error}</p>
-                ) : (
-                  <p className="text-center text-[13px] text-error">{error}</p>
-                ))}
-              <Button type="submit" className="w-full" disabled={loading || code.length < 6}>
-                {loading ? "Verifying..." : "Verify and continue"}
-              </Button>
-            </form>
-          </Card>
-
-          <button
-            type="button"
-            onClick={handleResend}
-            className="mt-4 w-full text-center text-[13px] text-muted-foreground transition-colors hover:text-foreground"
-          >
+      <AuthShell
+        title="Check your email"
+        subtitle={
+          <>
+            We sent a verification code to <span className="font-medium text-[var(--cv-ink)]">{email}</span>.
+          </>
+        }
+        below={
+          <button type="button" onClick={handleResend} className={authLinkClass}>
             {resent ? "Code resent. Check your email" : "Didn't get it? Resend code"}
           </button>
-        </div>
-      </div>
+        }
+      >
+        <form onSubmit={handleVerify} className="space-y-4">
+          <input
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            required
+            autoFocus
+            // Supabase's own OTP length isn't a fixed 6 -- confirmed
+            // live it sends 8 digits by default. Not hardcoding a
+            // specific length here beyond "clearly not empty", so
+            // this doesn't silently truncate/block a valid code
+            // again if that length ever changes.
+            maxLength={10}
+            placeholder="• • • • • • • •"
+            aria-label="Verification code"
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+            className="h-14 w-full rounded-[12px] border border-[#c9d6f7] bg-[#eef3ff] text-center font-mono text-2xl font-semibold tracking-[0.4em] text-[var(--cv-blue-bright)] outline-none transition-[border-color,box-shadow] placeholder:text-[#9fb2ea] focus:border-[var(--cv-blue-bright)] focus:shadow-[0_0_0_4px_rgba(53,83,212,0.12)]"
+          />
+          {error &&
+            (error.toLowerCase().includes("security purposes") ? (
+              <p className="text-center text-[13px] text-[var(--cv-fg-2)]">{error}</p>
+            ) : (
+              <p className="text-center text-[13px] text-error">{error}</p>
+            ))}
+          <button type="submit" className={authButtonClass} disabled={loading || code.length < 6}>
+            {loading ? "Verifying..." : "Verify and continue"}
+          </button>
+        </form>
+      </AuthShell>
     );
   }
 
+  const switchMode = () => {
+    setMode(mode === "signin" ? "signup" : "signin");
+    setError(null);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-sidebar px-4">
-      <ForceLightTheme />
-      <div className="w-full max-w-[360px]">
-        <div className="mb-6 flex flex-col items-center text-center">
-          {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
-          <img src="/logo.png" alt="" width={36} height={36} className="mb-3 rounded-md" />
-          <h1 className="text-lg font-semibold tracking-tight">
-            {mode === "signin" ? "Log in to Tracyn" : "Create your Tracyn account"}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "signin" ? "Welcome back." : "We'll email you a code to confirm it's really you."}
-          </p>
+    <AuthShell
+      title={mode === "signin" ? "Welcome back" : "Create your account"}
+      subtitle={mode === "signin" ? "Log in to your Tracyn workspace." : "Start free. We'll email you a code to confirm it's really you."}
+      topRight={
+        <p className="text-[14px] text-[var(--cv-fg-2)]">
+          <span className="hidden sm:inline">{mode === "signin" ? "New to Tracyn? " : "Have an account? "}</span>
+          <button type="button" onClick={switchMode} className={authLinkClass}>
+            {mode === "signin" ? "Sign up" : "Log in"}
+          </button>
+        </p>
+      }
+      below={
+        <p className="text-[14px] text-[var(--cv-fg-2)]">
+          {mode === "signin" ? "Need an account? " : "Already have an account? "}
+          <button type="button" onClick={switchMode} className={authLinkClass}>
+            {mode === "signin" ? "Sign up" : "Sign in"}
+          </button>
+        </p>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1.5">
+          <label htmlFor="email" className="text-[13.5px] font-medium text-[var(--cv-ink)]">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            required
+            placeholder="you@company.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            className={authInputClass}
+          />
         </div>
-
-        <Card className="p-5 shadow-subtle">
-          <form onSubmit={handleSubmit} className="space-y-2.5">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Email</label>
-              <Input
-                type="email"
-                required
-                placeholder="you@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Password</label>
-              <Input
-                type="password"
-                required
-                minLength={6}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
-              />
-            </div>
-            {error && <p className="text-[13px] text-error">{error}</p>}
-            <Button type="submit" className="w-full !mt-4" disabled={loading}>
-              {loading ? "Please wait..." : mode === "signin" ? "Sign in" : "Create account"}
-            </Button>
-          </form>
-        </Card>
-
-        <button
-          type="button"
-          onClick={() => {
-            setMode(mode === "signin" ? "signup" : "signin");
-            setError(null);
-          }}
-          className="mt-4 w-full text-center text-[13px] text-muted-foreground transition-colors hover:text-foreground"
-        >
-          {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="text-[13.5px] font-medium text-[var(--cv-ink)]">
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            required
+            minLength={6}
+            placeholder={mode === "signin" ? "Your password" : "At least 6 characters"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete={mode === "signin" ? "current-password" : "new-password"}
+            className={authInputClass}
+          />
+        </div>
+        {error && <p className="text-[13px] text-error">{error}</p>}
+        <button type="submit" className={`${authButtonClass} !mt-6`} disabled={loading}>
+          {loading ? "Please wait..." : mode === "signin" ? "Log in" : "Create account"}
         </button>
-      </div>
-    </div>
+      </form>
+    </AuthShell>
   );
 }
