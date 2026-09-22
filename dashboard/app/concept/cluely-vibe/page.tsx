@@ -162,7 +162,7 @@ function Hero() {
 // real screenshot crisp, right up to the cut.
 function CroppedWindow({ height, children }: { height: number; children: React.ReactNode }) {
   return (
-    <div className="relative overflow-hidden rounded-[18px]" style={{ height }}>
+    <div className="relative overflow-hidden rounded-t-[10px]" style={{ height }}>
       {children}
     </div>
   );
