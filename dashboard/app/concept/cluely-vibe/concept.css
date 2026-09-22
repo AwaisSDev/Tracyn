@@ -15,6 +15,7 @@
   --cv-blue-soft: #dde6fb;
   --cv-blue-deep: #1b1f52;
   --cv-blue-light: #7ea0f5;
+  --cv-blue-bright: #3553d4;
   /* Marketing-copy colors, separate from the in-app ones above so the
      screenshots stay faithful to the real dashboard. */
   --cv-ink: #0f1222;
@@ -87,6 +88,19 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 0 1px #24357a, 0 10px 24px -8px rgba(43, 63, 143, 0.6);
   transition: transform 0.15s ease, filter 0.15s ease;
 }
+/* Notion's solid primary, in the favicon's blue. */
+.cv-btn-primary {
+  background: var(--cv-blue-bright);
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.cv-btn-primary:hover { background: #2b45b8; }
+.cv-btn-primary:active { transform: scale(0.98); }
+
+/* The hero's highlighted word: Notion's soft pill with a dot. */
+.cv-hero-pill {
+  background: #dde6fb;
+}
+
 .cv-btn-dark:hover,
 .cv-btn-blue:hover { filter: brightness(1.08); }
 .cv-btn-dark:active,

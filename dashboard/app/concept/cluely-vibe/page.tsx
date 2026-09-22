@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Fraunces, Inter_Tight } from "next/font/google";
+import { Inter_Tight } from "next/font/google";
 import {
   ArrowRight,
   Check,
@@ -35,10 +35,8 @@ import { Reveal } from "@/components/landing/reveal";
 import { Badge, StatusBadge } from "@/components/ui/badge";
 import "./concept.css";
 
-// The punchline keeps its serif; everything else is a tight, Geist-like
-// grotesk, the way Cluely pairs one editorial headline with a clean sans.
-const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-serif", weight: ["400", "500"] });
-const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-cv-sans", weight: ["400", "500", "600"] });
+// A tight, Geist-like grotesk throughout, heavy for the Notion-style hero.
+const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-cv-sans", weight: ["400", "500", "600", "700"] });
 
 const NAV_ITEMS = [
   { label: "Timeline", icon: History },
@@ -91,7 +89,7 @@ const FAQS = [
 
 export default function CluelyVibeConceptPage() {
   return (
-    <div className={`${fraunces.variable} ${interTight.variable} cv`}>
+    <div className={`${interTight.variable} cv`}>
       <ForceLightTheme />
       <Nav />
       <Hero />
@@ -169,61 +167,94 @@ export default function CluelyVibeConceptPage() {
 
 function Nav() {
   return (
-    <header className="sticky top-0 z-30 border-b border-transparent bg-white/75 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5 sm:px-10">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
-            <img src="/logo.png" alt="" width={22} height={22} className="rounded" />
-            <span className="text-[16px] font-semibold tracking-[-0.02em] text-[var(--cv-ink)]">Tracyn</span>
-          </div>
-          <nav className="hidden items-center gap-6 text-[14px] font-medium text-[var(--cv-fg-2)] md:flex">
-            <span className="transition-colors hover:text-[var(--cv-ink)]">Product</span>
-            <span className="transition-colors hover:text-[var(--cv-ink)]">Evidence Packs</span>
-            <span className="transition-colors hover:text-[var(--cv-ink)]">Docs</span>
-            <span className="transition-colors hover:text-[var(--cv-ink)]">Pricing</span>
-          </nav>
+    <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md">
+      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-6 py-3.5 sm:px-8">
+        <div className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
+          <img src="/logo.png" alt="" width={26} height={26} className="rounded-md" />
+          <span className="text-[17px] font-semibold tracking-[-0.02em] text-[var(--cv-ink)]">Tracyn</span>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="hidden text-[14px] font-medium text-[var(--cv-fg-2)] sm:inline">Sign in</span>
-          <button className="cv-btn-dark rounded-[9px] px-4 py-2 text-[13.5px] font-medium text-white">Get started</button>
+        <nav className="hidden items-center gap-7 text-[15px] font-medium text-[var(--cv-ink)] md:flex">
+          <span className="flex items-center gap-1">
+            Product <ChevronDown className="h-3.5 w-3.5" strokeWidth={2} />
+          </span>
+          <span className="flex items-center gap-1">
+            Resources <ChevronDown className="h-3.5 w-3.5" strokeWidth={2} />
+          </span>
+          <span>Pricing</span>
+          <span>Docs</span>
+        </nav>
+        <div className="flex items-center justify-end gap-5">
+          <span className="hidden text-[15px] font-medium text-[var(--cv-ink)] sm:inline">Log in</span>
+          <button className="cv-btn-primary rounded-[8px] px-4 py-2 text-[15px] font-semibold text-white">
+            Get Tracyn free
+          </button>
         </div>
       </div>
     </header>
   );
 }
 
+// Notion's opening: a very large, heavy sans headline with one word set
+// in a soft colored pill (dot + word), a single plain line under it, a
+// solid and a tinted button, and the real product sitting straight on the
+// white page, cut off by a strip running the full width of the screen.
 function Hero() {
   return (
-    <section className="cv-hero-bg relative px-6 pt-20 sm:px-10 sm:pt-28">
-      <div className="mx-auto max-w-3xl text-center">
-        <h1 className="cv-serif text-[48px] leading-[1.02] tracking-[-0.02em] text-[var(--cv-ink)] sm:text-[72px]">
+    <section className="relative bg-white pt-16 sm:pt-24">
+      <div className="mx-auto max-w-5xl px-6 text-center sm:px-10">
+        <h1 className="text-[50px] font-bold leading-[1.04] tracking-[-0.035em] text-[var(--cv-ink)] sm:text-[84px] lg:text-[104px]">
           It&rsquo;s not a log.
           <br />
-          It&rsquo;s evidence.
+          It&rsquo;s{" "}
+          <span className="cv-hero-pill inline-flex items-center gap-[0.14em] rounded-full py-[0.02em] pl-[0.22em] pr-[0.3em] align-bottom">
+            <span className="h-[0.26em] w-[0.26em] rounded-full bg-[var(--cv-blue-bright)]" />
+            evidence
+          </span>.
         </h1>
-        <p className="mx-auto mt-6 max-w-xl text-[17px] font-medium leading-[1.5] tracking-[-0.01em] text-[var(--cv-fg-2)] sm:text-[19px]">
+        <p className="mx-auto mt-7 max-w-2xl text-[18px] leading-[1.5] tracking-[-0.01em] text-[var(--cv-ink)] sm:text-[21px]">
           Tracyn keeps a record of everything your AI agents do, asks a person before the risky parts, and turns it
           all into evidence your auditors accept.
         </p>
-        <div className="mt-9 flex items-center justify-center gap-3">
-          <button className="cv-btn-blue flex items-center gap-1.5 rounded-[10px] px-5 py-3 text-[14.5px] font-medium text-white">
-            Get started free <ArrowRight className="h-4 w-4" />
+        <div className="mt-8 flex items-center justify-center gap-3">
+          <button className="cv-btn-primary rounded-[8px] px-5 py-2.5 text-[16px] font-semibold text-white">
+            Get Tracyn free
           </button>
-          <button className="flex items-center gap-1.5 rounded-[10px] border border-[var(--cv-line)] bg-white px-5 py-3 text-[14.5px] font-medium text-[var(--cv-ink)] shadow-[0_1px_2px_rgba(15,18,34,0.05)] transition-colors hover:bg-[var(--cv-cream)]">
-            <Github className="h-4 w-4" /> View SDK
+          <button className="rounded-[8px] bg-[#e6ecfd] px-5 py-2.5 text-[16px] font-semibold text-[var(--cv-blue-bright)] transition-colors hover:bg-[#dbe3fc]">
+            View the SDK
           </button>
         </div>
       </div>
 
-      <div className="mx-auto mt-20 max-w-6xl">
-        <ShotPanel variant="navy" height={560}>
+      <div className="mx-auto mt-16 max-w-6xl px-6 sm:px-10">
+        <CroppedWindow height={500}>
           <AppWindow active="Timeline">
             <TimelineScreen />
           </AppWindow>
-        </ShotPanel>
+        </CroppedWindow>
       </div>
+      <WorksWithStrip />
     </section>
+  );
+}
+
+// Where Notion lists customer logos. Tracyn doesn't claim customers here,
+// only what it really plugs into: the MCP clients from mcp-server/README.md,
+// Slack and email approvals, and the Python SDK.
+function WorksWithStrip() {
+  const names = ["Claude", "ChatGPT", "Grok", "Slack", "Email", "Python SDK", "Any MCP client"];
+  return (
+    <div className="relative z-10 border-t border-[var(--cv-line)] bg-white">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-3 gap-y-2 px-6 py-5 sm:px-10">
+        <span className="mr-3 text-[13px] font-medium uppercase tracking-[0.14em] text-[var(--cv-fg-3)]">Works with</span>
+        {names.map((n, i) => (
+          <span key={n} className="flex items-center gap-3 text-[19px] font-semibold tracking-[-0.03em] text-[#3a3f55]">
+            {n}
+            {i < names.length - 1 && <span className="h-1 w-1 rounded-full bg-[#b9bfd3]" />}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -792,9 +823,9 @@ const MCP_TOOLS = [
   { name: "get_compliance_summary", desc: "Your current SOC 2 posture" },
 ];
 
-// The MCP server gets its own big navy panel: the five real tools and the
-// two ways to connect (see mcp-server/README.md) on the left, and on the
-// right a chat clearing an approval through them.
+// The MCP server gets its own big navy panel: the five real tools (see
+// mcp-server/README.md) on the left, and on the right a chat clearing an
+// approval through them.
 function McpFeature() {
   return (
     <div className="cv-panel-navy overflow-hidden rounded-[28px] text-white">
@@ -817,17 +848,6 @@ function McpFeature() {
                 <span className="text-[13.5px] text-white/70">{t.desc}</span>
               </div>
             ))}
-          </div>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
-              <p className="text-[11.5px] font-medium uppercase tracking-[0.14em] text-white/50">Hosted</p>
-              <p className="mt-1.5 truncate font-mono text-[12.5px] text-white">mcp.tracyn.online/mcp</p>
-            </div>
-            <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
-              <p className="text-[11.5px] font-medium uppercase tracking-[0.14em] text-white/50">Local</p>
-              <p className="mt-1.5 font-mono text-[12.5px] text-white">pip install tracyn-mcp</p>
-            </div>
           </div>
         </div>
 
@@ -892,7 +912,7 @@ function McpChatWindow() {
               <span className="h-1.5 w-1.5 rounded-full bg-[#5fbf73]" />
               Tracyn connected
             </span>
-            <span className="ml-auto">Opus 5</span>
+            <span className="ml-auto">Opus 5.5</span>
             <span>High</span>
             <span className="h-4 w-4 rounded-full border-2 border-[#7ea0f5]" />
           </div>
