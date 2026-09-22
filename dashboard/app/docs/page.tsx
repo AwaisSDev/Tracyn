@@ -84,7 +84,7 @@ export default function DocsPage() {
             </p>
           </Section>
 
-          <Section step={3} title="Install the SDK">
+          <Section step={3} id="sdk" title="Install the SDK">
             <p>One decorator is the whole integration for logging:</p>
             <Code>{`pip install tracyn`}</Code>
             <Code>{`from tracyn import Tracyn
@@ -101,7 +101,7 @@ def send_refund(customer_id: str, amount_cents: int):
             </p>
           </Section>
 
-          <Section step={4} title="Decide what needs a human">
+          <Section step={4} id="policy" title="Decide what needs a human">
             <p>
               Most actions don&apos;t need a human in the loop. Some, like refunds over a threshold or
               anything destructive, should. That&apos;s what <strong>Policy</strong> configures:
@@ -118,7 +118,7 @@ def send_refund(customer_id: str, amount_cents: int):
             </p>
           </Section>
 
-          <Section step={5} title="Get approvals into Slack">
+          <Section step={5} id="slack" title="Get approvals into Slack">
             <p>
               Without Slack, pending approvals still work: they show up on the Approvals page and, with a
               fallback email set in Settings, as an emailed link. Most teams still connect Slack from
@@ -126,7 +126,7 @@ def send_refund(customer_id: str, amount_cents: int):
             </p>
           </Section>
 
-          <Section step={6} title="Answer a security questionnaire in minutes">
+          <Section step={6} id="questionnaires" title="Answer a security questionnaire in minutes">
             <p>
               Under Questionnaires, upload a customer&apos;s security or compliance questionnaire (PDF,
               DOCX, or plain text). Tracyn parses out individual questions, finds your actual logged
@@ -136,7 +136,7 @@ def send_refund(customer_id: str, amount_cents: int):
             </p>
           </Section>
 
-          <Section step={7} title="What SOC 2 mapping actually gives you">
+          <Section step={7} id="soc2" title="What SOC 2 mapping actually gives you">
             <p>
               The SOC 2 page maps common Trust Services Criteria to what Tracyn is logging for you.
               It&apos;s a starting point for your own audit prep, not a certification. Talk to an auditor

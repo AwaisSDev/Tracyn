@@ -165,7 +165,7 @@ export default function LoginPage() {
             onClick={handleResend}
             className="mt-4 w-full text-center text-[13px] text-muted-foreground transition-colors hover:text-foreground"
           >
-            {resent ? "Code resent — check your email" : "Didn't get it? Resend code"}
+            {resent ? "Code resent. Check your email" : "Didn't get it? Resend code"}
           </button>
         </div>
       </div>

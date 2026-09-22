@@ -3,10 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  ArrowRight,
   Check,
   ChevronDown,
-  Github,
   History,
   CircleCheck,
   FileText,
@@ -32,10 +30,9 @@ import { ForceLightTheme } from "@/components/force-light-theme";
 import { Reveal } from "@/components/landing/reveal";
 import { Badge, StatusBadge } from "@/components/ui/badge";
 import { interTight } from "./fonts";
+import { NavLinks } from "./nav-links";
 import "./home.css";
 
-const SDK_URL = "https://github.com/AwaisSDev/Tracyn/tree/main/sdk";
-const GITHUB_URL = "https://github.com/AwaisSDev/Tracyn";
 const CONTACT_URL = "mailto:mawais9171@gmail.com";
 
 const NAV_ITEMS = [
@@ -106,7 +103,7 @@ export function Home() {
         </Reveal>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-10 sm:pt-36">
+      <section id="evidence" className="mx-auto max-w-6xl scroll-mt-20 px-4 pt-24 sm:px-10 sm:pt-36">
         <Reveal>
           <SectionHeading
             lead="Evidence,"
@@ -172,12 +169,7 @@ export function SiteNav() {
           <img src="/logo.png" alt="" width={26} height={26} className="rounded-md" />
           <span className="text-[17px] font-semibold tracking-[-0.02em] text-[var(--cv-ink)]">Tracyn</span>
         </Link>
-        <nav className="hidden items-center gap-7 text-[15px] font-medium text-[var(--cv-ink)] md:flex">
-          <a href="/#how" className="transition-colors hover:text-[var(--cv-blue-bright)]">How it works</a>
-          <a href="/#mcp" className="transition-colors hover:text-[var(--cv-blue-bright)]">MCP</a>
-          <Link href="/docs" className="transition-colors hover:text-[var(--cv-blue-bright)]">Docs</Link>
-          <Link href="/about" className="transition-colors hover:text-[var(--cv-blue-bright)]">About</Link>
-        </nav>
+        <NavLinks />
         <div className="flex items-center justify-end gap-5">
           <Link href="/login" className="hidden text-[15px] font-medium text-[var(--cv-ink)] sm:inline">
             Log in
@@ -223,14 +215,12 @@ function Hero() {
           <Link href="/login" className="cv-btn-primary rounded-[10px] px-5 py-2.5 text-[16px] font-semibold text-white">
             Get Tracyn free
           </Link>
-          <a
-            href={SDK_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/docs"
             className="cv-btn-soft rounded-[10px] px-5 py-2.5 text-[16px] font-semibold text-[var(--cv-blue-bright)]"
           >
-            View the SDK
-          </a>
+            Documentation
+          </Link>
         </div>
       </div>
 
@@ -1013,7 +1003,7 @@ function FinalCtaAndFooter() {
       links: [
         { label: "Docs", href: "/docs" },
         { label: "MCP setup", href: "/docs#mcp" },
-        { label: "SDK on GitHub", href: SDK_URL },
+        { label: "Install the SDK", href: "/docs#sdk" },
       ],
     },
     {
@@ -1043,7 +1033,7 @@ function FinalCtaAndFooter() {
           href="/login"
           className="cv-btn-dark mt-8 inline-flex items-center gap-2 rounded-[10px] px-5 py-3 text-[14.5px] font-medium text-white"
         >
-          Get started free <ArrowRight className="h-4 w-4" />
+          Get started free
         </Link>
       </div>
 
@@ -1067,9 +1057,6 @@ function FinalCtaAndFooter() {
           <div className="mt-14 flex items-center justify-between border-t border-[var(--cv-line-2)] pt-6">
             <p className="text-[13.5px] text-[var(--cv-fg-3)]">&copy; {new Date().getFullYear()} Tracyn. All rights reserved.</p>
             <div className="flex items-center gap-4 text-[var(--cv-ink)]">
-              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="hover:text-[var(--cv-blue-bright)]">
-                <Github className="h-[18px] w-[18px]" />
-              </a>
               <a href={CONTACT_URL} aria-label="Email" className="hover:text-[var(--cv-blue-bright)]">
                 <Mail className="h-[18px] w-[18px]" />
               </a>
@@ -1081,8 +1068,8 @@ function FinalCtaAndFooter() {
   );
 }
 
-// Internal pages go through next/link; in-page anchors, mail and GitHub
-// links are plain anchors (GitHub opens in a new tab).
+// Internal pages go through next/link; in-page anchors and mail links are
+// plain anchors (any external http link opens in a new tab).
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   const className = "text-[15px] text-[var(--cv-fg-2)] transition-colors hover:text-[var(--cv-ink)]";
   if (href.startsWith("/")) {

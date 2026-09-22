@@ -147,6 +147,67 @@
   box-shadow: 0 30px 60px -30px rgba(26, 29, 43, 0.28);
 }
 
+/* ---------- nav ---------- */
+
+/* The hover pill: always fades and scales; slides between links only once
+   it's already showing (see nav-links.tsx). */
+.cv-nav-pill {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.cv-nav-pill-glide {
+  transition:
+    opacity 0.2s ease,
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cv-nav-chevron {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Dropdown panels: drop in from just above, scaled a touch, then the
+   Product cards rise in one after another. */
+.cv-menu {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-6px) scale(0.985);
+  transform-origin: top center;
+  transition: opacity 0.18s ease, transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cv-menu[data-open="true"] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%);
+}
+.cv-menu-rise {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cv-menu[data-open="true"] .cv-menu-rise {
+  opacity: 1;
+  transform: none;
+  transition-delay: var(--d, 0ms);
+}
+.cv-nav-link:active {
+  transform: scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cv-nav-pill,
+  .cv-nav-pill-glide,
+  .cv-nav-chevron,
+  .cv-menu,
+  .cv-menu-rise {
+    transition: none;
+  }
+  .cv-menu-rise {
+    opacity: 1;
+    transform: none;
+  }
+  .cv-nav-link:active {
+    transform: none;
+  }
+}
+
 /* "Built for the audit" stat cards: tinted and bordered so they stand
    apart from the white page. */
 .cv-stat {
