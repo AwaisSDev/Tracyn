@@ -11,26 +11,23 @@ import "./home.css";
 export function AuthShell({
   title,
   subtitle,
-  topRight,
   children,
   below,
 }: {
   title: string;
   subtitle: React.ReactNode;
-  topRight?: React.ReactNode;
   children: React.ReactNode;
   below?: React.ReactNode;
 }) {
   return (
     <div className={`${interTight.variable} cv cv-hero-bg flex min-h-screen flex-col`}>
       <ForceLightTheme />
-      <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
+      <header className="mx-auto flex w-full max-w-7xl items-center px-5 py-4 sm:px-8">
         <Link href="/" className="flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
           <img src="/logo.png" alt="" width={32} height={32} className="rounded-md" />
           <span className="text-[20px] font-semibold tracking-[-0.025em] text-[var(--cv-ink)]">Tracyn</span>
         </Link>
-        {topRight}
       </header>
 
       <main className="flex flex-1 items-center justify-center px-5 pb-16 pt-6 sm:pt-10">
