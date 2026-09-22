@@ -217,10 +217,10 @@ function Hero() {
           all into evidence your auditors accept.
         </p>
         <div className="mt-8 flex items-center justify-center gap-3">
-          <button className="cv-btn-primary rounded-[8px] px-5 py-2.5 text-[16px] font-semibold text-white">
+          <button className="cv-btn-primary rounded-[10px] px-5 py-2.5 text-[16px] font-semibold text-white">
             Get Tracyn free
           </button>
-          <button className="rounded-[8px] bg-[#e6ecfd] px-5 py-2.5 text-[16px] font-semibold text-[var(--cv-blue-bright)] transition-colors hover:bg-[#dbe3fc]">
+          <button className="cv-btn-soft rounded-[10px] px-5 py-2.5 text-[16px] font-semibold text-[var(--cv-blue-bright)]">
             View the SDK
           </button>
         </div>

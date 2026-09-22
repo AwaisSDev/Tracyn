@@ -78,33 +78,58 @@
 
 /* ---------- buttons ---------- */
 
+/* Cluely's glossy buttons: a two-point radial fill with a soft white
+   sheen, shaded inner edges (light top-left, dark bottom-right) so the
+   rim reads crisply, plus a 1px outline and a colored drop glow. */
+.cv-btn-primary,
 .cv-btn-dark {
-  background: linear-gradient(180deg, #2a2d3d 0%, #11131d 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 0 1px #0b0c14, 0 8px 20px -8px rgba(15, 18, 34, 0.55);
+  position: relative;
   transition: transform 0.15s ease, filter 0.15s ease;
 }
-.cv-btn-blue {
-  background: linear-gradient(180deg, #4f6ee0 0%, #2b3f8f 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 0 1px #24357a, 0 10px 24px -8px rgba(43, 63, 143, 0.6);
-  transition: transform 0.15s ease, filter 0.15s ease;
-}
-/* Notion's solid primary, in the favicon's blue. */
+.cv-btn-primary:hover,
+.cv-btn-dark:hover { filter: brightness(1.08); }
+.cv-btn-primary:active,
+.cv-btn-dark:active { transform: scale(0.98); }
+
 .cv-btn-primary {
-  background: var(--cv-blue-bright);
-  transition: background-color 0.15s ease, transform 0.15s ease;
+  background:
+    radial-gradient(100% 100% at 65% 82%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0) 100%),
+    radial-gradient(115% 115% at 10% 17%, #4f7cf2 0%, #2a45d8 100%);
+  box-shadow:
+    0 0 0 1px #2539b8,
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset -3px -3px 4px rgba(191, 212, 251, 0.35),
+    inset 4px 4px 4px rgba(19, 26, 160, 0.12),
+    0 10px 22px -6px rgba(62, 94, 230, 0.5);
 }
-.cv-btn-primary:hover { background: #2b45b8; }
-.cv-btn-primary:active { transform: scale(0.98); }
+
+.cv-btn-dark {
+  background: radial-gradient(86% 86% at 10% 17%, rgba(78, 80, 92, 0.95) 15%, #07080c 100%);
+  box-shadow:
+    0 0 0 1px #05060a,
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset -1px -1px 4px rgba(0, 0, 0, 0.65),
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    5px 7px 14px -2px rgba(119, 133, 164, 0.45);
+}
+
+/* The tinted secondary gets the same rim treatment, just in light blue. */
+.cv-btn-soft {
+  background: linear-gradient(180deg, #eef2fe 0%, #dfe7fd 100%);
+  box-shadow:
+    0 0 0 1px #c5d2f7,
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset -2px -2px 4px rgba(150, 172, 235, 0.25),
+    0 6px 14px -8px rgba(62, 94, 230, 0.35);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.cv-btn-soft:hover { filter: brightness(1.02) saturate(1.1); }
+.cv-btn-soft:active { transform: scale(0.98); }
 
 /* The hero's highlighted word: Notion's soft pill with a dot. */
 .cv-hero-pill {
   background: #dde6fb;
 }
-
-.cv-btn-dark:hover,
-.cv-btn-blue:hover { filter: brightness(1.08); }
-.cv-btn-dark:active,
-.cv-btn-blue:active { transform: scale(0.98); }
 
 /* ---------- screenshot panels ---------- */
 
