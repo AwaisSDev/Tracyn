@@ -1,5 +1,10 @@
+// ARCHIVED: the previous landing page, kept for reference only. The
+// leading underscore makes this a private folder, so Next.js never routes
+// it and it isn't in the sitemap. The live home page is app/page.tsx,
+// which renders components/home/home.tsx. Its components still live in
+// components/landing/ (Reveal is shared with the new home page).
 import type { Metadata } from "next";
-import { Home } from "@/components/home/home";
+import { Landing } from "@/components/landing/landing";
 import { SITE_URL } from "@/lib/site";
 
 const TITLE = "Tracyn: It’s not a log. It’s evidence.";
@@ -26,5 +31,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootPage() {
-  return <Home />;
+  return <Landing />;
 }

@@ -1,7 +1,6 @@
-/* Cluely-vibe concept page. An isolated, unlinked experiment, not the
-   live landing page. Reuses the real site's reveal-on-scroll mechanism
-   (see components/landing/landing.css) with its own scoped tokens so
-   nothing here can leak into or collide with the real page.
+/* Home page (and 404) styles. Reuses the old landing page's
+   reveal-on-scroll mechanism (see components/landing/landing.css) with its
+   own scoped tokens under .cv, so nothing here leaks into the dashboard.
 
    Palette pulled directly from app/icon.png (the real favicon): a deep
    navy-to-periwinkle diagonal gradient behind a white "T" mark. */

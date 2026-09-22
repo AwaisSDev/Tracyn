@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Inter_Tight } from "next/font/google";
+import Link from "next/link";
 import {
   ArrowRight,
   Check,
@@ -31,10 +31,12 @@ import {
 import { ForceLightTheme } from "@/components/force-light-theme";
 import { Reveal } from "@/components/landing/reveal";
 import { Badge, StatusBadge } from "@/components/ui/badge";
-import "./concept.css";
+import { interTight } from "./fonts";
+import "./home.css";
 
-// A tight, Geist-like grotesk throughout, heavy for the Notion-style hero.
-const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-cv-sans", weight: ["400", "500", "600", "700"] });
+const SDK_URL = "https://github.com/AwaisSDev/Tracyn/tree/main/sdk";
+const GITHUB_URL = "https://github.com/AwaisSDev/Tracyn";
+const CONTACT_URL = "mailto:mawais9171@gmail.com";
 
 const NAV_ITEMS = [
   { label: "Timeline", icon: History },
@@ -85,14 +87,14 @@ const FAQS = [
   },
 ];
 
-export default function CluelyVibeConceptPage() {
+export function Home() {
   return (
     <div className={`${interTight.variable} cv`}>
       <ForceLightTheme />
-      <Nav />
+      <SiteNav />
       <Hero />
 
-      <section className="mx-auto max-w-6xl px-6 pt-32 sm:px-10">
+      <section id="how" className="mx-auto max-w-6xl scroll-mt-20 px-4 pt-24 sm:px-10 sm:pt-32">
         <Reveal>
           <SectionHeading lead="How Tracyn works" tail="before it acts" />
         </Reveal>
@@ -104,7 +106,7 @@ export default function CluelyVibeConceptPage() {
         </Reveal>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
+      <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-10 sm:pt-36">
         <Reveal>
           <SectionHeading
             lead="Evidence,"
@@ -113,7 +115,7 @@ export default function CluelyVibeConceptPage() {
           />
         </Reveal>
         <Reveal className="mt-14">
-          <ShotPanel variant="light" height={540}>
+          <ShotPanel variant="light" {...EVIDENCE_CROP}>
             <AppWindow active="Evidence Packs">
               <EvidenceScreen />
             </AppWindow>
@@ -121,7 +123,7 @@ export default function CluelyVibeConceptPage() {
         </Reveal>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
+      <section id="mcp" className="mx-auto max-w-6xl scroll-mt-20 px-4 pt-24 sm:px-10 sm:pt-36">
         <Reveal>
           <SectionHeading
             lead="Your audit trail,"
@@ -134,7 +136,7 @@ export default function CluelyVibeConceptPage() {
         </Reveal>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
+      <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-10 sm:pt-36">
         <Reveal>
           <SectionHeading lead="Trustworthy" tail="by construction" sub="The parts an auditor checks first, built in rather than bolted on." />
         </Reveal>
@@ -143,13 +145,13 @@ export default function CluelyVibeConceptPage() {
         </Reveal>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
+      <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-10 sm:pt-36">
         <Reveal>
           <BigStats />
         </Reveal>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
+      <section className="mx-auto max-w-6xl px-4 pt-24 sm:px-10 sm:pt-36">
         <Reveal>
           <Faq />
         </Reveal>
@@ -160,30 +162,32 @@ export default function CluelyVibeConceptPage() {
   );
 }
 
-function Nav() {
+// Shared with the 404 page (app/not-found.tsx).
+export function SiteNav() {
   return (
     <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md">
-      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-6 py-3.5 sm:px-8">
-        <div className="flex items-center gap-2">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-8 sm:py-3.5 md:grid md:grid-cols-[1fr_auto_1fr]">
+        <Link href="/" className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
           <img src="/logo.png" alt="" width={26} height={26} className="rounded-md" />
           <span className="text-[17px] font-semibold tracking-[-0.02em] text-[var(--cv-ink)]">Tracyn</span>
-        </div>
+        </Link>
         <nav className="hidden items-center gap-7 text-[15px] font-medium text-[var(--cv-ink)] md:flex">
-          <span className="flex items-center gap-1">
-            Product <ChevronDown className="h-3.5 w-3.5" strokeWidth={2} />
-          </span>
-          <span className="flex items-center gap-1">
-            Resources <ChevronDown className="h-3.5 w-3.5" strokeWidth={2} />
-          </span>
-          <span>Pricing</span>
-          <span>Docs</span>
+          <a href="/#how" className="transition-colors hover:text-[var(--cv-blue-bright)]">How it works</a>
+          <a href="/#mcp" className="transition-colors hover:text-[var(--cv-blue-bright)]">MCP</a>
+          <Link href="/docs" className="transition-colors hover:text-[var(--cv-blue-bright)]">Docs</Link>
+          <Link href="/about" className="transition-colors hover:text-[var(--cv-blue-bright)]">About</Link>
         </nav>
         <div className="flex items-center justify-end gap-5">
-          <span className="hidden text-[15px] font-medium text-[var(--cv-ink)] sm:inline">Log in</span>
-          <button className="cv-btn-primary rounded-[8px] px-4 py-2 text-[15px] font-semibold text-white">
+          <Link href="/login" className="hidden text-[15px] font-medium text-[var(--cv-ink)] sm:inline">
+            Log in
+          </Link>
+          <Link
+            href="/login"
+            className="cv-btn-primary whitespace-nowrap rounded-[8px] px-3.5 py-2 text-[14px] font-semibold text-white sm:px-4 sm:text-[15px]"
+          >
             Get Tracyn free
-          </button>
+          </Link>
         </div>
       </div>
     </header>
@@ -198,7 +202,7 @@ function Hero() {
   return (
     <section className="relative bg-white pt-16 sm:pt-24">
       <div className="mx-auto max-w-5xl px-6 text-center sm:px-10">
-        <h1 className="text-[50px] font-bold leading-[1.22] tracking-[-0.035em] text-[var(--cv-ink)] sm:text-[84px] lg:text-[104px]">
+        <h1 className="text-[42px] font-bold leading-[1.22] tracking-[-0.035em] text-[var(--cv-ink)] min-[400px]:text-[50px] sm:text-[84px] lg:text-[104px]">
           It&rsquo;s not a log.
           <br />
           It&rsquo;s{" "}
@@ -215,18 +219,23 @@ function Hero() {
           Tracyn keeps a record of everything your AI agents do, asks a person before the risky parts, and turns it
           all into evidence your auditors accept.
         </p>
-        <div className="mt-8 flex items-center justify-center gap-3">
-          <button className="cv-btn-primary rounded-[10px] px-5 py-2.5 text-[16px] font-semibold text-white">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link href="/login" className="cv-btn-primary rounded-[10px] px-5 py-2.5 text-[16px] font-semibold text-white">
             Get Tracyn free
-          </button>
-          <button className="cv-btn-soft rounded-[10px] px-5 py-2.5 text-[16px] font-semibold text-[var(--cv-blue-bright)]">
+          </Link>
+          <a
+            href={SDK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cv-btn-soft rounded-[10px] px-5 py-2.5 text-[16px] font-semibold text-[var(--cv-blue-bright)]"
+          >
             View the SDK
-          </button>
+          </a>
         </div>
       </div>
 
-      <div className="mx-auto mt-16 max-w-6xl px-6 sm:px-10">
-        <CroppedWindow height={500}>
+      <div className="mx-auto mt-12 max-w-6xl px-4 sm:mt-16 sm:px-10">
+        <CroppedWindow height={500} mobileHeight={380}>
           <AppWindow active="Timeline">
             <TimelineScreen />
           </AppWindow>
@@ -281,22 +290,21 @@ function SectionHeading({ lead, tail, sub }: { lead: string; tail: string; sub?:
 // window's top corners still rounded.
 function ShotPanel({
   variant,
-  height,
   children,
-}: {
+  ...heights
+}: CropHeights & {
   variant: "navy" | "light";
-  height: number;
   children: React.ReactNode;
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-[28px] px-5 pt-12 sm:px-10 sm:pt-16 lg:px-16 lg:pt-20 ${
+      className={`overflow-hidden rounded-[24px] px-4 pt-10 sm:rounded-[28px] sm:px-10 sm:pt-16 lg:px-16 lg:pt-20 ${
         variant === "navy" ? "cv-panel-navy" : "cv-panel-light"
       }`}
     >
       <div
-        className={`mx-auto overflow-hidden ${variant === "navy" ? "rounded-t-[10px]" : "cv-bezel"}`}
-        style={{ height }}
+        className={`mx-auto overflow-hidden ${CROP_CLASS} ${variant === "navy" ? "rounded-t-[10px]" : "cv-bezel"}`}
+        style={cropVars(heights)}
       >
         {children}
       </div>
@@ -309,9 +317,24 @@ function ShotPanel({
 // it reads as "here's the real thing" rather than a small isolated
 // widget. A hard crop (no fade overlay) keeps every visible pixel of the
 // real screenshot crisp, right up to the cut.
-function CroppedWindow({ height, children }: { height: number; children: React.ReactNode }) {
+// Crop heights per breakpoint: `height` from sm up, `mobileHeight` below
+// sm (phones get a shorter, trimmed screen), `lgHeight` from lg up (where
+// some screens change layout). Each falls back to `height`.
+type CropHeights = { height: number; mobileHeight?: number; lgHeight?: number };
+
+function cropVars({ height, mobileHeight, lgHeight }: CropHeights): React.CSSProperties {
+  return {
+    "--crop": `${height}px`,
+    "--crop-base": `${mobileHeight ?? height}px`,
+    "--crop-lg": `${lgHeight ?? height}px`,
+  } as React.CSSProperties;
+}
+
+const CROP_CLASS = "h-[var(--crop-base)] sm:h-[var(--crop)] lg:h-[var(--crop-lg)]";
+
+function CroppedWindow({ children, ...heights }: CropHeights & { children: React.ReactNode }) {
   return (
-    <div className="relative overflow-hidden rounded-t-[10px]" style={{ height }}>
+    <div className={`relative overflow-hidden rounded-t-[10px] ${CROP_CLASS}`} style={cropVars(heights)}>
       {children}
     </div>
   );
@@ -328,7 +351,7 @@ function AppWindow({ active, children }: { active: string; children: React.React
         <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-        <span className="mx-auto -translate-x-6 rounded-md bg-white px-16 py-0.5 text-[11.5px] text-[var(--cv-fg-2)] shadow-[0_0_0_1px_var(--cv-line)]">
+        <span className="mx-auto truncate rounded-md bg-white px-5 py-0.5 text-[11.5px] text-[var(--cv-fg-2)] shadow-[0_0_0_1px_var(--cv-line)] sm:-translate-x-6 sm:px-16">
           app.tracyn.online
         </span>
       </div>
@@ -383,19 +406,19 @@ function TimelineScreen() {
         <table className="w-full whitespace-nowrap text-left text-[13px]">
           <thead>
             <tr className="border-b border-[var(--cv-line)] text-[12px] text-[var(--cv-fg-2)]">
-              <th className="px-6 py-2.5 font-medium">When</th>
-              <th className="px-6 py-2.5 font-medium">Agent action</th>
+              <th className="hidden px-6 py-2.5 font-medium sm:table-cell">When</th>
+              <th className="px-4 py-2.5 font-medium sm:px-6">Agent action</th>
               <th className="hidden px-6 py-2.5 font-medium lg:table-cell">Type</th>
-              <th className="px-6 py-2.5 font-medium">Status</th>
+              <th className="px-4 py-2.5 font-medium sm:px-6">Status</th>
             </tr>
           </thead>
           <tbody>
             {TIMELINE_ROWS.map((row, i) => (
               <tr key={i} className="border-b border-[var(--cv-line)] last:border-0">
-                <td className="px-6 py-3 text-[var(--cv-fg-2)]">{row.when}</td>
-                <td className="px-6 py-3 font-medium text-[var(--cv-fg)]">{row.action}</td>
+                <td className="hidden px-6 py-3 text-[var(--cv-fg-2)] sm:table-cell">{row.when}</td>
+                <td className="px-4 py-3 font-medium text-[var(--cv-fg)] sm:px-6">{row.action}</td>
                 <td className="hidden px-6 py-3 text-[var(--cv-fg-2)] lg:table-cell">{row.type}</td>
-                <td className="px-6 py-3">
+                <td className="px-4 py-3 sm:px-6">
                   <StatusBadge status={row.status} />
                 </td>
               </tr>
@@ -406,6 +429,16 @@ function TimelineScreen() {
     </div>
   );
 }
+
+
+// Crop heights measured in the browser (at 375, 888 and 1280px wide) so
+// nothing vital is cut: the policy assistant's send row (489 / 452px) and,
+// at lg, the rows beside it (390px); the approval's buttons (425 / 403 /
+// 359px). Each gets ~14-20px of room below. Evidence is a deliberate cut:
+// on phones the first answer ends at 339px and the second peeks in.
+const POLICY_CROP: CropHeights = { mobileHeight: 503, height: 466, lgHeight: 404 };
+const APPROVALS_CROP: CropHeights = { mobileHeight: 441, height: 422, lgHeight: 378 };
+const EVIDENCE_CROP: CropHeights = { mobileHeight: 400, height: 540 };
 
 function FeatureBlueCard() {
   return (
@@ -420,8 +453,8 @@ function FeatureBlueCard() {
           not a one-shot form.
         </p>
       </div>
-      <div className="mt-10 px-6 pb-6 sm:px-10 sm:pb-0">
-        <CroppedWindow height={385}>
+      <div className="mt-10 px-4 sm:px-10">
+        <CroppedWindow {...POLICY_CROP}>
           <AppWindow active="Policy">
             <PolicyScreen />
           </AppWindow>
@@ -432,41 +465,49 @@ function FeatureBlueCard() {
 }
 
 function PolicyScreen() {
+  // `phone: false` rows are hidden below lg, where the assistant stacks
+  // under the rows instead of sitting beside them, to keep the screenshot
+  // short; the two that stay still show both outcomes.
   const rows = [
-    { label: "Deleting stored data", state: "Runs automatically", on: false },
-    { label: "Reading or accessing stored data", state: "Runs automatically", on: false },
-    { label: "Sending things outside your system", state: "Needs approval", on: true },
-    { label: "Internal, background actions", state: "Runs automatically", on: false },
+    { label: "Deleting stored data", state: "Runs automatically", on: false, phone: true },
+    { label: "Reading or accessing stored data", state: "Runs automatically", on: false, phone: false },
+    { label: "Sending things outside your system", state: "Needs approval", on: true, phone: true },
+    { label: "Internal, background actions", state: "Runs automatically", on: false, phone: false },
   ];
   return (
-    <div className="relative">
-      <div className="border-b border-[var(--cv-line)] px-6 py-4">
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_272px] lg:items-start">
+      <div className="min-w-0">
+      <div className="border-b border-[var(--cv-line)] px-4 py-4 sm:px-6">
         <h3 className="text-[17px] font-semibold tracking-tight text-[var(--cv-fg)]">Policy</h3>
         <p className="mt-0.5 text-[12.5px] text-[var(--cv-fg-2)]">
           Choose which kinds of things your AI agent needs a person's okay for.
         </p>
       </div>
-      <div className="divide-y divide-[var(--cv-line)] px-6 py-2 text-[var(--cv-fg)]">
+      <div className="divide-y divide-[var(--cv-line)] px-4 py-2 text-[var(--cv-fg)] sm:px-6">
         {rows.map((r) => (
-          <div key={r.label} className="flex items-center justify-between py-3.5">
-            <span className="text-[14px] font-medium">{r.label}</span>
-            <div className="flex items-center gap-2.5">
-              <span className="text-[13px] text-[var(--cv-fg-2)]">{r.state}</span>
+          <div
+            key={r.label}
+            className={`items-center justify-between gap-3 py-3.5 ${r.phone ? "flex" : "hidden lg:flex"}`}
+          >
+            <span className="min-w-0 truncate text-[14px] font-medium">{r.label}</span>
+            <div className="flex shrink-0 items-center gap-2.5">
+              <span className="hidden text-[13px] text-[var(--cv-fg-2)] sm:inline">{r.state}</span>
               <Toggle on={r.on} />
             </div>
           </div>
         ))}
       </div>
-      <div className="flex items-center gap-1.5 border-t border-[var(--cv-line)] px-6 py-4 text-[13px] font-medium text-[var(--cv-fg-2)]">
-        <ChevronDown className="h-3.5 w-3.5 -rotate-90" />
-        Advanced: edit the underlying rules as code
+      <div className="hidden items-center gap-1.5 border-t border-[var(--cv-line)] px-4 py-4 text-[13px] font-medium text-[var(--cv-fg-2)] sm:px-6 lg:flex">
+        <ChevronDown className="h-3.5 w-3.5 shrink-0 -rotate-90" />
+        <span className="truncate">Advanced: edit the underlying rules as code</span>
+      </div>
       </div>
 
-      {/* A smaller, lighter footprint than the real widget's 380px --
-          this is meant to peek in from the corner, not dominate the
-          screenshot. Still keeps the real hardcoded Notion-green diff
-          colors (see components/ui/badge.tsx's "success" variant). */}
-      <div className="absolute bottom-4 right-4 flex w-[260px] max-w-[calc(100%-2rem)] flex-col overflow-hidden rounded-lg border border-[var(--cv-line)] bg-white shadow-2xl">
+      {/* Smaller than the real widget's 380px, and docked rather than
+          floating so it never covers the rows. Still keeps the real
+          hardcoded Notion-green diff colors (see components/ui/badge.tsx's
+          "success" variant). */}
+      <div className="mx-3 mb-3 flex flex-col overflow-hidden rounded-lg border border-[var(--cv-line)] bg-white shadow-xl lg:my-3 lg:ml-0">
         <div className="flex items-center justify-between border-b border-[var(--cv-line)] px-3 py-2">
           <p className="text-[12px] font-semibold text-[var(--cv-fg)]">Policy assistant</p>
           <X className="h-3.5 w-3.5 text-[var(--cv-fg-2)]" />
@@ -535,9 +576,9 @@ function FeatureApprovalsCard() {
           A matching action pauses before it runs. Approve, edit, or reject it from the dashboard, email, or Slack.
         </p>
       </div>
-      <div className="mt-10 px-6 sm:px-10">
+      <div className="mt-10 px-4 sm:px-10">
         <div className="cv-bezel">
-          <CroppedWindow height={400}>
+          <CroppedWindow {...APPROVALS_CROP}>
             <AppWindow active="Approvals">
               <ApprovalsScreen />
             </AppWindow>
@@ -555,12 +596,6 @@ const APPROVALS = [
     meta: "external · requested Sep 20, 02:23 PM",
     inputs: '{\n  "order_id": "ord_8123",\n  "amount": 249.00,\n  "reason": "damaged on arrival"\n}',
   },
-  {
-    agent: "ops-agent",
-    action: "bulk_delete_records",
-    meta: "external · requested Sep 20, 02:22 PM",
-    inputs: '{\n  "table": "customers_archive",\n  "older_than_days": 365\n}',
-  },
 ];
 
 // Mirrors app/(app)/approvals/page.tsx: tabs, then one card per request,
@@ -568,9 +603,9 @@ const APPROVALS = [
 // decision buttons.
 function ApprovalsScreen() {
   return (
-    <div className="px-6 py-5">
+    <div className="px-4 py-5 sm:px-6">
       <h3 className="text-[20px] font-semibold tracking-tight">Approvals</h3>
-      <div className="mt-4 flex gap-5 border-b border-[var(--cv-line)] text-[13px] font-medium text-[var(--cv-fg-2)]">
+      <div className="mt-4 flex gap-4 overflow-hidden whitespace-nowrap border-b border-[var(--cv-line)] text-[12.5px] font-medium text-[var(--cv-fg-2)] sm:gap-5 sm:text-[13px]">
         {["Pending", "Approved", "Rejected", "Auto-denied"].map((t, i) => (
           <span key={t} className={`pb-2 ${i === 0 ? "border-b-2 border-[var(--cv-fg)] text-[var(--cv-fg)]" : ""}`}>
             {t}
@@ -588,7 +623,7 @@ function ApprovalsScreen() {
                 <StatusBadge status="pending" />
               </div>
               <p className="text-[12.5px] text-[var(--cv-fg-2)]">{a.meta}</p>
-              <pre className="mt-1 whitespace-pre-wrap rounded-md bg-[var(--cv-cream)] p-3 font-mono text-[11.5px] leading-relaxed">
+              <pre className="mt-1 overflow-hidden whitespace-pre rounded-md bg-[var(--cv-cream)] p-3 font-mono text-[11px] leading-relaxed sm:text-[11.5px]">
                 {a.inputs}
               </pre>
             </div>
@@ -630,16 +665,18 @@ const EVIDENCE_QA = [
 function EvidenceScreen() {
   return (
     <div>
-      <div className="flex items-center justify-between border-b border-[var(--cv-line)] px-6 py-4">
-        <div>
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--cv-line)] px-4 py-4 sm:px-6">
+        <div className="min-w-0">
           <h3 className="text-[17px] font-semibold tracking-tight">Evidence Packs</h3>
-          <p className="mt-0.5 text-[12.5px] text-[var(--cv-fg-2)]">SOC2-Questionnaire-2026.csv</p>
+          <p className="mt-0.5 truncate text-[12.5px] text-[var(--cv-fg-2)]">SOC2-Questionnaire-2026.csv</p>
         </div>
-        <Badge variant="success">4 of 4 answered</Badge>
+        <Badge variant="success" className="shrink-0 whitespace-nowrap">
+          4 of 4 answered
+        </Badge>
       </div>
-      <div className="space-y-4 p-6">
-        {EVIDENCE_QA.map((item) => (
-          <div key={item.q} className="rounded-lg border border-[var(--cv-line)] p-4">
+      <div className="space-y-4 p-4 sm:p-6">
+        {EVIDENCE_QA.map((item, i) => (
+          <div key={item.q} className={`rounded-lg border border-[var(--cv-line)] p-4 ${i < 2 ? "" : "hidden sm:block"}`}>
             <p className="text-[13.5px] font-medium">{item.q}</p>
             <p className="mt-2 text-[13px] leading-relaxed text-[var(--cv-fg-2)]">{item.a}</p>
             <div className="mt-3 flex flex-wrap gap-1.5">
@@ -804,7 +841,7 @@ const MCP_TOOLS = [
 function McpFeature() {
   return (
     <div className="cv-panel-navy overflow-hidden rounded-[28px] text-white">
-      <div className="grid gap-10 px-6 pt-12 sm:px-10 sm:pt-16 lg:grid-cols-[1fr_1.15fr] lg:gap-12 lg:px-14">
+      <div className="grid grid-cols-1 gap-10 px-5 pt-10 sm:px-10 sm:pt-16 lg:grid-cols-[1fr_1.15fr] lg:gap-12 lg:px-14 [&>*]:min-w-0">
         <div className="lg:pb-14">
           <span className="cv-pill inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12.5px] font-medium">
             <Plug className="h-3.5 w-3.5" /> MCP server
@@ -831,7 +868,7 @@ function McpFeature() {
           </div>
         </div>
 
-        <div className="self-center pb-12 lg:pb-14">
+        <div className="self-center pb-8 sm:pb-12 lg:pb-14">
           <McpChatWindow />
         </div>
       </div>
@@ -846,12 +883,14 @@ function McpChatWindow() {
   return (
     <div className="overflow-hidden rounded-[18px] border border-[#3d3d3a] bg-[#262624] text-[#ece9e2] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]">
       <div className="flex items-center gap-2 px-5 py-4">
-        <BookOpen className="h-4 w-4 text-[#b7b4ab]" strokeWidth={1.75} />
-        <span className="text-[14px] font-semibold">Approvals check</span>
-        <span className="rounded-md bg-[#3a3a37] px-1.5 py-0.5 text-[11.5px] font-medium text-[#c9c6bd]">Acme Agents</span>
+        <BookOpen className="h-4 w-4 shrink-0 text-[#b7b4ab]" strokeWidth={1.75} />
+        <span className="truncate text-[14px] font-semibold">Approvals check</span>
+        <span className="shrink-0 whitespace-nowrap rounded-md bg-[#3a3a37] px-1.5 py-0.5 text-[11.5px] font-medium text-[#c9c6bd]">
+          Acme Agents
+        </span>
       </div>
 
-      <div className="space-y-4 px-5 pb-5 text-[14.5px] leading-[1.6]">
+      <div className="space-y-4 px-4 pb-5 text-[14px] leading-[1.6] sm:px-5 sm:text-[14.5px]">
         <div className="flex justify-end">
           <div className="max-w-[80%] rounded-2xl bg-[#3a3a37] px-4 py-2.5">anything waiting on me?</div>
         </div>
@@ -884,10 +923,10 @@ function McpChatWindow() {
       <div className="px-4 pb-4">
         <div className="rounded-2xl border border-[#3d3d3a] bg-[#30302e] px-4 pb-3 pt-3.5">
           <p className="text-[14px] text-[#8f8c84]">Type / for commands</p>
-          <div className="mt-4 flex items-center gap-3 text-[13px] text-[#b7b4ab]">
-            <Plus className="h-4 w-4" strokeWidth={1.75} />
-            <Mic className="h-4 w-4" strokeWidth={1.75} />
-            <ChevronDown className="-ml-1.5 h-3.5 w-3.5" strokeWidth={1.75} />
+          <div className="mt-4 flex items-center gap-3 whitespace-nowrap text-[12px] text-[#b7b4ab] sm:text-[13px]">
+            <Plus className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+            <Mic className="hidden h-4 w-4 shrink-0 sm:block" strokeWidth={1.75} />
+            <ChevronDown className="-ml-1.5 hidden h-3.5 w-3.5 shrink-0 sm:block" strokeWidth={1.75} />
             <span className="flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-[#5fbf73]" />
               Tracyn connected
@@ -944,34 +983,64 @@ function Faq() {
 // aligned, two-tone line, dark button) and the footer's link columns.
 function FinalCtaAndFooter() {
   const columns = [
-    { title: "Product", links: ["Timeline", "Approvals", "Evidence Packs", "Policy", "Pricing"] },
-    { title: "Resources", links: ["Docs", "SDK on GitHub", "About"] },
-    { title: "Compliance", links: ["SOC 2 Mapping", "Security questionnaires", "Audit trail export"] },
-    { title: "Support", links: ["Privacy Policy", "Terms of Service", "Contact us"] },
+    {
+      title: "Product",
+      links: [
+        { label: "Get started", href: "/login" },
+        { label: "Log in", href: "/login" },
+        { label: "How it works", href: "#how" },
+        { label: "MCP server", href: "#mcp" },
+      ],
+    },
+    {
+      title: "Resources",
+      links: [
+        { label: "Docs", href: "/docs" },
+        { label: "MCP setup", href: "/docs#mcp" },
+        { label: "SDK on GitHub", href: SDK_URL },
+      ],
+    },
+    {
+      title: "Company",
+      links: [
+        { label: "About", href: "/about" },
+        { label: "Contact us", href: CONTACT_URL },
+      ],
+    },
+    {
+      title: "Legal",
+      links: [
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Terms of Service", href: "/terms" },
+      ],
+    },
   ];
   return (
-    <div className="cv-final-bg mt-36">
-      <div className="mx-auto max-w-6xl px-6 pb-24 pt-28 sm:px-10">
+    <div className="cv-final-bg mt-24 sm:mt-36">
+      <div className="mx-auto max-w-6xl px-5 pb-20 pt-20 sm:px-10 sm:pb-24 sm:pt-28">
         <h2 className="text-[26px] font-medium leading-[1.25] tracking-[-0.035em] sm:text-[32px]">
           <span className="text-[var(--cv-ink)]">Evidence that builds itself while your agents work.</span>
           <br />
           <span className="cv-grad-slate">Start logging your agent in five minutes.</span>
         </h2>
-        <button className="cv-btn-dark mt-8 flex items-center gap-2 rounded-[10px] px-5 py-3 text-[14.5px] font-medium text-white">
+        <Link
+          href="/login"
+          className="cv-btn-dark mt-8 inline-flex items-center gap-2 rounded-[10px] px-5 py-3 text-[14.5px] font-medium text-white"
+        >
           Get started free <ArrowRight className="h-4 w-4" />
-        </button>
+        </Link>
       </div>
 
-      <footer className="mx-auto max-w-6xl px-6 sm:px-10">
-        <div className="border-t border-[var(--cv-line-2)] pb-10 pt-20">
+      <footer className="mx-auto max-w-6xl px-5 sm:px-10">
+        <div className="border-t border-[var(--cv-line-2)] pb-10 pt-14 sm:pt-20">
           <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4 lg:grid-cols-[repeat(4,minmax(0,1fr))_1.2fr]">
             {columns.map((col) => (
               <div key={col.title}>
                 <p className="text-[15px] font-medium tracking-[-0.01em] text-[var(--cv-ink)]">{col.title}</p>
                 <ul className="mt-4 space-y-3">
                   {col.links.map((l) => (
-                    <li key={l} className="text-[15px] text-[var(--cv-fg-2)] transition-colors hover:text-[var(--cv-ink)]">
-                      {l}
+                    <li key={l.label}>
+                      <FooterLink href={l.href}>{l.label}</FooterLink>
                     </li>
                   ))}
                 </ul>
@@ -980,14 +1049,37 @@ function FinalCtaAndFooter() {
           </div>
 
           <div className="mt-14 flex items-center justify-between border-t border-[var(--cv-line-2)] pt-6">
-            <p className="text-[13.5px] text-[var(--cv-fg-3)]">&copy; 2026 Tracyn. All rights reserved.</p>
+            <p className="text-[13.5px] text-[var(--cv-fg-3)]">&copy; {new Date().getFullYear()} Tracyn. All rights reserved.</p>
             <div className="flex items-center gap-4 text-[var(--cv-ink)]">
-              <Github className="h-[18px] w-[18px]" />
-              <Mail className="h-[18px] w-[18px]" />
+              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="hover:text-[var(--cv-blue-bright)]">
+                <Github className="h-[18px] w-[18px]" />
+              </a>
+              <a href={CONTACT_URL} aria-label="Email" className="hover:text-[var(--cv-blue-bright)]">
+                <Mail className="h-[18px] w-[18px]" />
+              </a>
             </div>
           </div>
         </div>
       </footer>
     </div>
+  );
+}
+
+// Internal pages go through next/link; in-page anchors, mail and GitHub
+// links are plain anchors (GitHub opens in a new tab).
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const className = "text-[15px] text-[var(--cv-fg-2)] transition-colors hover:text-[var(--cv-ink)]";
+  if (href.startsWith("/")) {
+    return (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    );
+  }
+  const external = href.startsWith("http");
+  return (
+    <a href={href} className={className} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+      {children}
+    </a>
   );
 }
