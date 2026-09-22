@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PartyPopper } from "lucide-react";
+import { ArrowRight, PartyPopper } from "lucide-react";
 import { api } from "@/lib/api";
 import { useWorkspace } from "@/lib/workspace-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -321,6 +321,21 @@ function ApiKeysCard() {
 function BillingCard() {
   const { workspace } = useWorkspace();
 
+  // The pricing page's plan buttons land here as /settings?plan=<id>
+  // (after sign-in and, for a new account, workspace creation). Highlight
+  // that plan and offer to continue to checkout -- never redirect to a
+  // payment page on load without a click. ?billing=success&plan= is the
+  // post-payment return and is handled by PaymentSuccessDialog instead.
+  const [intent, setIntent] = useState<string | null>(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get("plan");
+    if (params.get("billing") || !plan || !PLANS.some((p) => p.id === plan && p.id !== "enterprise")) return;
+    setIntent(plan);
+    document.getElementById("billing")?.scrollIntoView({ block: "start" });
+  }, []);
+  const intentPlan = PLANS.find((p) => p.id === intent);
+
   const checkout = useMutation({
     mutationFn: (plan: string) =>
       api.post<{ checkout_url: string }>(`/v1/workspaces/${workspace!.id}/billing/checkout`, { plan }),
@@ -330,11 +345,33 @@ function BillingCard() {
   });
 
   return (
-    <Card>
+    <Card id="billing" className="scroll-mt-6">
       <CardHeader>
         <CardTitle>Plan &amp; billing</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
+        {intentPlan && (
+          <div className="flex flex-col gap-3 rounded-md border border-border bg-muted/50 p-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm">
+              {workspace?.plan === intentPlan.id ? (
+                <>
+                  This workspace is already on <span className="font-medium">{intentPlan.name}</span>.
+                </>
+              ) : (
+                <>
+                  You picked <span className="font-medium">{intentPlan.name}</span> ({intentPlan.price}) for{" "}
+                  <span className="font-medium">{workspace?.name ?? "this workspace"}</span>.
+                </>
+              )}
+            </p>
+            {workspace?.plan !== intentPlan.id && (
+              <Button size="sm" disabled={!workspace || checkout.isPending} onClick={() => checkout.mutate(intentPlan.id)}>
+                {checkout.isPending ? "Loading..." : "Continue to checkout"}
+                {!checkout.isPending && <ArrowRight className="ml-1 h-3.5 w-3.5" />}
+              </Button>
+            )}
+          </div>
+        )}
         <p className="text-sm">
           Current plan: <Badge variant="outline">{workspace?.plan ?? "free"}</Badge>
         </p>
@@ -345,7 +382,10 @@ function BillingCard() {
         )}
         <div className="grid gap-3 sm:grid-cols-3">
           {PLANS.map((p) => (
-            <div key={p.id} className="rounded-md border border-border p-3">
+            <div
+              key={p.id}
+              className={cn("rounded-md border border-border p-3", intent === p.id && "border-foreground ring-1 ring-foreground")}
+            >
               <div className="font-medium">{p.name}</div>
               <div className="text-sm text-muted-foreground">{p.price}</div>
               <p className="mt-1 text-xs text-muted-foreground">{p.blurb}</p>

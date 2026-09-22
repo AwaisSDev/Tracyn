@@ -163,15 +163,17 @@ export function Home() {
 export function SiteNav() {
   return (
     <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-8 sm:py-3.5 md:grid md:grid-cols-[1fr_auto_1fr]">
+      {/* Evenly spaced below lg, where a centered middle column would squeeze
+          Log in; truly centered links from lg up, like Notion. */}
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 sm:py-3.5 lg:grid lg:grid-cols-[1fr_auto_1fr]">
         <Link href="/" className="flex items-center gap-2">
           {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
           <img src="/logo.png" alt="" width={26} height={26} className="rounded-md" />
           <span className="text-[17px] font-semibold tracking-[-0.02em] text-[var(--cv-ink)]">Tracyn</span>
         </Link>
         <NavLinks />
-        <div className="flex items-center justify-end gap-5">
-          <Link href="/login" className="hidden text-[15px] font-medium text-[var(--cv-ink)] sm:inline">
+        <div className="flex items-center justify-end gap-4 lg:gap-5">
+          <Link href="/login" className="hidden whitespace-nowrap text-[15px] font-medium text-[var(--cv-ink)] sm:inline">
             Log in
           </Link>
           <Link
@@ -258,7 +260,7 @@ function WorksWithStrip() {
 
 // Cluely's section titles: one line, two tones. The lead is near-black
 // fading to slate, the tail sits back in a quieter gray.
-function SectionHeading({ lead, tail, sub }: { lead: string; tail: string; sub?: string }) {
+export function SectionHeading({ lead, tail, sub }: { lead: string; tail: string; sub?: string }) {
   return (
     <div className="text-center">
       <h2 className="text-[34px] font-medium leading-[1.15] tracking-[-0.035em] sm:text-[52px]">
@@ -830,44 +832,32 @@ function BigStats() {
   );
 }
 
-const MCP_TOOLS = [
-  { name: "get_recent_actions", desc: "What your agents did, and when", icon: History },
-  { name: "get_pending_approvals", desc: "Every request waiting on a person", icon: CircleCheck },
-  { name: "decide_approval", desc: "Approve or reject, right in the chat", icon: ShieldCheck },
-  { name: "draft_questionnaire_answers", desc: "Evidence-backed answers, cited by event", icon: FileText },
-  { name: "get_compliance_summary", desc: "Your current SOC 2 posture", icon: BadgeCheck },
-];
+// The MCP clients mcp-server/README.md documents connecting.
+const MCP_CLIENTS = ["Claude", "ChatGPT", "Grok"];
 
-// The MCP server gets its own big navy panel: the five real tools (see
-// mcp-server/README.md) on the left, and on the right a chat clearing an
-// approval through them.
+// The MCP server gets its own big navy panel, kept minimal: a heading, one
+// line, the clients it works in, and a chat clearing an approval.
 function McpFeature() {
   return (
     <div className="cv-panel-navy overflow-hidden rounded-[28px] text-white">
       <div className="grid grid-cols-1 gap-10 px-5 pt-10 sm:px-10 sm:pt-16 lg:grid-cols-[1fr_1.15fr] lg:gap-12 lg:px-14 [&>*]:min-w-0">
-        <div className="lg:pb-14">
+        <div className="lg:self-center lg:pb-14">
           <span className="cv-pill inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12.5px] font-medium">
             <Plug className="h-3.5 w-3.5" /> MCP server
           </span>
           <h3 className="mt-4 text-[26px] font-semibold leading-[1.15] tracking-[-0.03em] sm:mt-5 sm:text-[36px]">
-            Five tools. Any MCP client.
+            Ask it. Approve it. Done.
           </h3>
           <p className="mt-3 max-w-md text-[15px] leading-relaxed text-white/75 sm:text-[16px]">
             Deciding an approval needs a reviewer key, so an agent can never approve its own request.
           </p>
-
-          <div className="mt-8 hidden divide-y divide-white/10 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] sm:block">
-            {MCP_TOOLS.map((t) => (
-              <div key={t.name} className="flex items-center gap-3.5 px-4 py-3.5">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.07]">
-                  <t.icon className="h-[17px] w-[17px] text-[#b9c8fb]" strokeWidth={1.75} />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[15px] font-medium leading-snug tracking-[-0.01em] text-white">{t.desc}</p>
-                  <p className="mt-0.5 truncate font-mono text-[12px] tracking-normal text-white/45">{t.name}</p>
-                </div>
-              </div>
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            {MCP_CLIENTS.map((c) => (
+              <span key={c} className="rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[13px] font-medium text-white/90">
+                {c}
+              </span>
             ))}
+            <span className="px-1 text-[13px] text-white/55">and any MCP client</span>
           </div>
         </div>
 
@@ -955,7 +945,8 @@ function UsedTool() {
   );
 }
 
-function Faq() {
+// Also used by the pricing page with its own questions.
+export function Faq({ items = FAQS }: { items?: { q: string; a: string }[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   return (
     <div>
@@ -963,7 +954,7 @@ function Faq() {
         Frequently asked questions
       </h2>
       <div className="mt-8 divide-y divide-[var(--cv-line)] border-y border-[var(--cv-line)]">
-        {FAQS.map((f, i) => {
+        {items.map((f, i) => {
           const open = openIndex === i;
           return (
             <div key={i}>
@@ -987,15 +978,17 @@ function Faq() {
 
 // Cluely closes on one tinted band that holds both the last CTA (left
 // aligned, two-tone line, dark button) and the footer's link columns.
-function FinalCtaAndFooter() {
+// Shared with the pricing page.
+export function FinalCtaAndFooter() {
   const columns = [
     {
       title: "Product",
       links: [
         { label: "Get started", href: "/login" },
         { label: "Log in", href: "/login" },
-        { label: "How it works", href: "#how" },
-        { label: "MCP server", href: "#mcp" },
+        { label: "Pricing", href: "/pricing" },
+        { label: "How it works", href: "/#how" },
+        { label: "MCP server", href: "/#mcp" },
       ],
     },
     {

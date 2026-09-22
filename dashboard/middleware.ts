@@ -1,7 +1,8 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { safeNext } from "@/lib/safe-next";
 
-const PUBLIC_PATHS = ["/login", "/docs", "/privacy", "/terms", "/about"];
+const PUBLIC_PATHS = ["/login", "/docs", "/privacy", "/terms", "/about", "/pricing"];
 const LANDING_PATH = "/";
 
 export async function middleware(request: NextRequest) {
@@ -42,12 +43,14 @@ export async function middleware(request: NextRequest) {
 
   if (!session && !isPublic) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", request.nextUrl.pathname);
+    loginUrl.searchParams.set("next", request.nextUrl.pathname + request.nextUrl.search);
     return NextResponse.redirect(loginUrl);
   }
 
+  // Already signed in: skip the form and go wherever `?next=` points (e.g.
+  // a pricing page plan button's /settings?plan=...), or the dashboard.
   if (session && request.nextUrl.pathname === "/login") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL(safeNext(request.nextUrl.searchParams.get("next")), request.url));
   }
 
   return response;

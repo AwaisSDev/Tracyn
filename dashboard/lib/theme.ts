@@ -32,7 +32,7 @@ export function setTheme(theme: Theme): void {
 
 // Public/marketing pages are always light, regardless of stored preference
 // or OS setting -- theming is a dashboard (post-login) feature only.
-const ALWAYS_LIGHT_PATHS = ["/", "/docs", "/about", "/privacy", "/terms", "/login"];
+const ALWAYS_LIGHT_PATHS = ["/", "/docs", "/about", "/pricing", "/privacy", "/terms", "/login"];
 
 function isAlwaysLightPath(pathname: string): boolean {
   return ALWAYS_LIGHT_PATHS.some((p) => (p === "/" ? pathname === "/" : pathname === p || pathname.startsWith(`${p}/`)));

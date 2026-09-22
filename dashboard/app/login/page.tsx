@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { api } from "@/lib/api";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ForceLightTheme } from "@/components/force-light-theme";
+import { safeNext } from "@/lib/safe-next";
 
 // Called before every Supabase signUp()/resend() -- those are what actually
 // send the email, and they're called directly from the browser with the
@@ -41,6 +42,17 @@ export default function LoginPage() {
   const [resent, setResent] = useState(false);
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
+
+  // `?next=` (from the middleware, or a pricing page plan button) is where
+  // to land after signing in; `?mode=signup` opens the sign-up form first.
+  // Read from window rather than useSearchParams so this page doesn't need
+  // a Suspense boundary.
+  const [next, setNext] = useState<string>(safeNext(null));
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setNext(safeNext(params.get("next")));
+    if (params.get("mode") === "signup") setMode("signup");
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -76,7 +88,7 @@ export default function LoginPage() {
           }
           throw error;
         }
-        router.push("/dashboard");
+        router.push(next);
         router.refresh();
       }
     } catch (err) {
@@ -93,7 +105,7 @@ export default function LoginPage() {
     try {
       const { error } = await supabase.auth.verifyOtp({ email, token: code, type: "signup" });
       if (error) throw error;
-      router.push("/dashboard");
+      router.push(next);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "That code didn't work. Check it and try again.");

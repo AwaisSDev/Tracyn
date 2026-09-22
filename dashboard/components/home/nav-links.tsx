@@ -15,7 +15,7 @@ type Pill = { x: number; w: number; visible: boolean; glide: boolean };
 const CLOSE_DELAY_MS = 140;
 
 // Notion's nav: Product and Resources open large panels (feature cards;
-// link columns), Docs and About are plain links. A soft pill glides under
+// link columns); Pricing, Docs and About are plain links. A soft pill glides under
 // whichever item is hovered, and the open trigger keeps it with its
 // chevron flipped. Menus open on hover or click, close on Escape or
 // outside click. All motion is CSS transitions, off under
@@ -84,8 +84,11 @@ export function NavLinks() {
     history.replaceState(null, "", href.slice(1));
   }
 
-  const itemClass =
-    "cv-nav-link relative z-10 flex items-center gap-1 rounded-full px-3.5 py-1.5 text-[var(--cv-ink)] transition-colors duration-200 hover:text-[var(--cv-blue-bright)]";
+  // Color is set separately from the base so an active item's blue never
+  // competes with the default ink class.
+  const itemBase =
+    "cv-nav-link relative z-10 flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1.5 transition-colors duration-200 hover:text-[var(--cv-blue-bright)] lg:px-3.5";
+  const itemClass = `${itemBase} text-[var(--cv-ink)]`;
 
   return (
     <div
@@ -94,7 +97,7 @@ export function NavLinks() {
       onMouseLeave={scheduleClose}
       onMouseEnter={cancelClose}
     >
-      <nav ref={navRef} aria-label="Main" className="relative flex items-center text-[15px] font-medium">
+      <nav ref={navRef} aria-label="Main" className="relative flex items-center text-[14.5px] font-medium lg:text-[15px]">
         <span
           aria-hidden
           className={`cv-nav-pill pointer-events-none absolute inset-y-0 left-0 rounded-full bg-[#eaeefc] ${
@@ -128,6 +131,15 @@ export function NavLinks() {
           </button>
         ))}
         <Link
+          href="/pricing"
+          onMouseEnter={(e) => hoverItem(e.currentTarget, null)}
+          onFocus={(e) => pillTo(e.currentTarget)}
+          aria-current={pathname === "/pricing" ? "page" : undefined}
+          className={`${itemBase} ${pathname === "/pricing" ? "text-[var(--cv-blue-bright)]" : "text-[var(--cv-ink)]"}`}
+        >
+          Pricing
+        </Link>
+        <Link
           href="/docs"
           onMouseEnter={(e) => hoverItem(e.currentTarget, null)}
           onFocus={(e) => pillTo(e.currentTarget)}
@@ -135,11 +147,13 @@ export function NavLinks() {
         >
           Docs
         </Link>
+        {/* Below lg there isn't room for five items beside Log in; About
+            is still one hover away in Resources > Company. */}
         <Link
           href="/about"
           onMouseEnter={(e) => hoverItem(e.currentTarget, null)}
           onFocus={(e) => pillTo(e.currentTarget)}
-          className={itemClass}
+          className={`${itemClass} hidden lg:flex`}
         >
           About
         </Link>
@@ -357,7 +371,7 @@ function MenuLink({
 
 const INK = "#1a1d2b";
 
-function RecordArt() {
+export function RecordArt() {
   return (
     <svg width="150" height="100" viewBox="0 0 150 100" fill="none" aria-hidden>
       <rect x="18" y="14" width="118" height="76" rx="6" fill="#fff" stroke={INK} strokeWidth="2.5" />
@@ -378,7 +392,7 @@ function RecordArt() {
   );
 }
 
-function ApproveArt() {
+export function ApproveArt() {
   return (
     <svg width="150" height="100" viewBox="0 0 150 100" fill="none" aria-hidden>
       <rect x="14" y="10" width="112" height="72" rx="6" fill="#fff" stroke={INK} strokeWidth="2.5" />
@@ -394,7 +408,7 @@ function ApproveArt() {
   );
 }
 
-function ProveArt() {
+export function ProveArt() {
   return (
     <svg width="150" height="100" viewBox="0 0 150 100" fill="none" aria-hidden>
       <rect x="40" y="16" width="62" height="78" rx="5" fill="#fff" stroke={INK} strokeWidth="2.5" transform="rotate(-6 71 55)" />
