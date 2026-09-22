@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Fraunces } from "next/font/google";
+import { Fraunces, Inter_Tight } from "next/font/google";
 import {
   ArrowRight,
   Check,
@@ -16,6 +16,10 @@ import {
   LogOut,
   Send,
   X,
+  Mail,
+  LayoutDashboard,
+  MessageSquare,
+  Plug,
   Link2,
 } from "lucide-react";
 import { ForceLightTheme } from "@/components/force-light-theme";
@@ -23,7 +27,10 @@ import { Reveal } from "@/components/landing/reveal";
 import { Badge, StatusBadge } from "@/components/ui/badge";
 import "./concept.css";
 
+// The punchline keeps its serif; everything else is a tight, Geist-like
+// grotesk, the way Cluely pairs one editorial headline with a clean sans.
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-serif", weight: ["400", "500"] });
+const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-cv-sans", weight: ["400", "500", "600"] });
 
 const NAV_ITEMS = [
   { label: "Timeline", icon: History },
@@ -68,54 +75,111 @@ const FAQS = [
     q: "How is evidence generated, not just logged?",
     a: "Evidence Packs draft answers to security questionnaires straight from your real logged events, citing the exact events used. A human reviews and edits before anything is exported.",
   },
+  {
+    q: "Can someone quietly edit the log?",
+    a: "Not without it showing. Every event stores a SHA-256 hash of its contents chained to the event before it, so changing any row breaks the chain from that point on.",
+  },
 ];
 
 export default function CluelyVibeConceptPage() {
   return (
-    <div className={`${fraunces.variable} cv`}>
+    <div className={`${fraunces.variable} ${interTight.variable} cv`}>
       <ForceLightTheme />
       <Nav />
       <Hero />
 
-      <Reveal className="mx-auto max-w-6xl px-6 py-28 sm:px-10">
-        <FeatureBlueCard />
-      </Reveal>
+      <section className="mx-auto max-w-6xl px-6 pt-32 sm:px-10">
+        <Reveal>
+          <SectionHeading lead="How Tracyn works" tail="before it acts" />
+        </Reveal>
+        <Reveal className="mt-14">
+          <FeatureBlueCard />
+        </Reveal>
+        <Reveal className="mt-6">
+          <FeatureApprovalsCard />
+        </Reveal>
+      </section>
 
-      <Reveal className="mx-auto max-w-6xl px-6 pb-28 sm:px-10">
-        <FeatureWhiteCard />
-      </Reveal>
+      <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
+        <Reveal>
+          <SectionHeading
+            lead="Evidence,"
+            tail="not paperwork"
+            sub="Security questionnaires answered from what your agents really did. Every answer cites the events behind it."
+          />
+        </Reveal>
+        <Reveal className="mt-14">
+          <ShotPanel variant="light" height={540}>
+            <AppWindow active="Evidence Packs">
+              <EvidenceScreen />
+            </AppWindow>
+          </ShotPanel>
+        </Reveal>
+      </section>
 
-      <Reveal className="mx-auto max-w-3xl px-6 pb-28 sm:px-10">
-        <StatRows />
-      </Reveal>
+      <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
+        <Reveal>
+          <SectionHeading
+            lead="Your audit trail,"
+            tail="inside any chat"
+            sub="Tracyn ships an MCP server. Ask what your agents did, clear a pending approval, or draft a questionnaire answer from Claude, ChatGPT, Grok, or any MCP client."
+          />
+        </Reveal>
+        <Reveal className="mt-14">
+          <McpFeature />
+        </Reveal>
+      </section>
 
-      <Reveal className="mx-auto max-w-3xl px-6 pb-28 sm:px-10">
-        <Faq />
-      </Reveal>
+      <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
+        <Reveal>
+          <SectionHeading lead="Trustworthy" tail="by construction" sub="The parts an auditor checks first, built in rather than bolted on." />
+        </Reveal>
+        <Reveal className="mt-14">
+          <TrustTiles />
+        </Reveal>
+        <Reveal className="mt-24">
+          <Channels />
+        </Reveal>
+      </section>
 
-      <FinalCta />
-      <Footer />
+      <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
+        <Reveal>
+          <BigStats />
+        </Reveal>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
+        <Reveal>
+          <Faq />
+        </Reveal>
+      </section>
+
+      <FinalCtaAndFooter />
     </div>
   );
 }
 
 function Nav() {
   return (
-    <header className="sticky top-0 z-30 bg-[#fdfdfe]/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 sm:px-10">
-        <div className="flex items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
-          <img src="/logo.png" alt="" width={24} height={24} className="rounded" />
-          <span className="text-[15px] font-semibold tracking-tight">Tracyn</span>
+    <header className="sticky top-0 z-30 border-b border-transparent bg-white/75 backdrop-blur-md">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5 sm:px-10">
+        <div className="flex items-center gap-8">
+          <div className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
+            <img src="/logo.png" alt="" width={22} height={22} className="rounded" />
+            <span className="text-[16px] font-semibold tracking-[-0.02em] text-[var(--cv-ink)]">Tracyn</span>
+          </div>
+          <nav className="hidden items-center gap-6 text-[14px] font-medium text-[var(--cv-fg-2)] md:flex">
+            <span className="transition-colors hover:text-[var(--cv-ink)]">Product</span>
+            <span className="transition-colors hover:text-[var(--cv-ink)]">Evidence Packs</span>
+            <span className="transition-colors hover:text-[var(--cv-ink)]">Docs</span>
+            <span className="transition-colors hover:text-[var(--cv-ink)]">Pricing</span>
+          </nav>
         </div>
-        <nav className="hidden items-center gap-8 text-[14px] text-[var(--cv-fg-2)] md:flex">
-          <span>Product</span>
-          <span>Evidence Packs</span>
-          <span>Pricing</span>
-        </nav>
-        <button className="rounded-full bg-[var(--cv-fg)] px-4 py-2 text-[13px] font-medium text-white transition-transform hover:scale-[1.03] active:scale-[0.98]">
-          Get started
-        </button>
+        <div className="flex items-center gap-4">
+          <span className="hidden text-[14px] font-medium text-[var(--cv-fg-2)] sm:inline">Sign in</span>
+          <button className="cv-btn-dark rounded-[9px] px-4 py-2 text-[13.5px] font-medium text-white">Get started</button>
+        </div>
       </div>
     </header>
   );
@@ -123,35 +187,82 @@ function Nav() {
 
 function Hero() {
   return (
-    <section className="cv-hero-bg relative overflow-hidden px-6 pb-24 pt-16 sm:px-10 sm:pt-24">
+    <section className="cv-hero-bg relative px-6 pt-20 sm:px-10 sm:pt-28">
       <div className="mx-auto max-w-3xl text-center">
-        <h1 className="cv-serif text-[46px] leading-[1.05] tracking-tight sm:text-[68px]">
+        <h1 className="cv-serif text-[48px] leading-[1.02] tracking-[-0.02em] text-[var(--cv-ink)] sm:text-[72px]">
           It&rsquo;s not a log.
           <br />
           It&rsquo;s evidence.
         </h1>
-        <p className="mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-[var(--cv-fg-2)] sm:text-[20px]">
+        <p className="mx-auto mt-6 max-w-xl text-[17px] font-medium leading-[1.5] tracking-[-0.01em] text-[var(--cv-fg-2)] sm:text-[19px]">
           Tracyn keeps a record of everything your AI agents do, asks a person before the risky parts, and turns it
           all into evidence your auditors accept.
         </p>
-        <div className="mt-8 flex items-center justify-center gap-3">
-          <button className="flex items-center gap-1.5 rounded-full bg-[var(--cv-fg)] px-6 py-3 text-[14px] font-medium text-white shadow-lg transition-transform hover:scale-[1.03] active:scale-[0.98]">
-            Get started free <ArrowRight className="h-3.5 w-3.5" />
+        <div className="mt-9 flex items-center justify-center gap-3">
+          <button className="cv-btn-blue flex items-center gap-1.5 rounded-[10px] px-5 py-3 text-[14.5px] font-medium text-white">
+            Get started free <ArrowRight className="h-4 w-4" />
           </button>
-          <button className="flex items-center gap-1.5 rounded-full border border-[var(--cv-line)] bg-white px-6 py-3 text-[14px] font-medium text-[var(--cv-fg)] transition-colors hover:bg-[var(--cv-cream)]">
-            <Github className="h-3.5 w-3.5" /> View SDK
+          <button className="flex items-center gap-1.5 rounded-[10px] border border-[var(--cv-line)] bg-white px-5 py-3 text-[14.5px] font-medium text-[var(--cv-ink)] shadow-[0_1px_2px_rgba(15,18,34,0.05)] transition-colors hover:bg-[var(--cv-cream)]">
+            <Github className="h-4 w-4" /> View SDK
           </button>
         </div>
       </div>
 
-      <div className="relative mx-auto mt-16 max-w-6xl rounded-[24px] bg-white/50 p-4 shadow-[0_1px_1px_rgba(26,29,43,0.04)] backdrop-blur-sm sm:p-6">
-        <CroppedWindow height={400}>
+      <div className="mx-auto mt-20 max-w-6xl">
+        <ShotPanel variant="navy" height={560}>
           <AppWindow active="Timeline">
             <TimelineScreen />
           </AppWindow>
-        </CroppedWindow>
+        </ShotPanel>
       </div>
     </section>
+  );
+}
+
+// Cluely's section titles: one line, two tones. The lead is near-black
+// fading to slate, the tail sits back in a quieter gray.
+function SectionHeading({ lead, tail, sub }: { lead: string; tail: string; sub?: string }) {
+  return (
+    <div className="text-center">
+      <h2 className="text-[34px] font-medium leading-[1.15] tracking-[-0.035em] sm:text-[52px]">
+        <span className="cv-grad-ink">{lead}</span> <span className="text-[var(--cv-fg-3)]">{tail}</span>
+      </h2>
+      {sub && (
+        <p className="mx-auto mt-4 max-w-xl text-[17px] leading-[1.6] text-[var(--cv-fg-2)] sm:text-[18px]">{sub}</p>
+      )}
+    </div>
+  );
+}
+
+// The real-product screenshot frame, straight from Cluely's own: a large
+// rounded panel, the app window sitting inset from the top and sides and
+// running right off the panel's bottom edge. On a light panel the window
+// gets a thin gray bezel so it separates from the pale background; on the
+// navy one the contrast already does that. The panel's
+// overflow does the cut, so the bottom is a clean straight line with the
+// window's top corners still rounded.
+function ShotPanel({
+  variant,
+  height,
+  children,
+}: {
+  variant: "navy" | "light";
+  height: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`overflow-hidden rounded-[28px] px-5 pt-12 sm:px-10 sm:pt-16 lg:px-16 lg:pt-20 ${
+        variant === "navy" ? "cv-panel-navy" : "cv-panel-light"
+      }`}
+    >
+      <div
+        className={`mx-auto overflow-hidden ${variant === "navy" ? "rounded-t-[10px]" : "cv-bezel"}`}
+        style={{ height }}
+      >
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -170,17 +281,18 @@ function CroppedWindow({ height, children }: { height: number; children: React.R
 
 // A faithful, full-scale recreation of the real dashboard chrome (see
 // components/nav/sidebar.tsx and app-shell.tsx) -- same nav items, same
-// icons, same order -- not a cropped or shrunk widget. Always framed by a
-// padded, differently-colored panel in its caller (never flush against a
-// card's own edge), so its rounded corners never collide with a parent's.
+// icons, same order. Sets its own text color so it never inherits white
+// from a dark card it sits on.
 function AppWindow({ active, children }: { active: string; children: React.ReactNode }) {
   return (
-    <div className="cv-window overflow-hidden rounded-[18px] border border-[var(--cv-line)] bg-white">
+    <div className="cv-window overflow-hidden rounded-t-[10px] border border-[var(--cv-line)] bg-white text-[var(--cv-fg)]">
       <div className="flex items-center gap-1.5 border-b border-[var(--cv-line)] bg-[var(--cv-cream)] px-4 py-2.5">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#e6b8b0]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#e8d9a8]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#b4c7ef]" />
-        <span className="ml-3 text-[12px] text-[var(--cv-fg-2)]">app.tracyn.online</span>
+        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+        <span className="mx-auto -translate-x-6 rounded-md bg-white px-16 py-0.5 text-[11.5px] text-[var(--cv-fg-2)] shadow-[0_0_0_1px_var(--cv-line)]">
+          app.tracyn.online
+        </span>
       </div>
       <div className="flex">
         <div className="hidden w-[220px] shrink-0 flex-col border-r border-[var(--cv-line)] bg-[var(--cv-cream)] p-3 sm:flex">
@@ -230,12 +342,12 @@ function TimelineScreen() {
         <span className="rounded-md bg-[var(--cv-fg)] px-3 py-1.5 text-[12px] font-medium text-white">Export CSV</span>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-[13px]">
+        <table className="w-full whitespace-nowrap text-left text-[13px]">
           <thead>
             <tr className="border-b border-[var(--cv-line)] text-[12px] text-[var(--cv-fg-2)]">
               <th className="px-6 py-2.5 font-medium">When</th>
               <th className="px-6 py-2.5 font-medium">Agent action</th>
-              <th className="px-6 py-2.5 font-medium">Type</th>
+              <th className="hidden px-6 py-2.5 font-medium lg:table-cell">Type</th>
               <th className="px-6 py-2.5 font-medium">Status</th>
             </tr>
           </thead>
@@ -244,7 +356,7 @@ function TimelineScreen() {
               <tr key={i} className="border-b border-[var(--cv-line)] last:border-0">
                 <td className="px-6 py-3 text-[var(--cv-fg-2)]">{row.when}</td>
                 <td className="px-6 py-3 font-medium text-[var(--cv-fg)]">{row.action}</td>
-                <td className="px-6 py-3 text-[var(--cv-fg-2)]">{row.type}</td>
+                <td className="hidden px-6 py-3 text-[var(--cv-fg-2)] lg:table-cell">{row.type}</td>
                 <td className="px-6 py-3">
                   <StatusBadge status={row.status} />
                 </td>
@@ -302,13 +414,7 @@ function PolicyScreen() {
             <span className="text-[14px] font-medium">{r.label}</span>
             <div className="flex items-center gap-2.5">
               <span className="text-[13px] text-[var(--cv-fg-2)]">{r.state}</span>
-              <span
-                className={`inline-flex h-5 w-9 items-center rounded-full px-0.5 ${
-                  r.on ? "justify-end bg-[var(--cv-blue)]" : "justify-start bg-[var(--cv-line)]"
-                }`}
-              >
-                <span className="h-4 w-4 rounded-full bg-white shadow" />
-              </span>
+              <Toggle on={r.on} />
             </div>
           </div>
         ))}
@@ -361,24 +467,100 @@ function PolicyScreen() {
   );
 }
 
-function FeatureWhiteCard() {
+function Toggle({ on }: { on: boolean }) {
   return (
-    <div className="overflow-hidden rounded-[24px] border border-[var(--cv-line)] bg-white">
-      <div className="mx-auto max-w-lg px-6 pt-16 text-center sm:px-10">
+    <span
+      className={`inline-flex h-5 w-9 items-center rounded-full px-0.5 ${
+        on ? "justify-end bg-[var(--cv-blue)]" : "justify-start bg-[var(--cv-line)]"
+      }`}
+    >
+      <span className="h-4 w-4 rounded-full bg-white shadow" />
+    </span>
+  );
+}
+
+// Second of the "how it works" pair: same card shape as the blue one, in
+// the light variant, the way Cluely alternates a saturated card with a
+// pale one.
+function FeatureApprovalsCard() {
+  return (
+    <div className="cv-panel-light overflow-hidden rounded-[24px] text-[var(--cv-ink)]">
+      <div className="mx-auto max-w-xl px-6 pt-16 text-center sm:px-10">
         <h2 className="text-[32px] font-semibold leading-tight tracking-tight sm:text-[40px]">
-          Every action becomes real evidence
+          When it&rsquo;s risky, Tracyn{" "}
+          <span className="mx-1 rounded-full border border-[var(--cv-blue)]/15 bg-[var(--cv-blue-soft)] px-2.5 py-0.5 text-[28px] text-[var(--cv-blue)] sm:text-[34px]">
+            asks
+          </span>{" "}
+          first
         </h2>
         <p className="mx-auto mt-4 max-w-sm text-[16px] leading-relaxed text-[var(--cv-fg-2)]">
-          Evidence Packs turn your logged actions into drafted answers for security questionnaires, grounded in
-          real events, cited by id, never invented.
+          A matching action pauses before it runs. Approve, edit, or reject it from the dashboard, email, or Slack.
         </p>
       </div>
-      <div className="mt-10 bg-[var(--cv-cream)] px-6 pb-6 sm:px-10 sm:pb-0">
-        <CroppedWindow height={380}>
-          <AppWindow active="Evidence Packs">
-            <EvidenceScreen />
-          </AppWindow>
-        </CroppedWindow>
+      <div className="mt-10 px-6 sm:px-10">
+        <div className="cv-bezel">
+          <CroppedWindow height={400}>
+            <AppWindow active="Approvals">
+              <ApprovalsScreen />
+            </AppWindow>
+          </CroppedWindow>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const APPROVALS = [
+  {
+    agent: "support-bot",
+    action: "send_refund",
+    meta: "external · requested Sep 20, 02:23 PM",
+    inputs: '{\n  "order_id": "ord_8123",\n  "amount": 249.00,\n  "reason": "damaged on arrival"\n}',
+  },
+  {
+    agent: "ops-agent",
+    action: "bulk_delete_records",
+    meta: "external · requested Sep 20, 02:22 PM",
+    inputs: '{\n  "table": "customers_archive",\n  "older_than_days": 365\n}',
+  },
+];
+
+// Mirrors app/(app)/approvals/page.tsx: tabs, then one card per request,
+// "<agent> wants to run <action>", the inputs preview, and the three
+// decision buttons.
+function ApprovalsScreen() {
+  return (
+    <div className="px-6 py-5">
+      <h3 className="text-[20px] font-semibold tracking-tight">Approvals</h3>
+      <div className="mt-4 flex gap-5 border-b border-[var(--cv-line)] text-[13px] font-medium text-[var(--cv-fg-2)]">
+        {["Pending", "Approved", "Rejected", "Auto-denied"].map((t, i) => (
+          <span key={t} className={`pb-2 ${i === 0 ? "border-b-2 border-[var(--cv-fg)] text-[var(--cv-fg)]" : ""}`}>
+            {t}
+          </span>
+        ))}
+      </div>
+      <div className="mt-4 space-y-3">
+        {APPROVALS.map((a) => (
+          <div key={a.action} className="flex flex-col items-start gap-3 rounded-lg border border-[var(--cv-line)] p-4 xl:flex-row xl:justify-between xl:gap-4">
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="flex flex-wrap items-center gap-1.5 text-[14px]">
+                <span className="font-medium">{a.agent}</span>
+                <span className="text-[var(--cv-fg-2)]">wants to run</span>
+                <span className="font-medium">{a.action}</span>
+                <StatusBadge status="pending" />
+              </div>
+              <p className="text-[12.5px] text-[var(--cv-fg-2)]">{a.meta}</p>
+              <pre className="mt-1 whitespace-pre-wrap rounded-md bg-[var(--cv-cream)] p-3 font-mono text-[11.5px] leading-relaxed">
+                {a.inputs}
+              </pre>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <span className="rounded-md bg-[var(--cv-fg)] px-3 py-1.5 text-[12px] font-medium text-white">Approve</span>
+              <span className="rounded-md border border-[var(--cv-line)] px-3 py-1.5 text-[12px] font-medium">Edit...</span>
+              <span className="rounded-md bg-[#e03e3e] px-3 py-1.5 text-[12px] font-medium text-white">Reject</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -436,26 +618,269 @@ function EvidenceScreen() {
   );
 }
 
-function StatRows() {
-  const rows = [
-    { icon: Link2, label: "Chained, tamper-evident", desc: "Every event links to the last by hash. Edit one and the chain visibly breaks." },
-    { icon: ShieldCheck, label: "One policy, two outcomes", desc: "An action either runs automatically or waits for a person. Nothing in between to misconfigure." },
-    { icon: BadgeCheck, label: "SOC 2, auto-mapped", desc: "Controls are mapped to what your workspace actually did, not a static template." },
+// Cluely's "Undetectable in every way" row: a small real-UI tile, then a
+// caption whose first sentence is bold and the rest recedes.
+function TrustTiles() {
+  const tiles = [
+    {
+      lead: "Tamper-evident.",
+      rest: "Every event stores a SHA-256 hash chained to the one before it. Edit a row and the chain visibly breaks.",
+      visual: <ChainVisual />,
+    },
+    {
+      lead: "One policy, two outcomes.",
+      rest: "An action runs automatically or waits for a person. Nothing in between to misconfigure.",
+      visual: <PolicyVisual />,
+    },
+    {
+      lead: "SOC 2, auto-mapped.",
+      rest: "Controls are backed by what your workspace actually did, not a static template.",
+      visual: <Soc2Visual />,
+    },
   ];
   return (
-    <div className="divide-y divide-[var(--cv-line)]">
-      {rows.map((r, i) => (
-        <div key={i} className="flex items-start gap-4 py-7">
-          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--cv-blue-soft)]">
-            <r.icon className="h-[18px] w-[18px] text-[var(--cv-blue)]" />
+    <div className="grid gap-8 md:grid-cols-3 md:gap-6">
+      {tiles.map((t) => (
+        <div key={t.lead}>
+          <div className="cv-panel-light flex h-[250px] items-center justify-center overflow-hidden rounded-[20px] p-6">
+            {t.visual}
           </div>
-          <div>
-            <p className="text-[21px] font-semibold tracking-tight">{r.label}</p>
-            <p className="mt-1 text-[14px] leading-relaxed text-[var(--cv-fg-2)]">{r.desc}</p>
-          </div>
+          <p className="mt-5 text-[17px] leading-[1.45] tracking-[-0.01em] text-[var(--cv-fg-2)]">
+            <span className="font-medium text-[var(--cv-ink)]">{t.lead}</span> {t.rest}
+          </p>
         </div>
       ))}
     </div>
+  );
+}
+
+function ChainVisual() {
+  const events = [
+    { id: "evt_a91f", action: "send_refund", hash: "3f9a…c21e" },
+    { id: "evt_28ce", action: "close_account", hash: "b702…9d44" },
+    { id: "evt_7d10", action: "lookup_order", hash: "e18c…05af" },
+  ];
+  return (
+    <div className="w-full max-w-[260px] space-y-0">
+      {events.map((e, i) => (
+        <div key={e.id}>
+          <div className="rounded-lg border border-[var(--cv-line)] bg-white px-3 py-2 text-[var(--cv-fg)] shadow-[0_1px_2px_rgba(15,18,34,0.05)]">
+            <div className="flex items-center justify-between text-[12px]">
+              <span className="font-medium">{e.action}</span>
+              <span className="text-[var(--cv-fg-3)]">{e.id}</span>
+            </div>
+            <p className="mt-0.5 font-mono text-[10.5px] text-[var(--cv-blue)]">sha256 {e.hash}</p>
+          </div>
+          {i < events.length - 1 && (
+            <div className="flex justify-center py-1 text-[var(--cv-fg-3)]">
+              <Link2 className="h-3.5 w-3.5" />
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PolicyVisual() {
+  return (
+    <div className="w-full max-w-[260px] space-y-2.5">
+      {[
+        { label: "lookup_order", state: "Runs automatically", on: false },
+        { label: "send_refund", state: "Needs approval", on: true },
+      ].map((r) => (
+        <div
+          key={r.label}
+          className="flex items-center justify-between rounded-lg border border-[var(--cv-line)] bg-white px-3 py-3 text-[var(--cv-fg)] shadow-[0_1px_2px_rgba(15,18,34,0.05)]"
+        >
+          <div>
+            <p className="text-[12.5px] font-medium">{r.label}</p>
+            <p className="text-[11px] text-[var(--cv-fg-2)]">{r.state}</p>
+          </div>
+          <Toggle on={r.on} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Soc2Visual() {
+  const controls = [
+    { id: "CC6.1", title: "Logical access, least privilege" },
+    { id: "CC7.2", title: "Monitoring for anomalies" },
+    { id: "CC8.1", title: "Change management" },
+  ];
+  return (
+    <div className="w-full max-w-[260px] overflow-hidden rounded-lg border border-[var(--cv-line)] bg-white text-[var(--cv-fg)] shadow-[0_1px_2px_rgba(15,18,34,0.05)]">
+      {controls.map((c) => (
+        <div key={c.id} className="flex items-center gap-2.5 border-b border-[var(--cv-line)] px-3 py-2.5 last:border-0">
+          <span className="font-mono text-[11px] font-medium text-[var(--cv-blue)]">{c.id}</span>
+          <span className="min-w-0 flex-1 truncate text-[12px]">{c.title}</span>
+          <Check className="h-3.5 w-3.5 shrink-0 text-[#2F5D3A]" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Channels() {
+  const items = [
+    { icon: LayoutDashboard, label: "Dashboard" },
+    { icon: Mail, label: "Email" },
+    { icon: MessageSquare, label: "Slack" },
+    { icon: Plug, label: "MCP" },
+  ];
+  return (
+    <div className="text-center">
+      <p className="text-[12px] font-medium uppercase tracking-[0.18em] text-[var(--cv-fg-3)]">
+        Approvals reach you where you work
+      </p>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
+        {items.map((it) => (
+          <span key={it.label} className="flex items-center gap-2 text-[17px] font-medium text-[var(--cv-fg-2)]">
+            <it.icon className="h-[18px] w-[18px] text-[var(--cv-blue)]" strokeWidth={1.75} />
+            {it.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Cluely's "12+ Languages" figures, laid out three across instead of
+// stacked: an oversized gradient figure over a blue-tipped hairline, a
+// label, then one quiet line.
+function BigStats() {
+  const stats = [
+    { figure: "5", unit: "min", label: "To your first logged action", desc: "Install the SDK, wrap one tool call, and it's recording." },
+    { figure: "SHA-256", unit: "", label: "Chained event hashes", desc: "Each event is hashed with the one before it, so history can't be rewritten quietly." },
+    { figure: "2", unit: "", label: "Outcomes per action", desc: "It runs on its own, or it waits for a person. Your policy decides which." },
+  ];
+  return (
+    <div>
+      <SectionHeading lead="Built for" tail="the audit" />
+      <div className="mt-16 grid gap-12 md:grid-cols-3 md:gap-8">
+        {stats.map((s) => (
+          <div key={s.label} className="relative border-t border-[var(--cv-line)] pt-8">
+            <span className="absolute -top-px left-0 h-[2px] w-12 bg-[var(--cv-blue)]" />
+            <p className="cv-grad-ink inline-block text-[56px] font-medium leading-none tracking-[-0.045em] lg:text-[68px]">
+              {s.figure}
+              {s.unit && <span className="ml-1 text-[28px] tracking-[-0.02em]">{s.unit}</span>}
+            </p>
+            <p className="mt-5 text-[20px] font-medium tracking-[-0.02em] text-[var(--cv-ink)]">{s.label}</p>
+            <p className="mt-2 text-[15.5px] leading-[1.6] text-[var(--cv-fg-2)]">{s.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const MCP_TOOLS = [
+  { name: "get_recent_actions", desc: "What your agents did, and when" },
+  { name: "get_pending_approvals", desc: "Every request waiting on a person" },
+  { name: "decide_approval", desc: "Approve or reject, right in the chat" },
+  { name: "draft_questionnaire_answers", desc: "Evidence-backed answers, cited by event" },
+  { name: "get_compliance_summary", desc: "Your current SOC 2 posture" },
+];
+
+// The MCP server gets its own big navy panel: the five real tools and the
+// two ways to connect (see mcp-server/README.md) on the left, and on the
+// right a chat window running off the panel's bottom edge, the same cut
+// as every other screenshot.
+function McpFeature() {
+  return (
+    <div className="cv-panel-navy overflow-hidden rounded-[28px] text-white">
+      <div className="grid gap-10 px-6 pt-12 sm:px-10 sm:pt-16 lg:grid-cols-[1fr_1.15fr] lg:gap-12 lg:px-14">
+        <div className="lg:pb-14">
+          <span className="cv-pill inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12.5px] font-medium">
+            <Plug className="h-3.5 w-3.5" /> MCP server
+          </span>
+          <h3 className="mt-5 text-[30px] font-semibold leading-[1.15] tracking-[-0.03em] sm:text-[36px]">
+            Five tools. Any MCP client.
+          </h3>
+          <p className="mt-3 max-w-md text-[16px] leading-relaxed text-white/75">
+            Deciding an approval needs a reviewer key, so an agent can never approve its own request.
+          </p>
+
+          <div className="mt-8 divide-y divide-white/10 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
+            {MCP_TOOLS.map((t) => (
+              <div key={t.name} className="flex flex-col gap-0.5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                <span className="font-mono text-[12.5px] text-[#b9c8fb]">{t.name}</span>
+                <span className="text-[13.5px] text-white/70">{t.desc}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+              <p className="text-[11.5px] font-medium uppercase tracking-[0.14em] text-white/50">Hosted</p>
+              <p className="mt-1.5 truncate font-mono text-[12.5px] text-white">mcp.tracyn.online/mcp</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+              <p className="text-[11.5px] font-medium uppercase tracking-[0.14em] text-white/50">Local</p>
+              <p className="mt-1.5 font-mono text-[12.5px] text-white">pip install tracyn-mcp</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="self-end">
+          <McpChatWindow />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// A neutral chat client (not any one vendor's UI) calling the real tools,
+// with the same summary sentence get_pending_approvals really returns.
+function McpChatWindow() {
+  return (
+    <div className="h-[380px] overflow-hidden rounded-t-[10px] border border-b-0 lg:h-[470px] border-[var(--cv-line)] bg-white text-[var(--cv-fg)] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.5)]">
+      <div className="flex items-center gap-1.5 border-b border-[var(--cv-line)] bg-[var(--cv-cream)] px-4 py-2.5">
+        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+        <span className="ml-3 text-[12px] font-medium text-[var(--cv-fg-2)]">New chat</span>
+        <span className="ml-auto flex items-center gap-1.5 rounded-full border border-[var(--cv-line)] bg-white px-2 py-0.5 text-[11px] text-[var(--cv-fg-2)]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#28c840]" /> tracyn connected
+        </span>
+      </div>
+      <div className="space-y-4 p-5 text-[13.5px] leading-relaxed">
+        <div className="flex justify-end">
+          <div className="max-w-[80%] rounded-2xl bg-[var(--cv-cream)] px-3.5 py-2">Are there any approvals waiting on me?</div>
+        </div>
+        <div className="space-y-2">
+          <ToolChip name="get_pending_approvals" />
+          <p>One request is waiting on you:</p>
+          <div className="rounded-lg border border-[var(--cv-line)] bg-[var(--cv-cream)]/60 px-3 py-2.5 text-[13px]">
+            <span className="font-medium">ops-agent</span> wants to run{" "}
+            <span className="font-medium">bulk_delete_records</span> (external) with{" "}
+            <span className="font-mono text-[12px]">{"{'count': 500}"}</span>, currently <StatusBadge status="pending" />
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <div className="max-w-[80%] rounded-2xl bg-[var(--cv-cream)] px-3.5 py-2">
+            Reject it. Nothing gets bulk deleted without a ticket.
+          </div>
+        </div>
+        <div className="space-y-2">
+          <ToolChip name="decide_approval" />
+          <p>Rejected, with your note attached. It&rsquo;s logged to the timeline as your decision.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ToolChip({ name }: { name: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-md border border-[var(--cv-line)] bg-white px-2 py-1 text-[11.5px] text-[var(--cv-fg-2)]">
+      <Plug className="h-3 w-3 text-[var(--cv-blue)]" />
+      tracyn
+      <span className="text-[var(--cv-fg-3)]">/</span>
+      <span className="font-mono text-[var(--cv-fg)]">{name}</span>
+    </span>
   );
 }
 
@@ -463,22 +888,24 @@ function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   return (
     <div>
-      <h2 className="mb-8 text-left text-[36px] font-semibold tracking-tight sm:text-[42px]">
+      <h2 className="text-[32px] font-medium tracking-[-0.035em] text-[var(--cv-ink)] sm:text-[40px]">
         Frequently asked questions
       </h2>
-      <div className="divide-y divide-[var(--cv-line)]">
+      <div className="mt-8 divide-y divide-[var(--cv-line)] border-y border-[var(--cv-line)]">
         {FAQS.map((f, i) => {
           const open = openIndex === i;
           return (
             <div key={i}>
               <button
                 onClick={() => setOpenIndex(open ? null : i)}
-                className="flex w-full items-center justify-between py-5 text-left text-[19px] font-medium"
+                className="flex w-full items-center justify-between gap-6 py-5 text-left text-[17px] text-[var(--cv-ink)]"
               >
                 {f.q}
-                <ChevronDown className={`h-4 w-4 shrink-0 text-[var(--cv-fg-2)] transition-transform ${open ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`h-4 w-4 shrink-0 text-[var(--cv-fg-3)] transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+                />
               </button>
-              {open && <p className="pb-5 text-[15px] leading-relaxed text-[var(--cv-fg-2)]">{f.a}</p>}
+              {open && <p className="max-w-3xl pb-6 text-[16px] leading-[1.65] text-[var(--cv-fg-2)]">{f.a}</p>}
             </div>
           );
         })}
@@ -487,35 +914,59 @@ function Faq() {
   );
 }
 
-function FinalCta() {
+// Cluely closes on one tinted band that holds both the last CTA (left
+// aligned, two-tone line, dark button) and the footer's link columns.
+function FinalCtaAndFooter() {
+  const columns = [
+    { title: "Product", links: ["Timeline", "Approvals", "Evidence Packs", "Policy", "Pricing"] },
+    { title: "Resources", links: ["Docs", "SDK on GitHub", "About"] },
+    { title: "Compliance", links: ["SOC 2 Mapping", "Security questionnaires", "Audit trail export"] },
+    { title: "Support", links: ["Privacy Policy", "Terms of Service", "Contact us"] },
+  ];
   return (
-    <section className="cv-final-bg px-6 py-24 text-center sm:px-10">
-      <h2 className="cv-serif mx-auto max-w-md text-[38px] leading-tight sm:text-[46px]">
-        Start logging in five minutes.
-      </h2>
-      <p className="mt-3 text-[16px] text-[var(--cv-fg-2)]">No credit card. Free plan built for trying it out.</p>
-      <button className="mx-auto mt-7 flex items-center gap-1.5 rounded-full bg-[var(--cv-fg)] px-6 py-3 text-[14px] font-medium text-white shadow-lg transition-transform hover:scale-[1.03] active:scale-[0.98]">
-        <Check className="h-3.5 w-3.5" /> Get started free
-      </button>
-    </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="border-t border-[var(--cv-line)] px-6 py-10 sm:px-10">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-[13px] text-[var(--cv-fg-2)] sm:flex-row">
-        <div className="flex items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
-          <img src="/logo.png" alt="" width={18} height={18} className="rounded" />
-          <span className="font-medium text-[var(--cv-fg)]">Tracyn</span>
-        </div>
-        <p>&copy; 2026 Tracyn. All rights reserved.</p>
-        <div className="flex items-center gap-4">
-          <span>Privacy</span>
-          <span>Terms</span>
-        </div>
+    <div className="cv-final-bg mt-36">
+      <div className="mx-auto max-w-6xl px-6 pb-24 pt-28 sm:px-10">
+        <h2 className="text-[26px] font-medium leading-[1.25] tracking-[-0.035em] sm:text-[32px]">
+          <span className="text-[var(--cv-ink)]">Evidence that builds itself while your agents work.</span>
+          <br />
+          <span className="cv-grad-slate">Start logging your agent in five minutes.</span>
+        </h2>
+        <button className="cv-btn-dark mt-8 flex items-center gap-2 rounded-[10px] px-5 py-3 text-[14.5px] font-medium text-white">
+          Get started free <ArrowRight className="h-4 w-4" />
+        </button>
       </div>
-    </footer>
+
+      <footer className="mx-auto max-w-6xl px-6 sm:px-10">
+        <div className="border-t border-[var(--cv-line-2)] pb-10 pt-20">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4 lg:grid-cols-[repeat(4,minmax(0,1fr))_1.2fr]">
+            {columns.map((col) => (
+              <div key={col.title}>
+                <p className="text-[15px] font-medium tracking-[-0.01em] text-[var(--cv-ink)]">{col.title}</p>
+                <ul className="mt-4 space-y-3">
+                  {col.links.map((l) => (
+                    <li key={l} className="text-[15px] text-[var(--cv-fg-2)] transition-colors hover:text-[var(--cv-ink)]">
+                      {l}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 inline-flex h-[34px] items-center gap-2 rounded-[6px] border border-[#c9d0e4]/50 bg-[#d3d9e9]/50 px-3 text-[13.5px] text-[var(--cv-fg-2)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#28c840]" />
+            All systems operational
+          </div>
+
+          <div className="mt-8 flex items-center justify-between border-t border-[var(--cv-line-2)] pt-6">
+            <p className="text-[13.5px] text-[var(--cv-fg-3)]">&copy; 2026 Tracyn. All rights reserved.</p>
+            <div className="flex items-center gap-4 text-[var(--cv-ink)]">
+              <Github className="h-[18px] w-[18px]" />
+              <Mail className="h-[18px] w-[18px]" />
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }

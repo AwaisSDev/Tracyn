@@ -15,8 +15,15 @@
   --cv-blue-soft: #dde6fb;
   --cv-blue-deep: #1b1f52;
   --cv-blue-light: #7ea0f5;
+  /* Marketing-copy colors, separate from the in-app ones above so the
+     screenshots stay faithful to the real dashboard. */
+  --cv-ink: #0f1222;
+  --cv-fg-3: #8a90a6;
+  --cv-line-2: #d3d9e9;
   color: var(--cv-fg);
-  background: #fdfdfe;
+  background: #ffffff;
+  font-family: var(--font-cv-sans), "Inter", -apple-system, "Segoe UI", sans-serif;
+  letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -48,7 +55,66 @@
     radial-gradient(ellipse 60% 50% at 50% -10%, rgba(221, 230, 251, 0.95), transparent 60%),
     radial-gradient(ellipse 45% 40% at 85% 15%, rgba(43, 63, 143, 0.14), transparent 65%),
     radial-gradient(ellipse 50% 45% at 10% 20%, rgba(126, 160, 245, 0.16), transparent 65%),
-    linear-gradient(180deg, #f2f4fb 0%, #fdfdfe 55%, #fdfdfe 100%);
+    linear-gradient(180deg, #eef1fb 0%, #ffffff 60%, #ffffff 100%);
+}
+
+/* ---------- type ---------- */
+
+/* Cluely's section-title treatment: text filled with a near-black to
+   slate gradient rather than a flat color. */
+.cv-grad-ink {
+  background: linear-gradient(to right, #0f1222 0%, #4a5178 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.cv-grad-slate {
+  background: linear-gradient(96deg, #5d6a96 20%, #98a3c4 35%, #5d6a96 48%, #5d6a96 70%, #98a3c4 80%, #5d6a96 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- buttons ---------- */
+
+.cv-btn-dark {
+  background: linear-gradient(180deg, #2a2d3d 0%, #11131d 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 0 0 1px #0b0c14, 0 8px 20px -8px rgba(15, 18, 34, 0.55);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.cv-btn-blue {
+  background: linear-gradient(180deg, #4f6ee0 0%, #2b3f8f 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 0 1px #24357a, 0 10px 24px -8px rgba(43, 63, 143, 0.6);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+.cv-btn-dark:hover,
+.cv-btn-blue:hover { filter: brightness(1.08); }
+.cv-btn-dark:active,
+.cv-btn-blue:active { transform: scale(0.98); }
+
+/* ---------- screenshot panels ---------- */
+
+.cv-panel-navy {
+  background:
+    radial-gradient(90% 70% at 15% 0%, rgba(126, 160, 245, 0.28), transparent 60%),
+    radial-gradient(70% 60% at 100% 100%, rgba(102, 132, 232, 0.35), transparent 60%),
+    linear-gradient(160deg, #161a45 0%, #1f2b6b 55%, #2b3f8f 100%);
+}
+/* Thin gray frame around a screenshot sitting on a light panel, so the
+   window's white edges don't melt into the pale background. */
+.cv-bezel {
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+  padding: 6px 6px 0;
+  background: #d3d9e8;
+  box-shadow: 0 30px 60px -30px rgba(26, 29, 43, 0.28);
+}
+
+.cv-panel-light {
+  background:
+    radial-gradient(80% 70% at 50% 0%, rgba(255, 255, 255, 0.9), transparent 70%),
+    linear-gradient(180deg, #eef1fa 0%, #e2e7f5 100%);
+  box-shadow: inset 0 0 0 1px rgba(201, 208, 228, 0.5);
 }
 
 .cv-window {
@@ -68,5 +134,5 @@
 }
 
 .cv-final-bg {
-  background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(221, 230, 251, 0.85), transparent 65%), #f2f4fb;
+  background: linear-gradient(180deg, #ffffff 0%, #eef1f8 12%, #e3e8f3 100%);
 }
