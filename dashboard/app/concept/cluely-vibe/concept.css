@@ -91,16 +91,14 @@
 .cv-btn-primary:active,
 .cv-btn-dark:active { transform: scale(0.98); }
 
+/* Deeper than Cluely's own blue and with no white sheen or outer glow:
+   just the crisp rim, a faint top highlight and darker lower edges. */
 .cv-btn-primary {
-  background:
-    radial-gradient(100% 100% at 65% 82%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0) 100%),
-    radial-gradient(115% 115% at 10% 17%, #4f7cf2 0%, #2a45d8 100%);
+  background: radial-gradient(115% 115% at 10% 17%, #3553d4 0%, #1c2f9e 100%);
   box-shadow:
-    0 0 0 1px #2539b8,
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    inset -3px -3px 4px rgba(191, 212, 251, 0.35),
-    inset 4px 4px 4px rgba(19, 26, 160, 0.12),
-    0 10px 22px -6px rgba(62, 94, 230, 0.5);
+    0 0 0 1px #17277f,
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .cv-btn-dark {
