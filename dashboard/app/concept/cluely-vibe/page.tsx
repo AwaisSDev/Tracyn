@@ -21,6 +21,14 @@ import {
   MessageSquare,
   Plug,
   Link2,
+  BookOpen,
+  Copy,
+  Share2,
+  Pin,
+  Volume2,
+  Plus,
+  Mic,
+  ChevronRight,
 } from "lucide-react";
 import { ForceLightTheme } from "@/components/force-light-theme";
 import { Reveal } from "@/components/landing/reveal";
@@ -786,8 +794,7 @@ const MCP_TOOLS = [
 
 // The MCP server gets its own big navy panel: the five real tools and the
 // two ways to connect (see mcp-server/README.md) on the left, and on the
-// right a chat window running off the panel's bottom edge, the same cut
-// as every other screenshot.
+// right a chat clearing an approval through them.
 function McpFeature() {
   return (
     <div className="cv-panel-navy overflow-hidden rounded-[28px] text-white">
@@ -824,7 +831,7 @@ function McpFeature() {
           </div>
         </div>
 
-        <div className="self-end">
+        <div className="self-center pb-12 lg:pb-14">
           <McpChatWindow />
         </div>
       </div>
@@ -832,54 +839,73 @@ function McpFeature() {
   );
 }
 
-// A neutral chat client (not any one vendor's UI) calling the real tools,
-// with the same summary sentence get_pending_approvals really returns.
+// A dark, desktop-chat-app style window (warm charcoal, tool calls folded
+// into a "Used 1 tool" line, composer at the bottom) calling the real
+// tools, with the same summary get_pending_approvals really returns.
 function McpChatWindow() {
   return (
-    <div className="h-[380px] overflow-hidden rounded-t-[10px] border border-b-0 lg:h-[470px] border-[var(--cv-line)] bg-white text-[var(--cv-fg)] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.5)]">
-      <div className="flex items-center gap-1.5 border-b border-[var(--cv-line)] bg-[var(--cv-cream)] px-4 py-2.5">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-        <span className="ml-3 text-[12px] font-medium text-[var(--cv-fg-2)]">New chat</span>
-        <span className="ml-auto flex items-center gap-1.5 rounded-full border border-[var(--cv-line)] bg-white px-2 py-0.5 text-[11px] text-[var(--cv-fg-2)]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#28c840]" /> tracyn connected
-        </span>
+    <div className="overflow-hidden rounded-[18px] border border-[#3d3d3a] bg-[#262624] text-[#ece9e2] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]">
+      <div className="flex items-center gap-2 px-5 py-4">
+        <BookOpen className="h-4 w-4 text-[#b7b4ab]" strokeWidth={1.75} />
+        <span className="text-[14px] font-semibold">Approvals check</span>
+        <span className="rounded-md bg-[#3a3a37] px-1.5 py-0.5 text-[11.5px] font-medium text-[#c9c6bd]">Acme Agents</span>
       </div>
-      <div className="space-y-4 p-5 text-[13.5px] leading-relaxed">
+
+      <div className="space-y-4 px-5 pb-5 text-[14.5px] leading-[1.6]">
         <div className="flex justify-end">
-          <div className="max-w-[80%] rounded-2xl bg-[var(--cv-cream)] px-3.5 py-2">Are there any approvals waiting on me?</div>
+          <div className="max-w-[80%] rounded-2xl bg-[#3a3a37] px-4 py-2.5">anything waiting on me?</div>
         </div>
-        <div className="space-y-2">
-          <ToolChip name="get_pending_approvals" />
-          <p>One request is waiting on you:</p>
-          <div className="rounded-lg border border-[var(--cv-line)] bg-[var(--cv-cream)]/60 px-3 py-2.5 text-[13px]">
-            <span className="font-medium">ops-agent</span> wants to run{" "}
-            <span className="font-medium">bulk_delete_records</span> (external) with{" "}
-            <span className="font-mono text-[12px]">{"{'count': 500}"}</span>, currently <StatusBadge status="pending" />
-          </div>
+        <div>
+          <UsedTool />
+          <p className="mt-2">
+            One approval is waiting: ops-agent wants to run bulk_delete_records (external) with{" "}
+            <span className="rounded bg-[#30302e] px-1 font-mono text-[12.5px] text-[#e2ded4]">{"{'count': 500}"}</span>,
+            requested 41 minutes ago. Want me to approve or reject it?
+          </p>
         </div>
         <div className="flex justify-end">
-          <div className="max-w-[80%] rounded-2xl bg-[var(--cv-cream)] px-3.5 py-2">
+          <div className="max-w-[80%] rounded-2xl bg-[#3a3a37] px-4 py-2.5">
             Reject it. Nothing gets bulk deleted without a ticket.
           </div>
         </div>
-        <div className="space-y-2">
-          <ToolChip name="decide_approval" />
-          <p>Rejected, with your note attached. It&rsquo;s logged to the timeline as your decision.</p>
+        <div>
+          <UsedTool />
+          <p className="mt-2">Rejected, with your note attached. It&rsquo;s logged to the timeline as your decision.</p>
+          <div className="mt-3 flex items-center gap-3.5 text-[#8f8c84]">
+            <Copy className="h-[15px] w-[15px]" strokeWidth={1.75} />
+            <Share2 className="h-[15px] w-[15px]" strokeWidth={1.75} />
+            <Pin className="h-[15px] w-[15px]" strokeWidth={1.75} />
+            <Volume2 className="h-[15px] w-[15px]" strokeWidth={1.75} />
+            <span className="text-[12.5px]">just now</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-4 pb-4">
+        <div className="rounded-2xl border border-[#3d3d3a] bg-[#30302e] px-4 pb-3 pt-3.5">
+          <p className="text-[14px] text-[#8f8c84]">Type / for commands</p>
+          <div className="mt-4 flex items-center gap-3 text-[13px] text-[#b7b4ab]">
+            <Plus className="h-4 w-4" strokeWidth={1.75} />
+            <Mic className="h-4 w-4" strokeWidth={1.75} />
+            <ChevronDown className="-ml-1.5 h-3.5 w-3.5" strokeWidth={1.75} />
+            <span className="flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#5fbf73]" />
+              Tracyn connected
+            </span>
+            <span className="ml-auto">Opus 5</span>
+            <span>High</span>
+            <span className="h-4 w-4 rounded-full border-2 border-[#7ea0f5]" />
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function ToolChip({ name }: { name: string }) {
+function UsedTool() {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-md border border-[var(--cv-line)] bg-white px-2 py-1 text-[11.5px] text-[var(--cv-fg-2)]">
-      <Plug className="h-3 w-3 text-[var(--cv-blue)]" />
-      tracyn
-      <span className="text-[var(--cv-fg-3)]">/</span>
-      <span className="font-mono text-[var(--cv-fg)]">{name}</span>
+    <span className="inline-flex items-center gap-1 text-[13.5px] text-[#8f8c84]">
+      Used 1 tool <ChevronRight className="h-3.5 w-3.5" />
     </span>
   );
 }
@@ -953,12 +979,7 @@ function FinalCtaAndFooter() {
             ))}
           </div>
 
-          <div className="mt-12 inline-flex h-[34px] items-center gap-2 rounded-[6px] border border-[#c9d0e4]/50 bg-[#d3d9e9]/50 px-3 text-[13.5px] text-[var(--cv-fg-2)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#28c840]" />
-            All systems operational
-          </div>
-
-          <div className="mt-8 flex items-center justify-between border-t border-[var(--cv-line-2)] pt-6">
+          <div className="mt-14 flex items-center justify-between border-t border-[var(--cv-line-2)] pt-6">
             <p className="text-[13.5px] text-[var(--cv-fg-3)]">&copy; 2026 Tracyn. All rights reserved.</p>
             <div className="flex items-center gap-4 text-[var(--cv-ink)]">
               <Github className="h-[18px] w-[18px]" />
