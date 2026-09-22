@@ -202,17 +202,13 @@ function Hero() {
           It&rsquo;s not a log.
           <br />
           It&rsquo;s{" "}
-          {/* Measured against Inter Tight's real glyph bounds: at line-height
-              1 the ink of "evidence" (d's ascender down to the baseline)
-              sits 0.089em below the top and 0.125em above the bottom, so
-              the uneven padding evens out the visible gap. The dot sits
-              on the middle of the "e" (its ink spans -0.012em to 0.56em),
-              0.274em above the baseline. The extra 0.02em on the right offsets the negative
-              tracking, which pulls the last letter's ink past its box.
-              inline-block keeps the pill on the text baseline. */}
-          <span className="cv-hero-pill inline-block rounded-full pb-[0.019em] pl-[0.3em] pr-[0.32em] pt-[0.067em] leading-none">
-            <span className="mr-[0.16em] inline-block h-[0.26em] w-[0.26em] rounded-full bg-[var(--cv-blue-bright)] align-[0.144em]" />
-            evidence
+          {/* Notion's own pill, from its live styles, in em so it scales:
+              the label drops to 0.75x the headline at a lighter weight,
+              a large dot is centered in the pill, the label sits on the
+              headline's baseline, and the padding is the same both sides. */}
+          <span className="cv-hero-pill inline-flex items-baseline gap-[0.215em] rounded-full px-[0.5em] py-[0.143em] text-[0.75em] font-medium leading-[1.21] tracking-[-0.028em]">
+            <span className="h-[0.573em] w-[0.573em] shrink-0 self-center rounded-full bg-[var(--cv-pill-dot)]" />
+            <span>evidence</span>
           </span>.
         </h1>
         <p className="mx-auto mt-7 max-w-2xl text-[18px] leading-[1.5] tracking-[-0.01em] text-[var(--cv-ink)] sm:text-[21px]">

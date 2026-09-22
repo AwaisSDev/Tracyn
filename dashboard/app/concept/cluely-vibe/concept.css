@@ -126,7 +126,8 @@
 
 /* The hero's highlighted word: Notion's soft pill with a dot. */
 .cv-hero-pill {
-  background: #dde6fb;
+  --cv-pill-dot: #3a5cf0;
+  background: #d9e3ff;
 }
 
 /* ---------- screenshot panels ---------- */
