@@ -147,6 +147,13 @@
   box-shadow: 0 30px 60px -30px rgba(26, 29, 43, 0.28);
 }
 
+/* "Built for the audit" stat cards: tinted and bordered so they stand
+   apart from the white page. */
+.cv-stat {
+  background: linear-gradient(180deg, #eef1fa 0%, #e3e8f5 100%);
+  border: 1px solid #cfd6ea;
+}
+
 .cv-panel-light {
   background:
     radial-gradient(80% 70% at 50% 0%, rgba(255, 255, 255, 0.9), transparent 70%),

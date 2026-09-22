@@ -343,10 +343,12 @@ function CroppedWindow({ children, ...heights }: CropHeights & { children: React
 // A faithful, full-scale recreation of the real dashboard chrome (see
 // components/nav/sidebar.tsx and app-shell.tsx) -- same nav items, same
 // icons, same order. Sets its own text color so it never inherits white
-// from a dark card it sits on.
+// from a dark card it sits on. At least 32px taller than its crop, so the
+// crop always cuts straight through it and the window's own bottom edge
+// never shows, however short the screen inside is.
 function AppWindow({ active, children }: { active: string; children: React.ReactNode }) {
   return (
-    <div className="cv-window overflow-hidden rounded-t-[10px] border border-[var(--cv-line)] bg-white text-[var(--cv-fg)]">
+    <div className="cv-window flex min-h-[calc(100%+32px)] flex-col overflow-hidden rounded-t-[10px] border border-[var(--cv-line)] bg-white text-[var(--cv-fg)]">
       <div className="flex items-center gap-1.5 border-b border-[var(--cv-line)] bg-[var(--cv-cream)] px-4 py-2.5">
         <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
@@ -355,7 +357,7 @@ function AppWindow({ active, children }: { active: string; children: React.React
           app.tracyn.online
         </span>
       </div>
-      <div className="flex">
+      <div className="flex flex-1">
         <div className="hidden w-[220px] shrink-0 flex-col border-r border-[var(--cv-line)] bg-[var(--cv-cream)] p-3 sm:flex">
           <div className="mb-3 flex items-center gap-2 px-1.5 py-1">
             {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
@@ -507,9 +509,12 @@ function PolicyScreen() {
           floating so it never covers the rows. Still keeps the real
           hardcoded Notion-green diff colors (see components/ui/badge.tsx's
           "success" variant). */}
-      <div className="mx-3 mb-3 flex flex-col overflow-hidden rounded-lg border border-[var(--cv-line)] bg-white shadow-xl lg:my-3 lg:ml-0">
-        <div className="flex items-center justify-between border-b border-[var(--cv-line)] px-3 py-2">
-          <p className="text-[12px] font-semibold text-[var(--cv-fg)]">Policy assistant</p>
+      <div className="mx-3 mb-3 flex flex-col overflow-hidden rounded-xl border border-[#c3cbe3] bg-white shadow-[0_0_0_4px_rgba(221,230,251,0.7),0_16px_32px_-12px_rgba(26,29,43,0.3)] lg:my-3 lg:ml-0">
+        <div className="flex items-center justify-between border-b border-[#dde2f0] bg-[var(--cv-cream)] px-3 py-2">
+          <p className="flex items-center gap-1.5 text-[12px] font-semibold text-[var(--cv-fg)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--cv-blue-bright)]" />
+            Policy assistant
+          </p>
           <X className="h-3.5 w-3.5 text-[var(--cv-fg-2)]" />
         </div>
         <div className="space-y-2 p-2.5">
@@ -549,11 +554,13 @@ function PolicyScreen() {
 function Toggle({ on }: { on: boolean }) {
   return (
     <span
-      className={`inline-flex h-5 w-9 items-center rounded-full px-0.5 ${
-        on ? "justify-end bg-[var(--cv-blue)]" : "justify-start bg-[var(--cv-line)]"
+      className={`inline-flex h-5 w-9 shrink-0 items-center rounded-full px-0.5 ${
+        on
+          ? "justify-end bg-[var(--cv-blue)]"
+          : "justify-start bg-[#cdd3e4] shadow-[inset_0_0_0_1px_rgba(26,29,43,0.08)]"
       }`}
     >
-      <span className="h-4 w-4 rounded-full bg-white shadow" />
+      <span className="h-4 w-4 rounded-full bg-white shadow-[0_1px_2px_rgba(26,29,43,0.3)]" />
     </span>
   );
 }
@@ -798,9 +805,9 @@ function Soc2Visual() {
   );
 }
 
-// Cluely's "12+ Languages" figures, laid out three across instead of
-// stacked: an oversized gradient figure over a blue-tipped hairline, a
-// label, then one quiet line.
+// Cluely's "12+ Languages" figures as tinted cards, stacked on phones and
+// three across from md: an oversized gradient figure, a label, then one
+// quiet line.
 function BigStats() {
   const stats = [
     { figure: "5", unit: "min", label: "To your first logged action", desc: "Install the SDK, wrap one tool call, and it's recording." },
@@ -810,16 +817,22 @@ function BigStats() {
   return (
     <div>
       <SectionHeading lead="Built for" tail="the audit" />
-      <div className="mt-16 grid gap-12 md:grid-cols-3 md:gap-8">
+      <div className="mt-10 grid gap-3 md:mt-16 md:grid-cols-3 md:gap-5">
         {stats.map((s) => (
-          <div key={s.label} className="relative border-t border-[var(--cv-line)] pt-8">
-            <span className="absolute -top-px left-0 h-[2px] w-12 bg-[var(--cv-blue)]" />
-            <p className="cv-grad-ink inline-block text-[56px] font-medium leading-none tracking-[-0.045em] lg:text-[68px]">
+          <div
+            key={s.label}
+            className="cv-stat rounded-[20px] p-6 lg:p-8"
+          >
+            <p className="cv-grad-ink inline-block whitespace-nowrap text-[48px] font-medium leading-none tracking-[-0.045em] md:text-[44px] lg:text-[54px] xl:text-[64px]">
               {s.figure}
-              {s.unit && <span className="ml-1 text-[28px] tracking-[-0.02em]">{s.unit}</span>}
+              {s.unit && <span className="ml-1 text-[24px] tracking-[-0.02em] md:text-[28px]">{s.unit}</span>}
             </p>
-            <p className="mt-5 text-[20px] font-medium tracking-[-0.02em] text-[var(--cv-ink)]">{s.label}</p>
-            <p className="mt-2 text-[15.5px] leading-[1.6] text-[var(--cv-fg-2)]">{s.desc}</p>
+            <p className="mt-4 text-[18px] font-medium tracking-[-0.02em] text-[var(--cv-ink)] md:mt-5 md:text-[20px]">
+              {s.label}
+            </p>
+            <p className="mt-1.5 text-[15px] leading-[1.55] text-[var(--cv-fg-2)] md:mt-2 md:text-[15.5px] md:leading-[1.6]">
+              {s.desc}
+            </p>
           </div>
         ))}
       </div>
@@ -846,14 +859,14 @@ function McpFeature() {
           <span className="cv-pill inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12.5px] font-medium">
             <Plug className="h-3.5 w-3.5" /> MCP server
           </span>
-          <h3 className="mt-5 text-[30px] font-semibold leading-[1.15] tracking-[-0.03em] sm:text-[36px]">
+          <h3 className="mt-4 text-[26px] font-semibold leading-[1.15] tracking-[-0.03em] sm:mt-5 sm:text-[36px]">
             Five tools. Any MCP client.
           </h3>
-          <p className="mt-3 max-w-md text-[16px] leading-relaxed text-white/75">
+          <p className="mt-3 max-w-md text-[15px] leading-relaxed text-white/75 sm:text-[16px]">
             Deciding an approval needs a reviewer key, so an agent can never approve its own request.
           </p>
 
-          <div className="mt-8 divide-y divide-white/10 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
+          <div className="mt-8 hidden divide-y divide-white/10 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04] sm:block">
             {MCP_TOOLS.map((t) => (
               <div key={t.name} className="flex items-center gap-3.5 px-4 py-3.5">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.07]">
@@ -890,7 +903,7 @@ function McpChatWindow() {
         </span>
       </div>
 
-      <div className="space-y-4 px-4 pb-5 text-[14px] leading-[1.6] sm:px-5 sm:text-[14.5px]">
+      <div className="space-y-3 px-4 pb-4 text-[13.5px] leading-[1.55] sm:space-y-4 sm:px-5 sm:pb-5 sm:text-[14.5px] sm:leading-[1.6]">
         <div className="flex justify-end">
           <div className="max-w-[80%] rounded-2xl bg-[#3a3a37] px-4 py-2.5">anything waiting on me?</div>
         </div>
@@ -899,7 +912,7 @@ function McpChatWindow() {
           <p className="mt-2">
             One approval is waiting: ops-agent wants to run bulk_delete_records (external) with{" "}
             <span className="rounded bg-[#30302e] px-1 font-mono text-[12.5px] text-[#e2ded4]">{"{'count': 500}"}</span>,
-            requested 41 minutes ago. Want me to approve or reject it?
+            requested 41 minutes ago. Approve or reject it?
           </p>
         </div>
         <div className="flex justify-end">
@@ -910,7 +923,7 @@ function McpChatWindow() {
         <div>
           <UsedTool />
           <p className="mt-2">Rejected, with your note attached. It&rsquo;s logged to the timeline as your decision.</p>
-          <div className="mt-3 flex items-center gap-3.5 text-[#8f8c84]">
+          <div className="mt-3 hidden items-center gap-3.5 text-[#8f8c84] sm:flex">
             <Copy className="h-[15px] w-[15px]" strokeWidth={1.75} />
             <Share2 className="h-[15px] w-[15px]" strokeWidth={1.75} />
             <Pin className="h-[15px] w-[15px]" strokeWidth={1.75} />
@@ -933,7 +946,7 @@ function McpChatWindow() {
             </span>
             <span className="ml-auto">Opus 5.5</span>
             <span>High</span>
-            <span className="h-4 w-4 rounded-full border-2 border-[#7ea0f5]" />
+            <span className="h-4 w-4 shrink-0 rounded-full border-2 border-[#7ea0f5]" />
           </div>
         </div>
       </div>
