@@ -933,20 +933,23 @@ function McpChatWindow() {
         </div>
       </div>
 
-      <div className="px-4 pb-4">
-        <div className="rounded-2xl border border-[#3d3d3a] bg-[#30302e] px-4 pb-3 pt-3.5">
+      <div className="px-3 pb-3 sm:px-4 sm:pb-4">
+        <div className="rounded-2xl border border-[#3d3d3a] bg-[#30302e] px-3.5 pb-3 pt-3.5 sm:px-4">
           <p className="text-[14px] text-[#8f8c84]">Type / for commands</p>
-          <div className="mt-4 flex items-center gap-3 whitespace-nowrap text-[12px] text-[#b7b4ab] sm:text-[13px]">
+          {/* Fits down to 320px without spilling past the composer's edge:
+              below 400px the effort label goes, below 360px the model name
+              too, so "Tracyn connected" always reads in full. */}
+          <div className="mt-4 flex items-center gap-2 whitespace-nowrap text-[12px] text-[#b7b4ab] min-[400px]:gap-3 sm:text-[13px]">
             <Plus className="h-4 w-4 shrink-0" strokeWidth={1.75} />
             <Mic className="hidden h-4 w-4 shrink-0 sm:block" strokeWidth={1.75} />
             <ChevronDown className="-ml-1.5 hidden h-3.5 w-3.5 shrink-0 sm:block" strokeWidth={1.75} />
-            <span className="flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#5fbf73]" />
-              Tracyn connected
+            <span className="flex min-w-0 items-center gap-1.5">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#5fbf73]" />
+              <span className="truncate">Tracyn connected</span>
             </span>
-            <span className="ml-auto">Opus 5.5</span>
-            <span>High</span>
-            <span className="h-4 w-4 shrink-0 rounded-full border-2 border-[#7ea0f5]" />
+            <span className="ml-auto hidden shrink-0 min-[360px]:inline">Opus 5.5</span>
+            <span className="hidden shrink-0 min-[400px]:inline">High</span>
+            <span className="ml-auto h-4 w-4 shrink-0 rounded-full border-2 border-[#7ea0f5] min-[360px]:ml-0" />
           </div>
         </div>
       </div>
