@@ -17,8 +17,6 @@ import {
   Send,
   X,
   Mail,
-  LayoutDashboard,
-  MessageSquare,
   Plug,
   Link2,
   BookOpen,
@@ -143,9 +141,6 @@ export default function CluelyVibeConceptPage() {
         <Reveal className="mt-14">
           <TrustTiles />
         </Reveal>
-        <Reveal className="mt-24">
-          <Channels />
-        </Reveal>
       </section>
 
       <section className="mx-auto max-w-6xl px-6 pt-36 sm:px-10">
@@ -203,12 +198,20 @@ function Hero() {
   return (
     <section className="relative bg-white pt-16 sm:pt-24">
       <div className="mx-auto max-w-5xl px-6 text-center sm:px-10">
-        <h1 className="text-[50px] font-bold leading-[1.04] tracking-[-0.035em] text-[var(--cv-ink)] sm:text-[84px] lg:text-[104px]">
+        <h1 className="text-[50px] font-bold leading-[1.22] tracking-[-0.035em] text-[var(--cv-ink)] sm:text-[84px] lg:text-[104px]">
           It&rsquo;s not a log.
           <br />
           It&rsquo;s{" "}
-          <span className="cv-hero-pill inline-flex items-center gap-[0.14em] rounded-full py-[0.02em] pl-[0.22em] pr-[0.3em] align-bottom">
-            <span className="h-[0.26em] w-[0.26em] rounded-full bg-[var(--cv-blue-bright)]" />
+          {/* Measured against Inter Tight's real glyph bounds: at line-height
+              1 the ink of "evidence" (d's ascender down to the baseline)
+              sits 0.089em below the top and 0.125em above the bottom, so
+              the uneven padding evens out the visible gap. The dot sits
+              on the middle of the "e" (its ink spans -0.012em to 0.56em),
+              0.274em above the baseline. The extra 0.02em on the right offsets the negative
+              tracking, which pulls the last letter's ink past its box.
+              inline-block keeps the pill on the text baseline. */}
+          <span className="cv-hero-pill inline-block rounded-full pb-[0.019em] pl-[0.3em] pr-[0.32em] pt-[0.067em] leading-none">
+            <span className="mr-[0.16em] inline-block h-[0.26em] w-[0.26em] rounded-full bg-[var(--cv-blue-bright)] align-[0.144em]" />
             evidence
           </span>.
         </h1>
@@ -762,30 +765,6 @@ function Soc2Visual() {
   );
 }
 
-function Channels() {
-  const items = [
-    { icon: LayoutDashboard, label: "Dashboard" },
-    { icon: Mail, label: "Email" },
-    { icon: MessageSquare, label: "Slack" },
-    { icon: Plug, label: "MCP" },
-  ];
-  return (
-    <div className="text-center">
-      <p className="text-[12px] font-medium uppercase tracking-[0.18em] text-[var(--cv-fg-3)]">
-        Approvals reach you where you work
-      </p>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
-        {items.map((it) => (
-          <span key={it.label} className="flex items-center gap-2 text-[17px] font-medium text-[var(--cv-fg-2)]">
-            <it.icon className="h-[18px] w-[18px] text-[var(--cv-blue)]" strokeWidth={1.75} />
-            {it.label}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // Cluely's "12+ Languages" figures, laid out three across instead of
 // stacked: an oversized gradient figure over a blue-tipped hairline, a
 // label, then one quiet line.
@@ -816,11 +795,11 @@ function BigStats() {
 }
 
 const MCP_TOOLS = [
-  { name: "get_recent_actions", desc: "What your agents did, and when" },
-  { name: "get_pending_approvals", desc: "Every request waiting on a person" },
-  { name: "decide_approval", desc: "Approve or reject, right in the chat" },
-  { name: "draft_questionnaire_answers", desc: "Evidence-backed answers, cited by event" },
-  { name: "get_compliance_summary", desc: "Your current SOC 2 posture" },
+  { name: "get_recent_actions", desc: "What your agents did, and when", icon: History },
+  { name: "get_pending_approvals", desc: "Every request waiting on a person", icon: CircleCheck },
+  { name: "decide_approval", desc: "Approve or reject, right in the chat", icon: ShieldCheck },
+  { name: "draft_questionnaire_answers", desc: "Evidence-backed answers, cited by event", icon: FileText },
+  { name: "get_compliance_summary", desc: "Your current SOC 2 posture", icon: BadgeCheck },
 ];
 
 // The MCP server gets its own big navy panel: the five real tools (see
@@ -843,9 +822,14 @@ function McpFeature() {
 
           <div className="mt-8 divide-y divide-white/10 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
             {MCP_TOOLS.map((t) => (
-              <div key={t.name} className="flex flex-col gap-0.5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <span className="font-mono text-[12.5px] text-[#b9c8fb]">{t.name}</span>
-                <span className="text-[13.5px] text-white/70">{t.desc}</span>
+              <div key={t.name} className="flex items-center gap-3.5 px-4 py-3.5">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.07]">
+                  <t.icon className="h-[17px] w-[17px] text-[#b9c8fb]" strokeWidth={1.75} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[15px] font-medium leading-snug tracking-[-0.01em] text-white">{t.desc}</p>
+                  <p className="mt-0.5 truncate font-mono text-[12px] tracking-normal text-white/45">{t.name}</p>
+                </div>
               </div>
             ))}
           </div>
