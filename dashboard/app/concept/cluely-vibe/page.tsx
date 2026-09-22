@@ -238,11 +238,11 @@ function Hero() {
   );
 }
 
-// Where Notion lists customer logos. Tracyn doesn't claim customers here,
-// only what it really plugs into: the MCP clients from mcp-server/README.md,
-// Slack and email approvals, and the Python SDK.
+// Where Notion lists customer logos. Tracyn doesn't claim customers here;
+// it lists the AI assistants its MCP server connects to (see
+// mcp-server/README.md), so it reads as one category, not a mixed bag.
 function WorksWithStrip() {
-  const names = ["Claude", "ChatGPT", "Grok", "Slack", "Email", "Python SDK", "Any MCP client"];
+  const names = ["Claude", "ChatGPT", "Grok", "Kimi", "Any AI with MCP"];
   return (
     <div className="relative z-10 border-t border-[var(--cv-line)] bg-white">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-3 gap-y-2 px-6 py-5 sm:px-10">
