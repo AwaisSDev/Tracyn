@@ -180,7 +180,9 @@ export function Pricing() {
 }
 
 // Notion's pricing layout: two big group cards, each holding two plans
-// side by side, the second tinted and carrying an illustration.
+// side by side, the second tinted and carrying an illustration. The
+// illustration is taken out of flow and both titles reserve two lines, so
+// the plan rows line up across the two cards.
 function PlanGroup({
   title,
   plans,
@@ -194,16 +196,14 @@ function PlanGroup({
 }) {
   return (
     <div
-      className={`rounded-[22px] border p-6 sm:p-8 ${
+      className={`relative rounded-[22px] border p-6 sm:p-8 ${
         tone === "tint" ? "border-[#d7e0f7] bg-[#eef3ff]" : "border-[#dfe3ef] bg-white"
       }`}
     >
-      <div className="flex items-start justify-between gap-4">
-        <h2 className="max-w-[16ch] text-[26px] font-semibold leading-[1.15] tracking-[-0.03em] text-[var(--cv-ink)] sm:text-[30px]">
-          {title}
-        </h2>
-        {art && <div className="hidden shrink-0 scale-90 sm:block">{art}</div>}
-      </div>
+      <h2 className="max-w-[16ch] text-[26px] font-semibold leading-[1.15] tracking-[-0.03em] text-[var(--cv-ink)] sm:min-h-[2.3em] sm:text-[30px]">
+        {title}
+      </h2>
+      {art && <div className="pointer-events-none absolute right-5 top-5 hidden origin-top-right scale-[0.8] sm:block">{art}</div>}
       <div className="mt-8 grid gap-10 sm:grid-cols-2 sm:gap-6">
         {plans.map((p) => (
           <PlanColumn key={p.id} plan={p} />
@@ -217,7 +217,9 @@ function PlanColumn({ plan }: { plan: Plan }) {
   const ctaClass = {
     soft: "cv-btn-soft text-[var(--cv-blue-bright)]",
     primary: "cv-btn-primary text-white",
-    white: "border border-[#d7e0f7] bg-white text-[var(--cv-blue-bright)] shadow-[0_1px_2px_rgba(26,29,43,0.05)] hover:bg-[#f7f9ff]",
+    // Outline via an inset shadow, not a border, so this button is the same
+    // height as the others and the "Includes" lists stay aligned.
+    white: "bg-white text-[var(--cv-blue-bright)] shadow-[inset_0_0_0_1px_#d7e0f7,0_1px_2px_rgba(26,29,43,0.05)] hover:bg-[#f7f9ff]",
   }[plan.cta.style];
   const ctaBase = `flex w-full items-center justify-center rounded-[10px] px-4 py-2.5 text-[15px] font-semibold transition-colors ${ctaClass}`;
 

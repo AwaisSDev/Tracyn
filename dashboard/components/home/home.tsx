@@ -166,10 +166,10 @@ export function SiteNav() {
       {/* Evenly spaced below lg, where a centered middle column would squeeze
           Log in; truly centered links from lg up, like Notion. */}
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 sm:py-3.5 lg:grid lg:grid-cols-[1fr_auto_1fr]">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
-          <img src="/logo.png" alt="" width={26} height={26} className="rounded-md" />
-          <span className="text-[17px] font-semibold tracking-[-0.02em] text-[var(--cv-ink)]">Tracyn</span>
+          <img src="/logo.png" alt="" width={32} height={32} className="rounded-md" />
+          <span className="text-[20px] font-semibold tracking-[-0.025em] text-[var(--cv-ink)]">Tracyn</span>
         </Link>
         <NavLinks />
         <div className="flex items-center justify-end gap-4 lg:gap-5">
