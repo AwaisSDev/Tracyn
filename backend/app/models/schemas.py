@@ -221,6 +221,8 @@ class WorkspaceOut(BaseModel):
     slack_channel_id: str | None = None
     notify_email: str | None = None
     created_at: datetime
+    # The signed-in user's role here (owner / admin / member), when known.
+    role: str | None = None
 
 
 # ---------------------------------------------------------------------------

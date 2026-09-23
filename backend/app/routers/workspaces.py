@@ -20,12 +20,13 @@ def _slugify(name: str) -> str:
 async def list_my_workspaces(user: CurrentUser = Depends(get_current_user)) -> list[WorkspaceOut]:
     db = get_db()
     memberships = (
-        await run_db(lambda: db.table("workspace_members").select("workspace_id").eq("user_id", user.id).execute())
+        await run_db(lambda: db.table("workspace_members").select("workspace_id, role").eq("user_id", user.id).execute())
     ).data
-    ids = [m["workspace_id"] for m in memberships]
-    if not ids:
+    roles = {m["workspace_id"]: m.get("role") for m in memberships}
+    if not roles:
         return []
-    return (await run_db(lambda: db.table("workspaces").select("*").in_("id", ids).execute())).data
+    rows = (await run_db(lambda: db.table("workspaces").select("*").in_("id", list(roles)).execute())).data
+    return [{**w, "role": roles.get(w["id"])} for w in rows]
 
 
 @router.post("", response_model=WorkspaceOut, status_code=201)
@@ -47,7 +48,7 @@ async def create_workspace(body: WorkspaceCreateIn, user: CurrentUser = Depends(
         lambda: db.table("workspace_members").insert({"workspace_id": ws["id"], "user_id": user.id, "role": "owner"}).execute()
     )
     await run_db(lambda: db.table("policies").insert({"workspace_id": ws["id"], "rules_yaml": DEFAULT_POLICY_YAML}).execute())
-    return ws
+    return {**ws, "role": "owner"}
 
 
 class WorkspaceSettingsIn(BaseModel):
