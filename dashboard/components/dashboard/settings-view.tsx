@@ -99,13 +99,7 @@ function Account() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, [supabase]);
 
-  if (!user) {
-    return (
-      <Card className="p-5">
-        <Skel className="h-24 w-full" />
-      </Card>
-    );
-  }
+  if (!user) return <AccountSkeleton />;
 
   return (
     <>
@@ -401,7 +395,7 @@ function Keys() {
   const [menu, setMenu] = useState<string | null>(null);
   const [confirmRevoke, setConfirmRevoke] = useState<ApiKey | null>(null);
 
-  const { data: keys = [], isLoading } = useQuery({
+  const { data: keys = [], isPending } = useQuery({
     queryKey: ["api-keys", workspace?.id],
     queryFn: () => api.get<ApiKey[]>(`/v1/workspaces/${workspace!.id}/api-keys`),
     enabled: !!workspace,
@@ -524,7 +518,20 @@ function Keys() {
               </Button>
             </li>
           ))}
-          {!isLoading && active.length === 0 && <li className="px-5 py-8 text-center text-[15px] text-[var(--cd-fg-3)]">No active keys. Create one to start logging.</li>}
+          {isPending &&
+            Array.from({ length: 2 }).map((_, i) => (
+              <li key={i} className="flex items-center gap-3 px-5 py-4">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <Skel className="h-4 w-32" />
+                    <Skel className="h-[20px] w-16 rounded-full" />
+                  </div>
+                  <Skel className="mt-2 h-[14px] w-44" />
+                </div>
+                <Skel className="h-9 w-[74px] rounded-[6px]" />
+              </li>
+            ))}
+          {!isPending && active.length === 0 && <li className="px-5 py-8 text-center text-[15px] text-[var(--cd-fg-3)]">No active keys. Create one to start logging.</li>}
         </ul>
         <div className="hidden overflow-x-auto border-t border-[var(--cd-line)] sm:block">
           <table className="w-full min-w-[520px] text-[15px]">
@@ -539,13 +546,29 @@ function Keys() {
               </tr>
             </thead>
             <tbody>
-              {isLoading && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-3">
-                    <Skel className="h-6 w-full" />
-                  </td>
-                </tr>
-              )}
+              {isPending &&
+                Array.from({ length: 2 }).map((_, i) => (
+                  <tr key={i} className="border-b border-[var(--cd-line)] last:border-0">
+                    <td className="py-3.5 pl-5 pr-3">
+                      <Skel className="h-[15px] w-36" />
+                    </td>
+                    <td className="px-3">
+                      <Skel className="h-[13.5px] w-32" />
+                    </td>
+                    <td className="px-3">
+                      <Skel className="h-[22px] w-[72px] rounded-full" />
+                    </td>
+                    <td className="hidden px-3 md:table-cell">
+                      <Skel className="h-[15px] w-16" />
+                    </td>
+                    <td className="px-3">
+                      <Skel className="h-[15px] w-16" />
+                    </td>
+                    <td className="pr-5">
+                      <Skel className="ml-auto h-6 w-6 rounded-[6px]" />
+                    </td>
+                  </tr>
+                ))}
               {active.map((k) => (
                 <tr key={k.id} className="border-b border-[var(--cd-line)] last:border-0">
                   <td className="py-3 pl-5 pr-3 font-medium">
@@ -593,7 +616,7 @@ function Keys() {
                   </td>
                 </tr>
               ))}
-              {!isLoading && active.length === 0 && (
+              {!isPending && active.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-5 py-8 text-center text-[var(--cd-fg-3)]">
                     No active keys. Create one to start logging.
@@ -711,9 +734,9 @@ function PaymentSuccess() {
 
 function Billing({ intent }: { intent: string | null }) {
   const { workspace } = useWorkspace();
-  const { data: events = [] } = useEvents();
-  const { agents } = useAgents();
-  const { data: questionnaires = [] } = useQuestionnaires();
+  const { data: events = [], isPending: eventsPending } = useEvents();
+  const { agents, isPending: agentsPending } = useAgents();
+  const { data: questionnaires = [], isPending: packsPending } = useQuestionnaires();
   const plan = workspace?.plan ?? "free";
   const limits = PLAN_LIMITS[plan];
 
@@ -767,9 +790,9 @@ function Billing({ intent }: { intent: string | null }) {
           </span>
         </div>
         <div className="grid gap-5 border-t border-[var(--cd-line)] px-5 py-5 sm:grid-cols-3">
-          <Usage label="Events this month" used={monthEvents} limit={limits.events} />
-          <Usage label="Agents" used={agents.length} limit={limits.agents} />
-          <Usage label="Evidence packs this month" used={monthPacks} limit={limits.questionnaires} />
+          <Usage label="Events this month" used={monthEvents} limit={limits.events} loading={eventsPending} />
+          <Usage label="Agents" used={agents.length} limit={limits.agents} loading={agentsPending} />
+          <Usage label="Evidence packs this month" used={monthPacks} limit={limits.questionnaires} loading={packsPending} />
         </div>
       </Card>
 
@@ -813,9 +836,21 @@ function Billing({ intent }: { intent: string | null }) {
   );
 }
 
-function Usage({ label, used, limit }: { label: string; used: number; limit: number | null }) {
+function Usage({ label, used, limit, loading }: { label: string; used: number; limit: number | null; loading?: boolean }) {
   const over = limit != null && used > limit;
   const pct = limit ? Math.min(100, (used / limit) * 100) : 0;
+  if (loading) {
+    return (
+      <div>
+        <div className="text-[13.5px] text-[var(--cd-fg-2)]">{label}</div>
+        <div className="mt-2 flex items-end gap-1.5">
+          <Skel className="h-[22px] w-12" />
+          <Skel className="mb-0.5 h-[14px] w-14" />
+        </div>
+        <Skel className="mt-2.5 h-1.5 w-full rounded-full" />
+      </div>
+    );
+  }
   return (
     <div>
       <div className="text-[13.5px] text-[var(--cd-fg-2)]">{label}</div>
@@ -831,5 +866,50 @@ function Usage({ label, used, limit }: { label: string; used: number; limit: num
       </div>
       {over && <p className="mt-1.5 text-[13px] text-[#9a5b00]">Over your plan limit</p>}
     </div>
+  );
+}
+
+// Same cards and rows as the Account tab, so nothing shifts when it loads.
+function AccountSkeleton() {
+  const row = (lines: number) => (
+    <div className="grid gap-3 px-5 py-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] md:gap-8">
+      <div className="space-y-2">
+        <Skel className="h-[15px] w-24" />
+        <Skel className="h-[13px] w-52 max-w-full" />
+      </div>
+      <div className="space-y-2.5">
+        {Array.from({ length: lines }).map((_, i) => (
+          <Skel key={i} className="h-[42px] w-full rounded-[7px]" />
+        ))}
+      </div>
+    </div>
+  );
+  const footer = (w: number) => (
+    <div className="flex justify-end border-t border-[var(--cd-line)] bg-[#fafbfd] px-5 py-3">
+      <Skel className="h-9 rounded-[6px]" style={{ width: w }} />
+    </div>
+  );
+  return (
+    <>
+      <Card className="overflow-hidden">
+        <div className="divide-y divide-[var(--cd-line)]">
+          {row(1)}
+          {row(1)}
+        </div>
+        {footer(64)}
+      </Card>
+      <Card className="overflow-hidden">
+        {row(3)}
+        {footer(150)}
+      </Card>
+      <Card className="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center">
+        <div className="min-w-0 flex-1 space-y-2">
+          <Skel className="h-4 w-32" />
+          <Skel className="h-[14px] w-full" />
+          <Skel className="h-[14px] w-3/4" />
+        </div>
+        <Skel className="h-10 w-36 rounded-[6px]" />
+      </Card>
+    </>
   );
 }
