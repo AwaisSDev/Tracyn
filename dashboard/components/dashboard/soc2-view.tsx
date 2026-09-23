@@ -34,7 +34,7 @@ type Filter = "all" | "live" | "guidance";
 
 export function Soc2View() {
   const { workspace } = useWorkspace();
-  const { data: controls = [], isLoading } = useSoc2();
+  const { data: controls = [], isPending } = useSoc2();
   const [filter, setFilter] = useState<Filter>("all");
   const [focus, setFocus] = useState<string | null>(null);
 
@@ -77,8 +77,8 @@ export function Soc2View() {
       />
 
       <Card className="mt-7 p-5 sm:p-6">
-        {isLoading ? (
-          <Skel className="h-24 w-full" />
+        {isPending ? (
+          <CoverageSkeleton />
         ) : (
           <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10">
             <div>
@@ -166,21 +166,15 @@ export function Soc2View() {
           value={filter}
           onChange={setFilter}
           options={[
-            { value: "all", label: "All", count: controls.length },
-            { value: "live", label: "Live", count: live },
-            { value: "guidance", label: "Guidance", count: controls.length - live },
+            { value: "all", label: "All", count: isPending ? undefined : controls.length },
+            { value: "live", label: "Live", count: isPending ? undefined : live },
+            { value: "guidance", label: "Guidance", count: isPending ? undefined : controls.length - live },
           ]}
         />
       </div>
 
       <Card className="mt-3 divide-y divide-[var(--cd-line)] overflow-hidden">
-        {isLoading && (
-          <div className="space-y-2 p-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skel key={i} className="h-16 w-full" />
-            ))}
-          </div>
-        )}
+        {isPending && Array.from({ length: 6 }).map((_, i) => <ControlRowSkeleton key={i} />)}
         {shown.map((c) => {
           const isLive = hasLiveEvidence(c);
           return (
@@ -206,10 +200,70 @@ export function Soc2View() {
             </div>
           );
         })}
-        {!isLoading && shown.length === 0 && (
+        {!isPending && shown.length === 0 && (
           <p className="px-5 py-10 text-center text-[15.5px] text-[var(--cd-fg-3)]">No controls match.</p>
         )}
       </Card>
     </Page>
+  );
+}
+
+// ---------- skeletons, shaped like the real card and rows ----------
+
+function CoverageSkeleton() {
+  return (
+    <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)] md:gap-10">
+      <div>
+        <Skel className="h-[13.5px] w-40" />
+        <div className="mt-3 flex items-end gap-2">
+          <Skel className="h-[52px] w-28" />
+          <Skel className="mb-1 h-[14px] w-14" />
+        </div>
+        <Skel className="mt-4 h-1.5 w-full rounded-full" />
+        <div className="mt-4 space-y-2">
+          <Skel className="h-[13.5px] w-48" />
+          <Skel className="h-[13.5px] w-36" />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+        {[3, 1, 2, 1, 1, 1, 1, 1].map((n, i) => (
+          <div key={i} className="rounded-[8px] border border-[var(--cd-line)] p-3">
+            <div className="flex items-center justify-between gap-2">
+              <Skel className="h-[12.5px] w-8" />
+              <Skel className="h-[12.5px] w-6" />
+            </div>
+            <Skel className="mt-1.5 h-[14px] w-24" />
+            <div className="mt-2.5 flex gap-1">
+              {Array.from({ length: n }).map((_, j) => (
+                <Skel key={j} className="h-3.5 w-3.5 rounded-[4px]" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ControlRowSkeleton() {
+  return (
+    <div className="grid gap-3 px-5 py-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-8">
+      <div className="flex gap-3">
+        <Skel className="mt-[2px] h-[22px] w-12 shrink-0" />
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <Skel className="h-[15.5px] w-44" />
+          <Skel className="h-[14px] w-full" />
+          <Skel className="h-[14px] w-3/5" />
+        </div>
+      </div>
+      <div className="flex gap-2.5">
+        <Skel className="mt-[7px] h-[7px] w-[7px] shrink-0 rounded-full" />
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <Skel className="h-[15px] w-full" />
+          <Skel className="h-[15px] w-4/5" />
+          <Skel className="mt-1 h-[12.5px] w-32" />
+        </div>
+      </div>
+    </div>
   );
 }
