@@ -34,7 +34,7 @@ create table agents (
   name         text not null,
   description  text,
   is_active    bool not null default true,
-  created_by   uuid references auth.users(id),
+  created_by   uuid references auth.users(id) on delete set null,
   created_at   timestamptz not null default now(),
   unique (workspace_id, name)
 );
@@ -53,7 +53,7 @@ create table api_keys (
   -- decide-via-MCP endpoint), so this defaults to false and is only set true
   -- for a key a human explicitly creates for that purpose.
   can_review   bool not null default false,
-  created_by   uuid references auth.users(id),
+  created_by   uuid references auth.users(id) on delete set null,
   created_at   timestamptz not null default now(),
   last_used_at timestamptz,
   revoked_at   timestamptz
@@ -213,6 +213,13 @@ create trigger trg_events_chain_hash
 -- Enforce append-only at the database level (not just app convention).
 create or replace function reject_mutation() returns trigger as $$
 begin
+  -- The only exception: purge_workspace() (below) erasing this row's
+  -- workspace when its owner deletes their account. The setting is
+  -- transaction-local and only that function sets it.
+  if tg_op = 'DELETE'
+     and current_setting('tracyn.purging_workspace', true) = old.workspace_id::text then
+    return old;
+  end if;
   raise exception '% is append-only: % is not allowed', tg_table_name, tg_op;
 end;
 $$ language plpgsql;
@@ -287,7 +294,7 @@ create table questionnaires (
   status       text not null default 'processing'
                check (status in ('processing','ready','error')),
   error_message text,
-  uploaded_by  uuid references auth.users(id),
+  uploaded_by  uuid references auth.users(id) on delete set null,
   created_at   timestamptz not null default now()
 );
 
@@ -299,7 +306,7 @@ create table answers (
   draft_answer    text,
   final_answer    text,
   status          text not null default 'draft' check (status in ('draft','reviewed','approved')),
-  reviewed_by     uuid references auth.users(id),
+  reviewed_by     uuid references auth.users(id) on delete set null,
   reviewed_at     timestamptz,
   created_at      timestamptz not null default now()
 );
@@ -313,6 +320,27 @@ create table evidence_links (
   created_at     timestamptz not null default now()
 );
 create index idx_evidence_links_answer on evidence_links(answer_id);
+
+-- =========================================================================
+-- ACCOUNT DELETION
+-- =========================================================================
+-- Permanently deletes a workspace and everything in it, events included
+-- (the one path past the append-only guard above). Called by the backend's
+-- account deletion (routers/account.py) for workspaces whose owner is
+-- deleting their account and that have no other members. Service role only.
+-- Existing projects get this from supabase/account_deletion.sql.
+
+create or replace function purge_workspace(ws uuid) returns void as $$
+begin
+  perform set_config('tracyn.purging_workspace', ws::text, true);
+  delete from workspaces where id = ws;
+  perform set_config('tracyn.purging_workspace', '', true);
+end;
+$$ language plpgsql security definer set search_path = public;
+
+revoke all on function purge_workspace(uuid) from public;
+revoke all on function purge_workspace(uuid) from anon, authenticated;
+grant execute on function purge_workspace(uuid) to service_role;
 
 -- =========================================================================
 -- BILLING (F9 — Whop state mirror)
