@@ -40,7 +40,7 @@ def _summarize_approval(row: dict) -> dict:
         "decision_note": row.get("decision_note"),
         "summary": (
             f"{agent_name} wants to run {action_name} ({action_type}) with {inputs_preview} "
-            f"— requested {row['requested_at']}, currently {row['status']}"
+            f"(requested {row['requested_at']}, currently {row['status']})"
         ),
     }
 
