@@ -84,9 +84,9 @@ function PeopleCard({ members, loading, myRole }: { members: Member[]; loading: 
     },
   });
 
-  function actionsFor(m: Member): { label: string; run: () => void; danger?: boolean }[] {
-    if (m.is_me) return m.role === "owner" ? [] : [{ label: "Leave workspace", run: () => setPending({ kind: "leave", member: m }), danger: true }];
-    const list: { label: string; run: () => void; danger?: boolean }[] = [];
+  function actionsFor(m: Member): { label: string; run: () => void }[] {
+    if (m.is_me) return [];
+    const list: { label: string; run: () => void }[] = [];
     if (myRole === "owner" && m.role !== "owner") {
       list.push(
         m.role === "admin"
@@ -95,17 +95,19 @@ function PeopleCard({ members, loading, myRole }: { members: Member[]; loading: 
       );
       list.push({ label: "Make owner", run: () => setPending({ kind: "transfer", member: m }) });
     }
-    if ((myRole === "owner" && m.role !== "owner") || (myRole === "admin" && m.role === "member")) {
-      list.push({ label: "Remove from workspace", run: () => setPending({ kind: "remove", member: m }), danger: true });
-    }
     return list;
+  }
+
+  function canRemove(m: Member) {
+    return !m.is_me && ((myRole === "owner" && m.role !== "owner") || (myRole === "admin" && m.role === "member"));
   }
 
   const counts = members.reduce<Record<string, number>>((c, m) => ({ ...c, [m.role]: (c[m.role] ?? 0) + 1 }), {});
 
   return (
     <>
-      <Card className="overflow-hidden">
+      {/* No overflow-hidden here: the row menus need to extend past the card. */}
+      <Card>
         <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4">
           <div>
             <div className="text-[15.5px] font-semibold">People in {workspace?.name}</div>
@@ -157,8 +159,21 @@ function PeopleCard({ members, loading, myRole }: { members: Member[]; loading: 
                     {m.name && m.email ? `${m.email} · ` : ""}
                     {m.joined_at ? `joined ${timeAgo(m.joined_at)}` : ""}
                   </div>
+                  {m.is_me && m.role === "owner" && members.length > 1 && (
+                    <div className="mt-0.5 text-[13px] text-[var(--cd-fg-3)]">To leave, make someone else the owner first.</div>
+                  )}
                 </div>
                 <RolePill role={m.role} />
+                {m.is_me && m.role !== "owner" && (
+                  <Button size="sm" variant="danger" onClick={() => setPending({ kind: "leave", member: m })}>
+                    Leave
+                  </Button>
+                )}
+                {canRemove(m) && (
+                  <Button size="sm" variant="danger" onClick={() => setPending({ kind: "remove", member: m })}>
+                    Remove
+                  </Button>
+                )}
                 <div className="relative w-8 shrink-0">
                   {actions.length > 0 && (
                     <button
@@ -180,10 +195,7 @@ function PeopleCard({ members, loading, myRole }: { members: Member[]; loading: 
                           key={a.label}
                           type="button"
                           onClick={a.run}
-                          className={cn(
-                            "flex h-9 w-full items-center rounded-[6px] px-3 text-left text-[14.5px]",
-                            a.danger ? "text-[var(--cd-red)] hover:bg-[#fdf1f1]" : "text-[var(--cd-ink)] hover:bg-[var(--cd-hover)]"
-                          )}
+                          className="flex h-9 w-full items-center rounded-[6px] px-3 text-left text-[14.5px] text-[var(--cd-ink)] hover:bg-[var(--cd-hover)]"
                         >
                           {a.label}
                         </button>
@@ -195,7 +207,7 @@ function PeopleCard({ members, loading, myRole }: { members: Member[]; loading: 
             );
           })}
         </ul>
-        {setRole.error && <p className="border-t border-[var(--cd-line)] px-5 py-3 text-[14px] text-[var(--cd-red)]">{friendlyError(setRole.error)}</p>}
+        {setRole.error && <p className="rounded-b-[10px] border-t border-[var(--cd-line)] px-5 py-3 text-[14px] text-[var(--cd-red)]">{friendlyError(setRole.error)}</p>}
       </Card>
 
       <Modal
