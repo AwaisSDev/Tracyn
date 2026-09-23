@@ -76,7 +76,7 @@ async def post_approval_request(
     client = AsyncWebClient(token=settings.slack_bot_token)
     response = await client.chat_postMessage(
         channel=channel,
-        text=f"{agent_name} wants to run {action_name} — approval needed",
+        text=f"{agent_name} wants to run {action_name}: approval needed",
         blocks=_blocks(approval_id, agent_name, action_type, action_name, inputs_preview),
     )
     return response["channel"], response["ts"]

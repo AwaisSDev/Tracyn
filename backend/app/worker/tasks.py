@@ -125,7 +125,7 @@ async def sweep_expired_approvals(ctx) -> None:
 
         if row.get("slack_channel") and row.get("slack_message_ts"):
             await update_message_with_decision(
-                row["slack_channel"], row["slack_message_ts"], ":alarm_clock: *Auto-denied* — no response within 30 minutes"
+                row["slack_channel"], row["slack_message_ts"], ":alarm_clock: *Auto-denied*: no response within 30 minutes"
             )
 
         ws = await _db(
