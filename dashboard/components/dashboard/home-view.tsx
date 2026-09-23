@@ -31,10 +31,10 @@ function greeting() {
 
 export function HomeView() {
   const { workspace } = useWorkspace();
-  const { data: events = [], isLoading: eventsLoading } = useEvents();
-  const { data: pending = [], isLoading: pendingLoading } = useApprovals("pending");
-  const { agentName, agents, isLoading: agentsLoading } = useAgents();
-  const { data: questionnaires = [], isLoading: packsLoading } = useQuestionnaires();
+  const { data: events = [], isPending: eventsLoading } = useEvents();
+  const { data: pending = [], isPending: pendingLoading } = useApprovals("pending");
+  const { agentName, agents, isPending: agentsLoading } = useAgents();
+  const { data: questionnaires = [], isPending: packsLoading } = useQuestionnaires();
   const { data: controls = [] } = useSoc2();
 
   const ready = questionnaires.filter((q) => q.status === "ready");
@@ -107,6 +107,7 @@ export function HomeView() {
             <Stat
               label="Events this month"
               loading={eventsLoading}
+              bar={!!eventLimit}
               value={month.count.toLocaleString()}
               foot={
                 eventLimit ? (
@@ -130,21 +131,19 @@ export function HomeView() {
               label="Model spend this month"
               loading={eventsLoading}
               value={money(month.spend)}
-              foot={agentsLoading ? <Skel className="h-3 w-28" /> : `${agents.length} ${agents.length === 1 ? "agent" : "agents"} reporting`}
+              foot={`${agents.length} ${agents.length === 1 ? "agent" : "agents"} reporting`}
+              footLoading={agentsLoading}
             />
             <Stat
               label="SOC 2 controls with live evidence"
               loading={!controls.length}
+              bar
               value={`${live}/${controls.length}`}
               foot={
-                controls.length ? (
-                  <>
-                    <Progress segments={[{ value: live, color: "var(--cd-green)" }, { value: controls.length - live, color: "transparent" }]} />
-                    <span className="mt-2 block">{Math.round((live / controls.length) * 100)}% covered by Tracyn data</span>
-                  </>
-                ) : (
-                  <Skel className="h-3 w-32" />
-                )
+                <>
+                  <Progress segments={[{ value: live, color: "var(--cd-green)" }, { value: controls.length - live, color: "transparent" }]} />
+                  <span className="mt-2 block">{controls.length ? Math.round((live / controls.length) * 100) : 0}% covered by Tracyn data</span>
+                </>
               }
             />
           </div>
@@ -164,7 +163,7 @@ export function HomeView() {
               Needs your review
             </CardTitle>
             <div className="px-2 pb-2 pt-1">
-              {pendingLoading && <RowSkeletons n={3} />}
+              {pendingLoading && Array.from({ length: 3 }).map((_, i) => <ReviewRowSkeleton key={i} />)}
               {!pendingLoading && pending.length === 0 && (
                 <p className="px-3 py-8 text-center text-[15.5px] text-[var(--cd-fg-3)]">No pending approvals.</p>
               )}
@@ -205,13 +204,14 @@ export function HomeView() {
               Evidence packs
             </CardTitle>
             <div className="space-y-1 px-2 pb-2 pt-1">
-              {packsLoading && <RowSkeletons n={2} />}
+              {packsLoading && Array.from({ length: 2 }).map((_, i) => <PackRowSkeleton key={i} />)}
               {!packsLoading && questionnaires.length === 0 && (
                 <p className="px-3 py-8 text-center text-[15.5px] text-[var(--cd-fg-3)]">No questionnaires yet.</p>
               )}
               {questionnaires.slice(0, 3).map((q) => {
                 const idx = ready.findIndex((r) => r.id === q.id);
                 const answers = idx >= 0 ? answerQueries[idx]?.data ?? [] : [];
+                if (idx >= 0 && answerQueries[idx]?.isPending) return <PackRowSkeleton key={q.id} />;
                 const approved = answers.filter((a) => a.status === "approved").length;
                 const reviewed = answers.filter((a) => a.status === "reviewed").length;
                 return (
@@ -251,7 +251,18 @@ export function HomeView() {
           <Card>
             <CardTitle>This month by agent</CardTitle>
             <div className="space-y-3 px-5 pb-5 pt-3">
-              {eventsLoading && <RowSkeletons n={4} />}
+              {eventsLoading &&
+                [100, 72, 55, 40].map((w) => (
+                  <div key={w}>
+                    <div className="flex items-center justify-between">
+                      <Skel className="h-[15px] w-28" />
+                      <Skel className="h-[15px] w-5" />
+                    </div>
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#eef0f6]">
+                      <Skel className="h-full rounded-full" style={{ width: `${w}%` }} />
+                    </div>
+                  </div>
+                ))}
               {!eventsLoading && byAgent.length === 0 && <p className="py-6 text-center text-[15.5px] text-[var(--cd-fg-3)]">No activity yet.</p>}
               {byAgent.map(([name, n]) => (
                 <div key={name}>
@@ -267,6 +278,17 @@ export function HomeView() {
             </div>
             <div className="border-t border-[var(--cd-line)] px-5 py-4">
               <div className="mb-2.5 text-[13.5px] text-[var(--cd-fg-3)]">Outcomes</div>
+              {eventsLoading ? (
+                <>
+                  <Skel className="h-2 w-full rounded-full" />
+                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
+                    {[92, 84, 76, 56].map((w) => (
+                      <Skel key={w} className="h-[13.5px]" style={{ width: w }} />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
               <Progress
                 className="h-2"
                 segments={[
@@ -282,6 +304,8 @@ export function HomeView() {
                 <Legend color="var(--cd-red)" label="Rejected" n={outcomes.rejected} />
                 <Legend color="#f0a0a0" label="Error" n={outcomes.error} />
               </div>
+                </>
+              )}
             </div>
           </Card>
 
@@ -296,7 +320,7 @@ export function HomeView() {
               Latest activity
             </CardTitle>
             <div className="px-2 pb-2 pt-1">
-              {eventsLoading && <RowSkeletons n={6} />}
+              {eventsLoading && Array.from({ length: 7 }).map((_, i) => <ActivityRowSkeleton key={i} />)}
               {!eventsLoading && events.length === 0 && (
                 <Empty className="m-3" title="No events yet" body="Install the SDK and run an agent. Its actions show up here." />
               )}
@@ -325,12 +349,16 @@ function Stat({
   value,
   foot,
   loading,
+  footLoading,
+  bar,
   tone,
 }: {
   label: string;
   value: string;
   foot?: React.ReactNode;
   loading?: boolean;
+  footLoading?: boolean;
+  bar?: boolean;
   tone?: "amber";
 }) {
   return (
@@ -340,11 +368,18 @@ function Stat({
         <span className="truncate">{label}</span>
       </div>
       {loading ? (
-        <Skel className="mt-3 h-8 w-20" />
+        <Skel className="mt-2 h-[30px] w-20 sm:h-[34px]" />
       ) : (
         <div className="mt-2 text-[30px] font-semibold tabular-nums leading-none tracking-[-0.03em] sm:text-[34px]">{value}</div>
       )}
-      {foot && <div className="mt-3 text-[13.5px] text-[var(--cd-fg-3)]">{foot}</div>}
+      {loading || footLoading ? (
+        <div className="mt-3">
+          {bar && <Skel className="mb-2 h-1.5 w-full rounded-full" />}
+          <Skel className="h-[13px] w-32 max-w-full" />
+        </div>
+      ) : (
+        foot && <div className="mt-3 text-[13.5px] text-[var(--cd-fg-3)]">{foot}</div>
+      )}
     </div>
   );
 }
@@ -358,12 +393,49 @@ function Legend({ color, label, n }: { color: string; label: string; n: number }
   );
 }
 
-export function RowSkeletons({ n }: { n: number }) {
+function ReviewRowSkeleton() {
   return (
-    <div className="space-y-2 px-3 py-2">
-      {Array.from({ length: n }).map((_, i) => (
-        <Skel key={i} className="h-7 w-full" />
-      ))}
+    <div className="flex items-center gap-3 px-3 py-2.5">
+      <Skel className="h-[7px] w-[7px] shrink-0 rounded-full" />
+      <div className="min-w-0 flex-1 space-y-1.5 py-[3px]">
+        <div className="flex items-center gap-2">
+          <Skel className="h-[15px] w-32" />
+          <Skel className="h-[13px] w-20" />
+        </div>
+        <Skel className="h-[14px] w-52 max-w-full" />
+      </div>
+      <Skel className="hidden h-[13px] w-12 sm:block" />
+      <span className="w-4" />
+    </div>
+  );
+}
+
+function PackRowSkeleton() {
+  return (
+    <div className="px-3 py-3">
+      <div className="flex items-center justify-between gap-3">
+        <Skel className="h-[15.5px] w-48 max-w-[60%]" />
+        <Skel className="h-[13.5px] w-20" />
+      </div>
+      <Skel className="mt-3 h-1.5 w-full rounded-full" />
+    </div>
+  );
+}
+
+function ActivityRowSkeleton() {
+  return (
+    <div className="flex items-center gap-3 px-3 py-2">
+      <span className="flex w-[104px] shrink-0 items-center gap-2">
+        <Skel className="h-[7px] w-[7px] rounded-full" />
+        <Skel className="h-[13px] w-16" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <Skel className="h-[14px] w-36 max-w-full" />
+      </span>
+      <Skel className="hidden h-[13.5px] w-20 sm:block" />
+      <span className="flex w-[64px] shrink-0 justify-end">
+        <Skel className="h-[13.5px] w-12" />
+      </span>
     </div>
   );
 }
