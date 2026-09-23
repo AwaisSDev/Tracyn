@@ -26,7 +26,7 @@ Tracyn's logging/approval/audit-chain features work. Never invent specifics not 
 the evidence.
 - If the evidence doesn't support a confident answer, say so plainly and suggest what \
 the human reviewer should add.
-- Cite evidence by event id, using the exact ids given — never invent an id.
+- Cite evidence by event id, using the exact ids given. Never invent an id.
 - Keep answers to 2-4 sentences; questionnaires are read by busy security reviewers.
 
 Reply with ONLY a JSON object, no other text, no markdown fences: \
@@ -49,7 +49,7 @@ async def draft_answer(question: str, candidate_events: list[dict]) -> DraftedAn
         # wraps every question in one try/except, so one hard failure here
         # used to abort every other question in the file too).
         return DraftedAnswer(
-            answer="Draft generation is unavailable (no Ollama API key configured) — please write this answer manually.",
+            answer="Draft generation is unavailable (no Ollama API key configured). Please write this answer manually.",
             cited_event_ids=[],
         )
 
@@ -90,7 +90,7 @@ async def draft_answer(question: str, candidate_events: list[dict]) -> DraftedAn
         return DraftedAnswer(answer=parsed["answer"], cited_event_ids=cited)
     except (json.JSONDecodeError, KeyError, IndexError):
         return DraftedAnswer(
-            answer="Draft generation failed to parse — please write this answer manually.",
+            answer="Draft generation failed to parse. Please write this answer manually.",
             cited_event_ids=[],
         )
     except Exception:
@@ -98,6 +98,6 @@ async def draft_answer(question: str, candidate_events: list[dict]) -> DraftedAn
         # redact_with_llm: a transient outage or timeout for one question
         # must not take the rest of the questionnaire down with it.
         return DraftedAnswer(
-            answer="Draft generation failed (a temporary error) — please write this answer manually.",
+            answer="Draft generation failed (a temporary error). Please write this answer manually.",
             cited_event_ids=[],
         )
