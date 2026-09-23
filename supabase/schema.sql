@@ -343,6 +343,33 @@ revoke all on function purge_workspace(uuid) from anon, authenticated;
 grant execute on function purge_workspace(uuid) to service_role;
 
 -- =========================================================================
+-- SHARED WORKSPACES
+-- =========================================================================
+-- How people join a workspace (routers/members.py). join_code is the public
+-- part of both links (/join/<code>); link_token is the secret in the
+-- one-click invite link (null when it's off); password_hash is the
+-- workspace password typed on the plain link (null when that's off). RLS on
+-- with no policies (see below), so only the service role reads it.
+-- workspace_join_attempts logs failed joins to rate-limit password guesses.
+-- Existing projects get this from supabase/shared_workspaces.sql.
+
+create table workspace_invites (
+  workspace_id  uuid primary key references workspaces(id) on delete cascade,
+  join_code     text not null unique,
+  link_token    text unique,
+  password_hash text,
+  updated_at    timestamptz not null default now()
+);
+
+create table workspace_join_attempts (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  join_code  text not null,
+  created_at timestamptz not null default now()
+);
+create index idx_workspace_join_attempts_user on workspace_join_attempts(user_id, created_at desc);
+
+-- =========================================================================
 -- BILLING (F9 — Whop state mirror)
 -- =========================================================================
 
@@ -407,6 +434,8 @@ alter table questionnaires enable row level security;
 alter table answers enable row level security;
 alter table evidence_links enable row level security;
 alter table subscriptions enable row level security;
+alter table workspace_invites enable row level security;       -- no policies: service role only
+alter table workspace_join_attempts enable row level security; -- no policies: service role only
 
 create policy select_own_workspaces on workspaces
   for select using (is_workspace_member(id));
