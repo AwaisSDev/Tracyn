@@ -1,0 +1,190 @@
+/* The signed-in dashboard. Everything is scoped under .cd so none of it
+   leaks into the marketing pages. Built from the design research:
+   a soft tinted page with white cards, a quiet sidebar, borders for structure and
+   shadows only for things that float, blue spent on the one primary action
+   per page, and status carried by small colored dots. */
+
+.cd {
+  --cd-ink: #0f1222;
+  --cd-fg-2: #5b6078;
+  --cd-fg-3: #8a90a6;
+  --cd-line: #e4e7f0;
+  --cd-line-2: #d5dae8;
+  /* Card outlines: darker than the inner dividers so a card never melts
+     into the tinted page. */
+  --cd-card-edge: #d3d9e6;
+  --cd-bg: #f3f4f8;
+  --cd-side: #f3f4f8;
+  --cd-hover: #e9ebf2;
+  --cd-active: #ffffff;
+  --cd-blue: #3553d4;
+  --cd-blue-ink: #2a44b8;
+  --cd-blue-soft: #eaefff;
+  --cd-green: #1f9d62;
+  --cd-amber: #d98a00;
+  --cd-red: #d64545;
+  --cd-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  color: var(--cd-ink);
+  background: var(--cd-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", var(--font-cd-sans), "Inter", "Segoe UI", sans-serif;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Always reserve the scrollbar's width, so opening something that makes the
+   page taller (like an approval's detail) never nudges the layout sideways. */
+html:has(.cd) {
+  overflow-y: scroll;
+}
+
+.cd-noscroll { scrollbar-width: none; }
+.cd-noscroll::-webkit-scrollbar { display: none; }
+
+.cd-wordmark {
+  /* The logo's wordmark matches the marketing site exactly: Inter Tight,
+     20px, semibold (see components/home/home.tsx SiteNav). */
+  font-family: var(--font-cv-sans), "Inter", -apple-system, "Segoe UI", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--cv-ink, #0f1222);
+}
+
+.cd-mono {
+  font-family: var(--cd-mono);
+  letter-spacing: 0;
+}
+
+/* Cards sit on the tinted page: white, hairline border, a soft lift. */
+.cd-card {
+  background: #ffffff;
+  border: 1px solid var(--cd-card-edge);
+  box-shadow:
+    0 1px 2px rgba(15, 18, 34, 0.06),
+    0 3px 10px -3px rgba(15, 18, 34, 0.07);
+}
+
+/* Secondary button: white with a crisp rim, same family as the site's
+   glossy buttons but quiet. */
+.cd-btn-secondary {
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px var(--cd-line-2),
+    0 1px 2px rgba(15, 18, 34, 0.05);
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.cd-btn-secondary:hover { background: #f7f8fc; }
+.cd-btn-secondary:active { transform: scale(0.98); }
+
+/* Floating layers (menus, drawers, dialogs) are the only things with real
+   shadows. */
+.cd-float {
+  box-shadow:
+    0 0 0 1px rgba(15, 18, 34, 0.06),
+    0 12px 32px -12px rgba(15, 18, 34, 0.22),
+    0 4px 10px -6px rgba(15, 18, 34, 0.08);
+}
+
+.cd-panel-in {
+  animation: cd-slide-in 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cd-panel-out {
+  animation: cd-slide-out 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+.cd-fade-in {
+  animation: cd-fade-in 0.15s ease-out;
+}
+.cd-spin-in {
+  animation: cd-spin-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cd-fade-out {
+  animation: cd-fade-out 0.22s ease-in forwards;
+}
+.cd-pop-in {
+  animation: cd-pop-in 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes cd-slide-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes cd-slide-out {
+  from { transform: none; opacity: 1; }
+  to { transform: translateX(24px); opacity: 0; }
+}
+@keyframes cd-spin-in {
+  from { transform: rotate(-90deg) scale(0.6); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes cd-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes cd-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes cd-pop-in {
+  from { transform: translateY(-4px) scale(0.98); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.cd-skel {
+  background: linear-gradient(90deg, #f0f2f8 0%, #f7f8fc 50%, #f0f2f8 100%);
+  background-size: 200% 100%;
+  animation: cd-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes cd-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+.cd-focus:focus-visible,
+.cd a:focus-visible,
+.cd button:focus-visible {
+  outline: 2px solid var(--cd-blue);
+  outline-offset: 2px;
+}
+
+/* Most .cd-input rules are wrapped in :where() so Tailwind utilities on the
+   same element (text size, border color) still win. Padding is the
+   exception: Tailwind's reset zeroes input padding with an element
+   selector, which would beat a :where() rule, so it gets a real class
+   selector (override it with an important utility, e.g. !pl-9). */
+
+:where(.cd-input) {
+  height: 42px;
+  width: 100%;
+  border-radius: 7px;
+  border: 1px solid var(--cd-line-2);
+  background: #ffffff;
+  font-size: 15.5px;
+  color: var(--cd-ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+:where(.cd-input)::placeholder { color: #a3a9bd; }
+:where(.cd-input):focus {
+  border-color: var(--cd-blue);
+  box-shadow: 0 0 0 3px rgba(53, 83, 212, 0.12);
+}
+.cd-input {
+  padding: 0 14px;
+}
+textarea.cd-input {
+  padding: 10px 14px;
+}
+:where(textarea.cd-input) {
+  height: auto;
+  line-height: 1.55;
+  resize: vertical;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cd-panel-in,
+  .cd-panel-out,
+  .cd-fade-in,
+  .cd-fade-out,
+  .cd-spin-in,
+  .cd-pop-in,
+  .cd-skel { animation: none; }
+}
