@@ -11,6 +11,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { useWorkspace } from "@/lib/workspace-context";
 import type { ApiKey } from "@/lib/types";
 import { startOfMonth, useAgents, useEvents, useQuestionnaires } from "./data";
+import { MembersTab } from "./members-view";
 import {
   Button,
   Card,
@@ -25,7 +26,7 @@ import {
   timeAgo,
 } from "./ui";
 
-type Tab = "account" | "keys" | "billing";
+type Tab = "account" | "members" | "keys" | "billing";
 
 export function SettingsView() {
   const router = useRouter();
@@ -36,11 +37,11 @@ export function SettingsView() {
   // on the billing tab.
   const plan = params.get("plan");
   const billingReturn = params.get("billing") === "success";
-  const tab: Tab = raw === "keys" || raw === "billing" ? raw : plan || billingReturn ? "billing" : "account";
+  const tab: Tab = raw === "members" || raw === "keys" || raw === "billing" ? raw : plan || billingReturn ? "billing" : "account";
 
   return (
     <Page>
-      <PageHeader title="Settings" subtitle="Your account, the keys your agents use, and your plan." />
+      <PageHeader title="Settings" subtitle="Your account, who's in this workspace, the keys your agents use, and your plan." />
       <div className="mt-7">
         <Segmented
           label="Settings section"
@@ -48,6 +49,7 @@ export function SettingsView() {
           onChange={(t) => router.replace(t === "account" ? "/settings" : `/settings?tab=${t}`, { scroll: false })}
           options={[
             { value: "account", label: "Account" },
+            { value: "members", label: "Members" },
             { value: "keys", label: "API keys" },
             { value: "billing", label: "Plan and billing" },
           ]}
@@ -55,6 +57,7 @@ export function SettingsView() {
       </div>
       <div className="mt-6 space-y-4">
         {tab === "account" && <Account />}
+        {tab === "members" && <MembersTab />}
         {tab === "keys" && <Keys />}
         {tab === "billing" && <Billing intent={billingReturn ? null : plan} />}
       </div>
