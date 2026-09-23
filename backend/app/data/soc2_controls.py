@@ -1,8 +1,8 @@
-"""F7 — static SOC2 Trust Services Criteria (Common Criteria) mapping.
+"""F7: static SOC2 Trust Services Criteria (Common Criteria) mapping.
 
 Not legal or audit advice: this shows a workspace's auditor which of their
 Tracyn-logged evidence *speaks to* each control, as a starting point for
-their own SOC2 readiness work — it doesn't certify compliance by itself.
+their own SOC2 readiness work. It doesn't certify compliance by itself.
 """
 
 from pydantic import BaseModel
@@ -26,7 +26,7 @@ class Soc2ControlOut(Soc2Control):
 SOC2_CONTROLS: list[Soc2Control] = [
     Soc2Control(
         control_id="CC6.1",
-        title="Logical access — least privilege",
+        title="Logical access: least privilege",
         description="The entity implements logical access controls to protect systems from unauthorized access.",
         evidence_type="api_keys",
         evidence_note="Per-workspace API keys, individually revocable, with last-used tracking.",
@@ -113,7 +113,7 @@ SOC2_CONTROLS: list[Soc2Control] = [
         title="Confidentiality of information",
         description="Confidential information is protected during collection, use, retention, and disposal.",
         evidence_type="events.inputs_redacted / output_redacted",
-        evidence_note="Only redacted content is ever stored — raw PII never reaches long-term storage.",
+        evidence_note="Only redacted content is ever stored. Raw PII never reaches long-term storage.",
     ),
     Soc2Control(
         control_id="P1.1",
