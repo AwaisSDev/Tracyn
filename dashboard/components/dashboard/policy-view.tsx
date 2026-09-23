@@ -69,7 +69,7 @@ export function PolicyView() {
     return () => window.removeEventListener("keydown", onKey);
   }, [chatOpen]);
 
-  const { data: policy, isLoading } = useQuery({
+  const { data: policy, isPending } = useQuery({
     queryKey: ["policy", workspace?.id],
     queryFn: () => api.get<Policy>(`/v1/workspaces/${workspace!.id}/policy`),
     enabled: !!workspace,
@@ -164,23 +164,35 @@ export function PolicyView() {
           <Card className="overflow-hidden">
             <div className="flex items-center justify-between border-b border-[var(--cd-line)] px-5 py-3">
               <span className="text-[15.5px] font-semibold">Rules</span>
-              {rules && !isLoading && (
-                <span className="text-[13.5px] text-[var(--cd-fg-3)]">
-                  {needsApproval} of {rules.length} need approval
-                </span>
+              {isPending ? (
+                <Skel className="h-[13.5px] w-32" />
+              ) : (
+                rules && (
+                  <span className="text-[13.5px] text-[var(--cd-fg-3)]">
+                    {needsApproval} of {rules.length} need approval
+                  </span>
+                )
               )}
             </div>
-            {isLoading && (
-              <div className="space-y-2 p-4">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skel key={i} className="h-12 w-full" />
+            {isPending && (
+              <ul className="divide-y divide-[var(--cd-line)]">
+                {[62, 48, 56, 44, 70].map((w, i) => (
+                  <li key={i} className="flex items-center gap-4 px-4 py-4 sm:px-6 sm:py-5">
+                    <Skel className="hidden h-10 w-10 shrink-0 rounded-full sm:block" />
+                    <div className="min-w-0 flex-1">
+                      <Skel className="h-[17px]" style={{ width: `${w}%` }} />
+                      <Skel className="mt-2 h-[14.5px] w-40" />
+                    </div>
+                    <Skel className="hidden h-[14.5px] w-24 md:block" />
+                    <Skel className="h-[26px] w-[46px] shrink-0 rounded-full" />
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
-            {!isLoading && rules === null && (
+            {!isPending && rules === null && (
               <p className="px-5 py-6 text-[15px] text-[var(--cd-red)]">The policy YAML doesn&apos;t parse. Fix it in the editor below.</p>
             )}
-            {!isLoading && rules?.length === 0 && (
+            {!isPending && rules?.length === 0 && (
               <p className="px-5 py-8 text-center text-[15.5px] text-[var(--cd-fg-3)]">No rules yet. Every action runs without approval.</p>
             )}
             <ul className="divide-y divide-[var(--cd-line)]">
