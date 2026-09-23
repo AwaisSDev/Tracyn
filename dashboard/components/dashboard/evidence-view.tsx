@@ -31,7 +31,7 @@ export function EvidenceListView() {
   const { workspace } = useWorkspace();
   const queryClient = useQueryClient();
   const fileInput = useRef<HTMLInputElement>(null);
-  const { data: questionnaires = [], isLoading } = useQuestionnaires();
+  const { data: questionnaires = [], isPending } = useQuestionnaires();
 
   const ready = questionnaires.filter((q) => q.status === "ready");
   const answerQueries = useQueries({
@@ -82,8 +82,8 @@ export function EvidenceListView() {
       </div>
 
       <div className="mt-6 space-y-3">
-        {isLoading && Array.from({ length: 2 }).map((_, i) => <Skel key={i} className="h-[92px] w-full rounded-[9px]" />)}
-        {!isLoading && questionnaires.length === 0 && (
+        {isPending && Array.from({ length: 2 }).map((_, i) => <PackCardSkeleton key={i} />)}
+        {!isPending && questionnaires.length === 0 && (
           <Card>
             <Empty
               title="No evidence packs yet"
@@ -113,7 +113,12 @@ export function EvidenceListView() {
                   <span className="truncate text-[16.5px] font-medium">{q.filename}</span>
                   <span className="text-[13.5px] text-[var(--cd-fg-3)]">Uploaded {timeAgo(q.created_at)}</span>
                 </div>
-                {q.status === "ready" ? (
+                {q.status === "ready" && idx >= 0 && answerQueries[idx]?.isPending ? (
+                  <div className="mt-3 flex items-center gap-3">
+                    <Skel className="h-1.5 w-full max-w-[320px] rounded-full" />
+                    <Skel className="h-[13.5px] w-24 shrink-0" />
+                  </div>
+                ) : q.status === "ready" ? (
                   <div className="mt-2.5 flex items-center gap-3">
                     <Progress
                       className="max-w-[320px]"
@@ -163,7 +168,7 @@ export function EvidenceDetailView({ id }: { id: string }) {
   const { data: questionnaires = [] } = useQuestionnaires();
   const pack = questionnaires.find((q) => q.id === id);
 
-  const { data: answers = [], isLoading } = useQuery({
+  const { data: answers = [], isPending } = useQuery({
     queryKey: ["answers", id],
     queryFn: () => api.get<Answer[]>(`/v1/workspaces/${workspace!.id}/questionnaires/${id}/answers`),
     enabled: !!workspace,
@@ -205,9 +210,14 @@ export function EvidenceDetailView({ id }: { id: string }) {
             Evidence Packs
           </Link>
         }
-        title={pack?.filename ?? "Evidence pack"}
+        title={pack ? pack.filename : <Skel className="h-[30px] w-72 max-w-full sm:h-[34px]" />}
         subtitle={
-          answers.length ? (
+          isPending ? (
+            <span className="flex items-center gap-3">
+              <Skel className="h-1.5 w-40 rounded-full" />
+              <Skel className="h-[14.5px] w-44" />
+            </span>
+          ) : answers.length ? (
             <span className="flex items-center gap-3">
               <Progress
                 className="w-40"
@@ -253,11 +263,8 @@ export function EvidenceDetailView({ id }: { id: string }) {
         <ErrorText error={approveAll.error} />
       </div>
 
-      {isLoading ? (
-        <div className="mt-7 grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
-          <Skel className="h-80 rounded-[9px]" />
-          <Skel className="h-80 rounded-[9px]" />
-        </div>
+      {isPending ? (
+        <PackDetailSkeleton />
       ) : !answers.length ? (
         <Card className="mt-7"><Empty title="No answers in this pack" body="The questionnaire didn't contain any questions Tracyn could read." /></Card>
       ) : (
@@ -413,7 +420,6 @@ function Citations({ ids }: { ids: string[] }) {
     })),
   });
   const events = useMemo(() => results.map((r) => r.data).filter(Boolean) as AuditEvent[], [results]);
-  const loading = results.some((r) => r.isLoading);
 
   return (
     <div>
@@ -422,7 +428,7 @@ function Citations({ ids }: { ids: string[] }) {
         <Card className="px-4 py-6 text-center text-[15px] text-[var(--cd-fg-3)]">This answer doesn&apos;t cite any events.</Card>
       )}
       <div className="space-y-2">
-        {loading && ids.map((i) => <Skel key={i} className="h-[92px] w-full rounded-[8px]" />)}
+        {results.map((r, i) => (r.isPending ? <CitationSkeleton key={ids[i]} /> : null))}
         {events.map((e) => (
           <Link
             key={e.id}
@@ -443,6 +449,100 @@ function Citations({ ids }: { ids: string[] }) {
           </Link>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ---------- skeletons, shaped like what they stand in for ----------
+
+function PackCardSkeleton() {
+  return (
+    <Card className="flex items-center gap-4 p-4 sm:p-5">
+      <Skel className="h-10 w-10 shrink-0 rounded-[7px]" />
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <Skel className="h-[16.5px] w-60 max-w-full" />
+          <Skel className="h-[13.5px] w-28" />
+        </div>
+        <div className="mt-3 flex items-center gap-3">
+          <Skel className="h-1.5 w-full max-w-[320px] rounded-full" />
+          <Skel className="h-[13.5px] w-24 shrink-0" />
+        </div>
+      </div>
+      <Skel className="hidden h-[15px] w-16 sm:block" />
+    </Card>
+  );
+}
+
+function PackDetailSkeleton() {
+  return (
+    <div className="mt-7 grid items-start gap-4 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_320px]">
+      <Card className="overflow-hidden">
+        <div className="border-b border-[var(--cd-line)] px-4 py-3">
+          <Skel className="h-[13.5px] w-24" />
+        </div>
+        <div className="space-y-1 p-1.5">
+          {[88, 72, 94, 64, 80].map((w, i) => (
+            <div key={i} className="flex items-start gap-2.5 px-2.5 py-2">
+              <Skel className="mt-[2px] h-[13px] w-4 shrink-0" />
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <Skel className="h-[14px]" style={{ width: `${w}%` }} />
+                <Skel className="h-[14px] w-1/2" />
+              </div>
+              <Skel className="mt-[5px] h-[7px] w-[7px] shrink-0 rounded-full" />
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card>
+        <div className="flex items-center justify-between gap-3 border-b border-[var(--cd-line)] px-5 py-3">
+          <Skel className="h-[13.5px] w-28" />
+          <span className="flex items-center gap-3">
+            <Skel className="h-[13px] w-20" />
+            <Skel className="h-6 w-12" />
+          </span>
+        </div>
+        <div className="space-y-4 px-5 py-5">
+          <div className="space-y-2">
+            <Skel className="h-5 w-11/12" />
+            <Skel className="h-5 w-2/3" />
+          </div>
+          <div>
+            <Skel className="mb-2 h-[13.5px] w-36" />
+            <Skel className="h-[196px] w-full rounded-[7px]" />
+          </div>
+          <div className="flex gap-2">
+            <Skel className="h-10 w-36 rounded-[6px]" />
+            <Skel className="h-10 w-40 rounded-[6px]" />
+          </div>
+        </div>
+      </Card>
+
+      <div className="lg:col-start-2 xl:col-start-auto">
+        <Skel className="mb-2 h-3 w-32" />
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <CitationSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CitationSkeleton() {
+  return (
+    <div className="cd-card rounded-[9px] p-4">
+      <div className="flex items-center justify-between gap-2">
+        <Skel className="h-[14px] w-32" />
+        <span className="flex items-center gap-2">
+          <Skel className="h-[7px] w-[7px] rounded-full" />
+          <Skel className="h-[13px] w-16" />
+        </span>
+      </div>
+      <Skel className="mt-2 h-[13.5px] w-40" />
+      <Skel className="mt-3 h-[12.5px] w-52 max-w-full" />
     </div>
   );
 }
