@@ -108,14 +108,16 @@ export function ApprovalsView() {
         )}
       >
         <Card className="overflow-hidden">
-          {current.isLoading && (
-            <div className="space-y-2 p-4">
+          {current.isPending && (
+            <ul className="divide-y divide-[var(--cd-line)]">
               {Array.from({ length: 3 }).map((_, i) => (
-                <Skel key={i} className="h-[76px] w-full" />
+                <li key={i}>
+                  <ApprovalRowSkeleton compact={!!shown} />
+                </li>
               ))}
-            </div>
+            </ul>
           )}
-          {!current.isLoading && items.length === 0 && (
+          {!current.isPending && items.length === 0 && (
             <div className="p-4">
               <Empty
                 title={tab === "pending" ? "You're all caught up" : "Nothing here yet"}
@@ -235,6 +237,33 @@ function ApprovalRow({
         )}
       />
     </button>
+  );
+}
+
+// Same box model as ApprovalRow, so rows don't jump when the data lands.
+function ApprovalRowSkeleton({ compact }: { compact: boolean }) {
+  return (
+    <div className="flex w-full items-center gap-3 px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
+      <Skel className="hidden h-10 w-10 shrink-0 rounded-full sm:block" />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <Skel className="h-[17px] w-40 max-w-[55%]" />
+          <Skel className="h-[15px] w-28" />
+        </div>
+        <Skel className="mt-2 h-[15px] w-72 max-w-full" />
+      </div>
+      {!compact && (
+        <div className="hidden w-[140px] shrink-0 space-y-1.5 xl:block">
+          <Skel className="h-[13px] w-12" />
+          <Skel className="h-[14.5px] w-16" />
+        </div>
+      )}
+      <div className="flex shrink-0 flex-col items-end gap-2">
+        <Skel className="h-[14px] w-14" />
+        <Skel className="h-[22px] w-[104px] rounded-full" />
+      </div>
+      <Skel className="hidden h-5 w-5 shrink-0 rounded-full sm:block" />
+    </div>
   );
 }
 
