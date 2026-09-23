@@ -5,15 +5,6 @@ import Link from "next/link";
 import {
   Check,
   ChevronDown,
-  History,
-  CircleCheck,
-  FileText,
-  ShieldCheck,
-  BadgeCheck,
-  Settings as SettingsIcon,
-  LogOut,
-  Send,
-  X,
   Mail,
   Plug,
   Link2,
@@ -28,38 +19,12 @@ import {
 } from "lucide-react";
 import { ForceLightTheme } from "@/components/force-light-theme";
 import { Reveal } from "@/components/landing/reveal";
-import { Badge, StatusBadge } from "@/components/ui/badge";
 import { interTight } from "./fonts";
 import { NavLinks } from "./nav-links";
+import { AppWindow, ApprovalsScreen, EvidenceScreen, PolicyScreen, Switch, TimelineScreen } from "./product-shots";
 import "./home.css";
 
 const CONTACT_URL = "mailto:mawais9171@gmail.com";
-
-const NAV_ITEMS = [
-  { label: "Timeline", icon: History },
-  { label: "Approvals", icon: CircleCheck },
-  { label: "Evidence Packs", icon: FileText },
-  { label: "Policy", icon: ShieldCheck },
-  { label: "SOC 2 Mapping", icon: BadgeCheck },
-  { label: "Settings", icon: SettingsIcon },
-];
-
-const TIMELINE_ROWS = [
-  { when: "Sep 20, 02:23 PM", action: "send_refund", type: "external", status: "completed" },
-  { when: "Sep 20, 02:23 PM", action: "close_account", type: "external", status: "completed" },
-  { when: "Sep 20, 02:22 PM", action: "bulk_delete_records", type: "external", status: "pending" },
-  { when: "Sep 20, 02:22 PM", action: "check_invoice_status", type: "external", status: "completed" },
-  { when: "Sep 20, 02:22 PM", action: "update_ticket_status", type: "external", status: "completed" },
-  { when: "Sep 20, 02:22 PM", action: "send_receipt_email", type: "external", status: "completed" },
-  { when: "Sep 20, 02:22 PM", action: "lookup_order", type: "external", status: "completed" },
-  { when: "Sep 20, 02:22 PM", action: "check_system_health", type: "internal", status: "completed" },
-  { when: "Sep 20, 02:22 PM", action: "restart_service", type: "internal", status: "completed" },
-  { when: "Sep 20, 02:21 PM", action: "schedule_interview", type: "external", status: "completed" },
-  { when: "Sep 20, 02:21 PM", action: "send_offer_reminder", type: "external", status: "completed" },
-  { when: "Sep 20, 02:21 PM", action: "connectivity_check", type: "internal", status: "completed" },
-  { when: "Sep 20, 02:21 PM", action: "close_ticket", type: "external", status: "completed" },
-  { when: "Sep 20, 02:20 PM", action: "qualify_lead", type: "external", status: "completed" },
-];
 
 const FAQS = [
   {
@@ -332,107 +297,15 @@ function CroppedWindow({ children, ...heights }: CropHeights & { children: React
   );
 }
 
-// A faithful, full-scale recreation of the real dashboard chrome (see
-// components/nav/sidebar.tsx and app-shell.tsx) -- same nav items, same
-// icons, same order. Sets its own text color so it never inherits white
-// from a dark card it sits on. At least 32px taller than its crop, so the
-// crop always cuts straight through it and the window's own bottom edge
-// never shows, however short the screen inside is.
-function AppWindow({ active, children }: { active: string; children: React.ReactNode }) {
-  return (
-    <div className="cv-window flex min-h-[calc(100%+32px)] flex-col overflow-hidden rounded-t-[10px] border border-[var(--cv-line)] bg-white text-[var(--cv-fg)]">
-      <div className="flex items-center gap-1.5 border-b border-[var(--cv-line)] bg-[var(--cv-cream)] px-4 py-2.5">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-        <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
-        <span className="mx-auto truncate rounded-md bg-white px-5 py-0.5 text-[11.5px] text-[var(--cv-fg-2)] shadow-[0_0_0_1px_var(--cv-line)] sm:-translate-x-6 sm:px-16">
-          app.tracyn.online
-        </span>
-      </div>
-      <div className="flex flex-1">
-        <div className="hidden w-[220px] shrink-0 flex-col border-r border-[var(--cv-line)] bg-[var(--cv-cream)] p-3 sm:flex">
-          <div className="mb-3 flex items-center gap-2 px-1.5 py-1">
-            {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
-            <img src="/logo.png" alt="" width={18} height={18} className="rounded" />
-            <span className="text-[13px] font-semibold">Tracyn</span>
-          </div>
-          <div className="mb-3 flex items-center gap-2 rounded-md bg-white px-2.5 py-2 shadow-sm">
-            <span className="flex h-5 w-5 items-center justify-center rounded bg-[var(--cv-blue)] text-[10px] font-semibold text-white">
-              A
-            </span>
-            <span className="text-[12.5px] font-medium">Acme Agents</span>
-          </div>
-          <div className="flex-1 space-y-0.5 text-[13px] text-[var(--cv-fg-2)]">
-            {NAV_ITEMS.map((item) => {
-              const isActive = item.label === active;
-              return (
-                <div
-                  key={item.label}
-                  className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 ${
-                    isActive ? "bg-white font-medium text-[var(--cv-fg)] shadow-sm" : ""
-                  }`}
-                >
-                  <item.icon className="h-[15px] w-[15px]" strokeWidth={1.75} />
-                  {item.label}
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex items-center gap-2 px-2.5 py-1.5 text-[12.5px] text-[var(--cv-fg-2)]">
-            <LogOut className="h-[14px] w-[14px]" strokeWidth={1.75} />
-            Sign out
-          </div>
-        </div>
-        <div className="min-w-0 flex-1">{children}</div>
-      </div>
-    </div>
-  );
-}
-
-function TimelineScreen() {
-  return (
-    <div className="relative">
-      <div className="flex items-center justify-between border-b border-[var(--cv-line)] px-6 py-4">
-        <h3 className="text-[17px] font-semibold tracking-tight">Timeline</h3>
-        <span className="rounded-md bg-[var(--cv-fg)] px-3 py-1.5 text-[12px] font-medium text-white">Export CSV</span>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full whitespace-nowrap text-left text-[13px]">
-          <thead>
-            <tr className="border-b border-[var(--cv-line)] text-[12px] text-[var(--cv-fg-2)]">
-              <th className="hidden px-6 py-2.5 font-medium sm:table-cell">When</th>
-              <th className="px-4 py-2.5 font-medium sm:px-6">Agent action</th>
-              <th className="hidden px-6 py-2.5 font-medium lg:table-cell">Type</th>
-              <th className="px-4 py-2.5 font-medium sm:px-6">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {TIMELINE_ROWS.map((row, i) => (
-              <tr key={i} className="border-b border-[var(--cv-line)] last:border-0">
-                <td className="hidden px-6 py-3 text-[var(--cv-fg-2)] sm:table-cell">{row.when}</td>
-                <td className="px-4 py-3 font-medium text-[var(--cv-fg)] sm:px-6">{row.action}</td>
-                <td className="hidden px-6 py-3 text-[var(--cv-fg-2)] lg:table-cell">{row.type}</td>
-                <td className="px-4 py-3 sm:px-6">
-                  <StatusBadge status={row.status} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-
-// Crop heights measured in the browser (at 375, 888 and 1280px wide) so
-// nothing vital is cut: the policy assistant's send row (489 / 452px) and,
-// at lg, the rows beside it (390px); the approval's buttons (425 / 403 /
-// 359px). Each gets ~14-20px of room below. Evidence is a deliberate cut:
-// on phones the first answer ends at 339px and the second peeks in.
-const POLICY_CROP: CropHeights = { mobileHeight: 503, height: 466, lgHeight: 404 };
-const APPROVALS_CROP: CropHeights = { mobileHeight: 441, height: 422, lgHeight: 378 };
-const EVIDENCE_CROP: CropHeights = { mobileHeight: 400, height: 540 };
+// Crop heights measured in the browser at 375, 640, 800, 888, 1024 and
+// 1280px wide, taking the tallest point in each breakpoint's range plus
+// room: the whole policy assistant box with ~24px below it (phones 522,
+// tablets up to 572, desktop 505px) and the approval's Approve button with
+// ~18px (451 / 537 / 476px). Evidence is a deliberate cut on narrow screens (through the cited
+// events); from lg the answer's Approve button shows (up to 624px at 1024).
+const POLICY_CROP: CropHeights = { mobileHeight: 546, height: 596, lgHeight: 529 };
+const APPROVALS_CROP: CropHeights = { mobileHeight: 475, height: 555, lgHeight: 494 };
+const EVIDENCE_CROP: CropHeights = { mobileHeight: 560, height: 600, lgHeight: 640 };
 
 function FeatureBlueCard() {
   return (
@@ -455,105 +328,6 @@ function FeatureBlueCard() {
         </CroppedWindow>
       </div>
     </div>
-  );
-}
-
-function PolicyScreen() {
-  // `phone: false` rows are hidden below lg, where the assistant stacks
-  // under the rows instead of sitting beside them, to keep the screenshot
-  // short; the two that stay still show both outcomes.
-  const rows = [
-    { label: "Deleting stored data", state: "Runs automatically", on: false, phone: true },
-    { label: "Reading or accessing stored data", state: "Runs automatically", on: false, phone: false },
-    { label: "Sending things outside your system", state: "Needs approval", on: true, phone: true },
-    { label: "Internal, background actions", state: "Runs automatically", on: false, phone: false },
-  ];
-  return (
-    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_272px] lg:items-start">
-      <div className="min-w-0">
-      <div className="border-b border-[var(--cv-line)] px-4 py-4 sm:px-6">
-        <h3 className="text-[17px] font-semibold tracking-tight text-[var(--cv-fg)]">Policy</h3>
-        <p className="mt-0.5 text-[12.5px] text-[var(--cv-fg-2)]">
-          Choose which kinds of things your AI agent needs a person's okay for.
-        </p>
-      </div>
-      <div className="divide-y divide-[var(--cv-line)] px-4 py-2 text-[var(--cv-fg)] sm:px-6">
-        {rows.map((r) => (
-          <div
-            key={r.label}
-            className={`items-center justify-between gap-3 py-3.5 ${r.phone ? "flex" : "hidden lg:flex"}`}
-          >
-            <span className="min-w-0 truncate text-[14px] font-medium">{r.label}</span>
-            <div className="flex shrink-0 items-center gap-2.5">
-              <span className="hidden text-[13px] text-[var(--cv-fg-2)] sm:inline">{r.state}</span>
-              <Toggle on={r.on} />
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="hidden items-center gap-1.5 border-t border-[var(--cv-line)] px-4 py-4 text-[13px] font-medium text-[var(--cv-fg-2)] sm:px-6 lg:flex">
-        <ChevronDown className="h-3.5 w-3.5 shrink-0 -rotate-90" />
-        <span className="truncate">Advanced: edit the underlying rules as code</span>
-      </div>
-      </div>
-
-      {/* Smaller than the real widget's 380px, and docked rather than
-          floating so it never covers the rows. Still keeps the real
-          hardcoded Notion-green diff colors (see components/ui/badge.tsx's
-          "success" variant). */}
-      <div className="mx-3 mb-3 flex flex-col overflow-hidden rounded-xl border border-[#c3cbe3] bg-white shadow-[0_0_0_4px_rgba(221,230,251,0.7),0_16px_32px_-12px_rgba(26,29,43,0.3)] lg:my-3 lg:ml-0">
-        <div className="flex items-center justify-between border-b border-[#dde2f0] bg-[var(--cv-cream)] px-3 py-2">
-          <p className="flex items-center gap-1.5 text-[12px] font-semibold text-[var(--cv-fg)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--cv-blue-bright)]" />
-            Policy assistant
-          </p>
-          <X className="h-3.5 w-3.5 text-[var(--cv-fg-2)]" />
-        </div>
-        <div className="space-y-2 p-2.5">
-          <div className="flex justify-end">
-            <div className="max-w-[90%] rounded-xl bg-[var(--cv-fg)] px-2.5 py-1.5 text-[11px] leading-relaxed text-white">
-              Require approval for send_refund and charge_card
-            </div>
-          </div>
-          <div className="overflow-hidden rounded-lg border border-[var(--cv-line)]">
-            <pre className="px-2 py-1.5 font-mono text-[10px] leading-relaxed">
-              <div className="rounded bg-[#DBEDDB] px-1 text-[#2F5D3A]">+ action_name: &quot;*refund*&quot;</div>
-              <div className="rounded bg-[#DBEDDB] px-1 text-[#2F5D3A]">+ action_name: &quot;*card*&quot;</div>
-            </pre>
-            <div className="flex justify-end gap-1.5 border-t border-[var(--cv-line)] bg-[var(--cv-cream)]/60 px-2 py-1">
-              <span className="rounded border border-[var(--cv-line)] bg-white px-2 py-0.5 text-[10px] font-medium text-[var(--cv-fg)]">
-                Discard
-              </span>
-              <span className="flex items-center gap-1 rounded bg-[var(--cv-fg)] px-2 py-0.5 text-[10px] font-medium text-white">
-                <Check className="h-2.5 w-2.5" /> Apply
-              </span>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5 border-t border-[var(--cv-line)] p-2">
-          <div className="flex-1 rounded-md border border-[var(--cv-line)] px-2 py-1 text-[11px] text-[var(--cv-fg-2)]">
-            Describe a policy change...
-          </div>
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[var(--cv-fg)]">
-            <Send className="h-3 w-3 text-white" />
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Toggle({ on }: { on: boolean }) {
-  return (
-    <span
-      className={`inline-flex h-5 w-9 shrink-0 items-center rounded-full px-0.5 ${
-        on
-          ? "justify-end bg-[var(--cv-blue)]"
-          : "justify-start bg-[#cdd3e4] shadow-[inset_0_0_0_1px_rgba(26,29,43,0.08)]"
-      }`}
-    >
-      <span className="h-4 w-4 rounded-full bg-white shadow-[0_1px_2px_rgba(26,29,43,0.3)]" />
-    </span>
   );
 }
 
@@ -583,110 +357,6 @@ function FeatureApprovalsCard() {
             </AppWindow>
           </CroppedWindow>
         </div>
-      </div>
-    </div>
-  );
-}
-
-const APPROVALS = [
-  {
-    agent: "support-bot",
-    action: "send_refund",
-    meta: "external · requested Sep 20, 02:23 PM",
-    inputs: '{\n  "order_id": "ord_8123",\n  "amount": 249.00,\n  "reason": "damaged on arrival"\n}',
-  },
-];
-
-// Mirrors app/(app)/approvals/page.tsx: tabs, then one card per request,
-// "<agent> wants to run <action>", the inputs preview, and the three
-// decision buttons.
-function ApprovalsScreen() {
-  return (
-    <div className="px-4 py-5 sm:px-6">
-      <h3 className="text-[20px] font-semibold tracking-tight">Approvals</h3>
-      <div className="mt-4 flex gap-4 overflow-hidden whitespace-nowrap border-b border-[var(--cv-line)] text-[12.5px] font-medium text-[var(--cv-fg-2)] sm:gap-5 sm:text-[13px]">
-        {["Pending", "Approved", "Rejected", "Auto-denied"].map((t, i) => (
-          <span key={t} className={`pb-2 ${i === 0 ? "border-b-2 border-[var(--cv-fg)] text-[var(--cv-fg)]" : ""}`}>
-            {t}
-          </span>
-        ))}
-      </div>
-      <div className="mt-4 space-y-3">
-        {APPROVALS.map((a) => (
-          <div key={a.action} className="flex flex-col items-start gap-3 rounded-lg border border-[var(--cv-line)] p-4 xl:flex-row xl:justify-between xl:gap-4">
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <div className="flex flex-wrap items-center gap-1.5 text-[14px]">
-                <span className="font-medium">{a.agent}</span>
-                <span className="text-[var(--cv-fg-2)]">wants to run</span>
-                <span className="font-medium">{a.action}</span>
-                <StatusBadge status="pending" />
-              </div>
-              <p className="text-[12.5px] text-[var(--cv-fg-2)]">{a.meta}</p>
-              <pre className="mt-1 overflow-hidden whitespace-pre rounded-md bg-[var(--cv-cream)] p-3 font-mono text-[11px] leading-relaxed sm:text-[11.5px]">
-                {a.inputs}
-              </pre>
-            </div>
-            <div className="flex shrink-0 gap-2">
-              <span className="rounded-md bg-[var(--cv-fg)] px-3 py-1.5 text-[12px] font-medium text-white">Approve</span>
-              <span className="rounded-md border border-[var(--cv-line)] px-3 py-1.5 text-[12px] font-medium">Edit...</span>
-              <span className="rounded-md bg-[#e03e3e] px-3 py-1.5 text-[12px] font-medium text-white">Reject</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-const EVIDENCE_QA = [
-  {
-    q: "Does the system log every agent action?",
-    a: "Yes. Every action is recorded with a tamper-evident, chained hash as it happens, not reconstructed after the fact.",
-    cited: ["evt_a91f", "evt_28ce", "evt_7d10"],
-  },
-  {
-    q: "How are risky actions handled before they run?",
-    a: "A workspace policy decides. Matching actions pause for a human approval before they execute.",
-    cited: ["evt_5c2e"],
-  },
-  {
-    q: "Is there an audit trail an external auditor can review?",
-    a: "Yes. Every event chains to the previous one by hash, so tampering is visible, and the whole chain exports to CSV or a formatted evidence document.",
-    cited: ["evt_9b41", "evt_0d17"],
-  },
-  {
-    q: "Who reviews a drafted answer before it ships?",
-    a: "A human on your team. Drafts cite the exact events they're based on and are always editable before export, nothing is submitted automatically.",
-    cited: ["evt_3f88"],
-  },
-];
-
-function EvidenceScreen() {
-  return (
-    <div>
-      <div className="flex items-center justify-between gap-3 border-b border-[var(--cv-line)] px-4 py-4 sm:px-6">
-        <div className="min-w-0">
-          <h3 className="text-[17px] font-semibold tracking-tight">Evidence Packs</h3>
-          <p className="mt-0.5 truncate text-[12.5px] text-[var(--cv-fg-2)]">SOC2-Questionnaire-2026.csv</p>
-        </div>
-        <Badge variant="success" className="shrink-0 whitespace-nowrap">
-          4 of 4 answered
-        </Badge>
-      </div>
-      <div className="space-y-4 p-4 sm:p-6">
-        {EVIDENCE_QA.map((item, i) => (
-          <div key={item.q} className={`rounded-lg border border-[var(--cv-line)] p-4 ${i < 2 ? "" : "hidden sm:block"}`}>
-            <p className="text-[13.5px] font-medium">{item.q}</p>
-            <p className="mt-2 text-[13px] leading-relaxed text-[var(--cv-fg-2)]">{item.a}</p>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {item.cited.map((id) => (
-                <Badge key={id} variant="secondary">
-                  {id}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
@@ -760,7 +430,7 @@ function PolicyVisual() {
   return (
     <div className="w-full max-w-[260px] space-y-2.5">
       {[
-        { label: "lookup_order", state: "Runs automatically", on: false },
+        { label: "lookup_order", state: "Runs freely", on: false },
         { label: "send_refund", state: "Needs approval", on: true },
       ].map((r) => (
         <div
@@ -771,7 +441,7 @@ function PolicyVisual() {
             <p className="text-[12.5px] font-medium">{r.label}</p>
             <p className="text-[11px] text-[var(--cv-fg-2)]">{r.state}</p>
           </div>
-          <Toggle on={r.on} />
+          <Switch on={r.on} />
         </div>
       ))}
     </div>
