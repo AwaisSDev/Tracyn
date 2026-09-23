@@ -19,6 +19,7 @@ import {
   LogOut,
   Menu,
   Plus,
+  Users,
   X,
   ArrowUpRight,
 } from "lucide-react";
@@ -31,6 +32,7 @@ import type { Workspace } from "@/lib/types";
 import { interTight } from "@/components/home/fonts";
 import { cdSans } from "./font";
 import { useApprovals } from "./data";
+import { FirstRun, signOut } from "./onboarding";
 import { ErrorText, PLAN_INFO, Skel } from "./ui";
 import "@/components/home/home.css";
 import "./dash.css";
@@ -78,14 +80,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  if (!isLoading && workspaces.length === 0) {
-    return (
-      <div className={`${cdSans.variable} ${interTight.variable} cd min-h-screen`}>
-        <ForceLightTheme />
-        <CreateFirstWorkspace />
-      </div>
-    );
-  }
+  if (!isLoading && workspaces.length === 0) return <FirstRun />;
 
   return (
     <div className={`${cdSans.variable} ${interTight.variable} cd min-h-screen`}>
@@ -346,15 +341,25 @@ function WorkspaceSwitcher() {
               </button>
             </form>
           ) : (
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => setCreating(true)}
-              className="flex h-10 w-full items-center gap-2 rounded-[6px] px-3 text-left text-[15.5px] text-[var(--cd-fg-2)] hover:bg-[var(--cd-hover)]"
-            >
-              <Plus className="h-4 w-4" />
-              New workspace
-            </button>
+            <>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => setCreating(true)}
+                className="flex h-10 w-full items-center gap-2 rounded-[6px] px-3 text-left text-[15.5px] text-[var(--cd-fg-2)] hover:bg-[var(--cd-hover)]"
+              >
+                <Plus className="h-4 w-4" />
+                New workspace
+              </button>
+              <Link
+                href="/join"
+                role="menuitem"
+                className="flex h-10 w-full items-center gap-2 rounded-[6px] px-3 text-left text-[15.5px] text-[var(--cd-fg-2)] hover:bg-[var(--cd-hover)]"
+              >
+                <Users className="h-4 w-4" />
+                Join a workspace
+              </Link>
+            </>
           )}
         </div>
       )}
@@ -409,75 +414,6 @@ function Account() {
   );
 }
 
-async function signOut() {
-  await createSupabaseBrowserClient().auth.signOut();
-  // A full navigation, not router.push: middleware reads the session cookie
-  // on every request, and a client-side push can race the just-cleared
-  // cookie and bounce straight back into the dashboard.
-  window.location.href = "/login";
-}
-
-/** First run: a new account has no workspace yet. */
-function CreateFirstWorkspace() {
-  const queryClient = useQueryClient();
-  const [name, setName] = useState("");
-  const create = useMutation({
-    mutationFn: () => api.post<Workspace>("/v1/workspaces", { name: name.trim() }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["workspaces"] }),
-  });
-
-  return (
-    <div className="flex min-h-screen flex-col">
-      <header className="flex items-center px-5 py-5 sm:px-8">
-        <Link href="/" className="flex items-center gap-2.5">
-          {/* eslint-disable-next-line @next/next/no-img-element -- next/image's optimizer (sharp) fails on this PNG */}
-          <img src="/logo.png" alt="" width={32} height={32} className="rounded-md" />
-          <span className="cd-wordmark">Tracyn</span>
-        </Link>
-        <button type="button" onClick={signOut} className="ml-auto text-[15px] font-medium text-[var(--cd-fg-2)] hover:text-[var(--cd-ink)]">
-          Sign out
-        </button>
-      </header>
-      <main className="flex flex-1 items-center justify-center px-5 pb-20">
-        <div className="w-full max-w-[420px]">
-          <h1 className="text-center text-[32px] font-semibold leading-[1.15] tracking-[-0.03em]">Create your workspace</h1>
-          <p className="mt-2 text-center text-[16.5px] text-[var(--cd-fg-2)]">Your agents, events and API keys live here. You can add more later.</p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (name.trim()) create.mutate();
-            }}
-            className="cd-card mt-8 space-y-4 rounded-[10px] p-6"
-          >
-            <div>
-              <label htmlFor="cd-first-workspace" className="mb-2 block text-[15px] font-medium">
-                Workspace name
-              </label>
-              <input
-                id="cd-first-workspace"
-                autoFocus
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Acme Inc"
-                className="cd-input"
-              />
-            </div>
-            <ErrorText error={create.error} />
-            <button
-              type="submit"
-              disabled={!name.trim() || create.isPending}
-              className="cv-btn-primary flex h-11 w-full items-center justify-center rounded-[7px] text-[16px] font-medium text-white disabled:opacity-55"
-            >
-              {create.isPending ? "Creating..." : "Create workspace"}
-            </button>
-          </form>
-        </div>
-      </main>
-    </div>
-  );
-}
-
 function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -487,6 +423,8 @@ function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void 
     const all = [
       ...NAV.map((n) => ({ label: n.label, hint: "Go to", href: n.href, icon: n.icon })),
       { label: "Settings", hint: "Go to", href: "/settings", icon: Settings },
+      { label: "Members and invites", hint: "Settings", href: "/settings?tab=members", icon: Users },
+      { label: "Join a workspace", hint: "Open", href: "/join", icon: Users },
       { label: "API keys", hint: "Settings", href: "/settings?tab=keys", icon: Settings },
       { label: "Plan and billing", hint: "Settings", href: "/settings?tab=billing", icon: Settings },
       { label: "Pending approvals", hint: "Approvals", href: "/approvals", icon: CircleCheck },
