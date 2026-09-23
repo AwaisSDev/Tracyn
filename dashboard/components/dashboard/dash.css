@@ -129,7 +129,7 @@ html:has(.cd) {
 }
 
 .cd-skel {
-  background: linear-gradient(90deg, #f0f2f8 0%, #f7f8fc 50%, #f0f2f8 100%);
+  background: linear-gradient(90deg, #e8ebf2 0%, #f3f5f9 50%, #e8ebf2 100%);
   background-size: 200% 100%;
   animation: cd-shimmer 1.4s ease-in-out infinite;
 }

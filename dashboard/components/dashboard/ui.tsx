@@ -117,7 +117,7 @@ export function PageHeader({
   actions,
   eyebrow,
 }: {
-  title: string;
+  title: React.ReactNode;
   subtitle?: React.ReactNode;
   actions?: React.ReactNode;
   eyebrow?: React.ReactNode;
@@ -385,8 +385,9 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
   return <div className="mb-2 text-[13px] font-medium uppercase tracking-[0.06em] text-[var(--cd-fg-3)]">{children}</div>;
 }
 
-export function Skel({ className }: { className?: string }) {
-  return <div className={cn("cd-skel rounded-[4px]", className)} />;
+export function Skel({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  // A span (display: block) so it's valid anywhere, headings and paragraphs included.
+  return <span aria-hidden className={cn("block cd-skel rounded-[4px]", className)} style={style} />;
 }
 
 export function Empty({
