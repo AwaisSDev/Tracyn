@@ -35,7 +35,7 @@ export function setTheme(theme: Theme): void {
 // (components/dashboard) is designed light-only.
 const ALWAYS_LIGHT_PATHS = [
   "/", "/docs", "/about", "/pricing", "/privacy", "/terms", "/login",
-  "/dashboard", "/timeline", "/approvals", "/questionnaires", "/soc2", "/policy", "/settings", "/admin", "/oauth",
+  "/dashboard", "/timeline", "/approvals", "/questionnaires", "/soc2", "/policy", "/settings", "/admin", "/oauth", "/join",
 ];
 
 function isAlwaysLightPath(pathname: string): boolean {
