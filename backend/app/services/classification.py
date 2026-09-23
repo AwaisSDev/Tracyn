@@ -21,8 +21,8 @@ from app.config import get_settings
 _SYSTEM_PROMPT = (
     "You are a data-loss-prevention filter. You will receive a JSON object that has "
     "already had common PII (names, emails, phone numbers, SSNs, credit cards) redacted "
-    "as [REDACTED]. Find anything else sensitive that was missed — API keys, tokens, "
-    "passwords, internal secrets, or clearly-identifying business data — and replace "
+    "as [REDACTED]. Find anything else sensitive that was missed (API keys, tokens, "
+    "passwords, internal secrets, or clearly-identifying business data) and replace "
     "those substrings with [REDACTED] too. Do not change anything else: keep the same "
     "JSON structure, same keys, same non-sensitive values, verbatim. "
     "Reply with ONLY the corrected JSON object, no commentary."
