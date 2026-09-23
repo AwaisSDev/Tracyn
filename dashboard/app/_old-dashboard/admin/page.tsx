@@ -58,7 +58,7 @@ export default function AdminAnalyticsPage() {
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
         <p className="text-sm text-muted-foreground">
-          Founder-only. "Active" means a user's most recent sign-in fell in that window — Supabase doesn't keep a
+          Founder-only. "Active" means a user's most recent sign-in fell in that window. Supabase doesn't keep a
           full login history, just the one timestamp per user.
         </p>
       </div>
