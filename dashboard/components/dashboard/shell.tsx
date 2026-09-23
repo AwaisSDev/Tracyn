@@ -121,15 +121,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <Sidebar open={navOpen} onClose={() => setNavOpen(false)} onSearch={() => setPaletteOpen(true)} />
 
       <main className="min-w-0 md:pl-[288px]">
-        {isLoading ? (
-          <div className="mx-auto max-w-[1180px] space-y-5 px-4 py-8 sm:px-8 lg:px-10">
-            <Skel className="h-9 w-48" />
-            <Skel className="h-5 w-80 max-w-full" />
-            <Skel className="mt-6 h-64 w-full rounded-[10px]" />
-          </div>
-        ) : (
-          children
-        )}
+        {/* Pages render straight away and show their own skeletons, shaped
+            like their content, until their data arrives. */}
+        {children}
       </main>
 
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
@@ -286,13 +280,25 @@ function WorkspaceSwitcher() {
         aria-haspopup="menu"
         className="flex h-14 w-full items-center gap-3 rounded-[8px] px-2.5 text-left transition-colors hover:bg-[var(--cd-hover)]"
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] bg-[radial-gradient(115%_115%_at_10%_17%,#3553d4_0%,#1c2f9e_100%)] text-[14px] font-semibold text-white">
-          {initial}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-[16.5px] font-normal text-[var(--cd-ink)]">{workspace?.name ?? "Workspace"}</span>
-          <span className="block text-[13.5px] text-[var(--cd-fg-3)]">{PLAN_INFO[workspace?.plan ?? "free"]?.name} plan</span>
-        </span>
+        {workspace ? (
+          <>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] bg-[radial-gradient(115%_115%_at_10%_17%,#3553d4_0%,#1c2f9e_100%)] text-[14px] font-semibold text-white">
+              {initial}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[16.5px] font-normal text-[var(--cd-ink)]">{workspace.name}</span>
+              <span className="block text-[13.5px] text-[var(--cd-fg-3)]">{PLAN_INFO[workspace.plan ?? "free"]?.name} plan</span>
+            </span>
+          </>
+        ) : (
+          <>
+            <Skel className="h-8 w-8 shrink-0 rounded-[6px]" />
+            <span className="min-w-0 flex-1 space-y-1.5">
+              <Skel className="h-4 w-28" />
+              <Skel className="h-3 w-16" />
+            </span>
+          </>
+        )}
         <ChevronsUpDown className="h-4 w-4 text-[var(--cd-fg-3)]" />
       </button>
       {open && (
@@ -371,13 +377,25 @@ function Account() {
   const label = who.name ?? who.email;
   return (
     <div className="flex items-center gap-3 border-t border-[var(--cd-line)] px-5 py-4">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e3e7f3] text-[14px] font-semibold text-[var(--cd-fg-2)]">
-        {label?.charAt(0).toUpperCase() ?? ""}
-      </span>
-      <Link href="/settings" className="min-w-0 flex-1" title={who.email ?? undefined}>
-        <span className="block truncate text-[15px] text-[var(--cd-ink)]">{label ?? " "}</span>
-        {who.name && <span className="block truncate text-[13px] text-[var(--cd-fg-3)]">{who.email}</span>}
-      </Link>
+      {label ? (
+        <>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e3e7f3] text-[14px] font-semibold text-[var(--cd-fg-2)]">
+            {label.charAt(0).toUpperCase()}
+          </span>
+          <Link href="/settings" className="min-w-0 flex-1" title={who.email ?? undefined}>
+            <span className="block truncate text-[15px] text-[var(--cd-ink)]">{label}</span>
+            {who.name && <span className="block truncate text-[13px] text-[var(--cd-fg-3)]">{who.email}</span>}
+          </Link>
+        </>
+      ) : (
+        <>
+          <Skel className="h-9 w-9 shrink-0 rounded-full" />
+          <span className="min-w-0 flex-1 space-y-1.5">
+            <Skel className="h-4 w-24" />
+            <Skel className="h-3 w-36" />
+          </span>
+        </>
+      )}
       <button
         type="button"
         onClick={signOut}
