@@ -11,8 +11,9 @@ order; later steps depend on earlier ones.
    **service_role key**.
 3. Project Settings → API → JWT Settings: copy the **JWT Secret**.
 4. SQL Editor → paste and run [`supabase/schema.sql`](../supabase/schema.sql) in full.
-   A project set up before account deletion existed also needs
-   [`supabase/account_deletion.sql`](../supabase/account_deletion.sql) run once (safe to re-run).
+   A project set up before account deletion and shared workspaces existed also needs
+   [`supabase/account_deletion.sql`](../supabase/account_deletion.sql) and
+   [`supabase/shared_workspaces.sql`](../supabase/shared_workspaces.sql) run once each (both safe to re-run).
 5. Storage → create a new **private** bucket named `questionnaires` (used by F4's upload flow).
 6. Authentication → Providers: enable **Email** (magic link) — it's on by default. Authentication → URL Configuration: add
    `http://localhost:3000/auth/callback` and `https://tracyn.online/auth/callback` as redirect URLs.
