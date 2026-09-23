@@ -36,7 +36,7 @@ export function TimelineView() {
   const { workspace } = useWorkspace();
   const router = useRouter();
   const params = useSearchParams();
-  const { data: events = [], isLoading } = useEvents();
+  const { data: events = [], isPending } = useEvents();
   const { agents, agentName } = useAgents();
 
   const [query, setQuery] = useState("");
@@ -158,11 +158,11 @@ export function TimelineView() {
             value={status}
             onChange={setStatus}
             options={[
-              { value: "all", label: "All", count: counts.all },
-              { value: "completed", label: "Completed", count: counts.completed ?? 0 },
-              { value: "approved", label: "Approved", count: counts.approved ?? 0 },
-              { value: "rejected", label: "Rejected", count: counts.rejected ?? 0 },
-              { value: "error", label: "Error", count: counts.error ?? 0 },
+              { value: "all", label: "All", count: isPending ? undefined : counts.all },
+              { value: "completed", label: "Completed", count: isPending ? undefined : counts.completed ?? 0 },
+              { value: "approved", label: "Approved", count: isPending ? undefined : counts.approved ?? 0 },
+              { value: "rejected", label: "Rejected", count: isPending ? undefined : counts.rejected ?? 0 },
+              { value: "error", label: "Error", count: isPending ? undefined : counts.error ?? 0 },
             ]}
           />
         </div>
@@ -184,10 +184,20 @@ export function TimelineView() {
       <Card className="mt-4 overflow-hidden">
         {/* Phones get a stacked list instead of a table. */}
         <ul className="divide-y divide-[var(--cd-line)] sm:hidden">
-          {isLoading &&
-            Array.from({ length: 6 }).map((_, i) => (
-              <li key={i} className="px-4 py-4">
-                <Skel className="h-11 w-full" />
+          {isPending &&
+            Array.from({ length: 8 }).map((_, i) => (
+              <li key={i} className="flex items-center gap-3 px-4 py-4">
+                <div className="min-w-0 flex-1">
+                  <Skel className="h-4 w-40 max-w-full" style={{ width: `${55 + ((i * 17) % 35)}%` }} />
+                  <div className="mt-2 flex items-center gap-2">
+                    <Skel className="h-[14px] w-24" />
+                    <Skel className="h-[14px] w-12" />
+                  </div>
+                </div>
+                <span className="flex items-center gap-2">
+                  <Skel className="h-[7px] w-[7px] rounded-full" />
+                  <Skel className="h-[13px] w-[72px]" />
+                </span>
               </li>
             ))}
           {filtered.map((e) => (
@@ -223,11 +233,30 @@ export function TimelineView() {
               </tr>
             </thead>
             <tbody>
-              {isLoading &&
-                Array.from({ length: 8 }).map((_, i) => (
+              {isPending &&
+                Array.from({ length: 10 }).map((_, i) => (
                   <tr key={i} className="border-b border-[var(--cd-line)] last:border-0">
-                    <td className="py-3 pl-5 pr-3" colSpan={6}>
-                      <Skel className="h-5 w-full" />
+                    <td className="py-3.5 pl-6 pr-3">
+                      <Skel className="h-[14px]" style={{ width: 120 + ((i * 37) % 70) }} />
+                      <Skel className="mt-1.5 h-[12.5px] w-20" />
+                    </td>
+                    <td className="hidden px-3 py-3.5 md:table-cell">
+                      <Skel className="h-[14px] w-16" />
+                    </td>
+                    <td className="px-3 py-3.5">
+                      <span className="flex items-center gap-2">
+                        <Skel className="h-[7px] w-[7px] rounded-full" />
+                        <Skel className="h-[13px] w-[72px]" />
+                      </span>
+                    </td>
+                    <td className="hidden px-3 py-3.5 lg:table-cell">
+                      <Skel className="ml-auto h-[14px] w-14" />
+                    </td>
+                    <td className="hidden px-3 py-3.5 lg:table-cell">
+                      <Skel className="ml-auto h-[14px] w-14" />
+                    </td>
+                    <td className="py-3.5 pl-3 pr-6">
+                      <Skel className="ml-auto h-[14px] w-12" />
                     </td>
                   </tr>
                 ))}
@@ -262,7 +291,7 @@ export function TimelineView() {
             </tbody>
           </table>
         </div>
-        {!isLoading && filtered.length === 0 && (
+        {!isPending && filtered.length === 0 && (
           <div className="p-4">
             <Empty
               title={events.length ? "Nothing matches these filters" : "No events yet"}
@@ -271,7 +300,7 @@ export function TimelineView() {
           </div>
         )}
       </Card>
-      {!isLoading && filtered.length > 0 && (
+      {!isPending && filtered.length > 0 && (
         <p className="mt-3 text-[13.5px] text-[var(--cd-fg-3)]">
           Showing {filtered.length} of {events.length} most recent events
         </p>
