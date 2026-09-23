@@ -6,6 +6,34 @@ export interface Workspace {
   slack_channel_id: string | null;
   notify_email: string | null;
   created_at: string;
+  /** The signed-in user's role in this workspace. */
+  role?: WorkspaceRole | null;
+}
+
+export type WorkspaceRole = "owner" | "admin" | "member";
+
+export interface Member {
+  user_id: string;
+  role: WorkspaceRole;
+  joined_at: string | null;
+  email: string | null;
+  name: string | null;
+  is_me: boolean;
+}
+
+export interface InviteSettings {
+  join_code: string;
+  link_token: string | null;
+  has_password: boolean;
+}
+
+export interface JoinPreview {
+  workspace_id: string;
+  workspace_name: string;
+  member_count: number;
+  already_member: boolean;
+  key_valid: boolean;
+  accepts_password: boolean;
 }
 
 export interface Agent {
