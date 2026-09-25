@@ -1,0 +1,31 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.AwaisSDev/tracyn",
+  "title": "Tracyn",
+  "description": "Query your AI agents' audit trail, pending approvals and SOC 2 posture from any MCP client.",
+  "repository": {
+    "url": "https://github.com/AwaisSDev/Tracyn",
+    "source": "github",
+    "subfolder": "mcp-server"
+  },
+  "websiteUrl": "https://tracyn.online",
+  "version": "0.5.1",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "tracyn-mcp",
+      "version": "0.5.1",
+      "runtimeHint": "uvx",
+      "transport": { "type": "stdio" },
+      "environmentVariables": [
+        {
+          "name": "TRACYN_API_KEY",
+          "description": "API key from Tracyn Settings > API keys",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

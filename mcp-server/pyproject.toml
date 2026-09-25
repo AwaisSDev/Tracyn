@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tracyn-mcp"
-version = "0.5.0"
+version = "0.5.1"
 description = "MCP server for Tracyn — ask about your agent logs, approvals, and compliance posture in plain English, from Claude, ChatGPT, Grok, or any other MCP client."
 readme = "README.md"
 requires-python = ">=3.10"

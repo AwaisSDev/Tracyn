@@ -1,5 +1,7 @@
 # tracyn-mcp
 
+<!-- mcp-name: io.github.AwaisSDev/tracyn -->
+
 An MCP server exposing your Tracyn workspace as five tools:
 `get_recent_actions`, `get_pending_approvals`, `decide_approval`,
 `draft_questionnaire_answers`, `get_compliance_summary`. Works from Claude,
