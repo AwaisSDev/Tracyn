@@ -19,10 +19,10 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: SITE_URL,
     siteName: "Tracyn",
-    images: [{ url: "/logo.png", width: 512, height: 512 }],
+    images: [{ url: "/og.png", width: 512, height: 512 }],
     type: "website",
   },
-  twitter: { card: "summary", title: TITLE, description: DESCRIPTION, images: ["/logo.png"] },
+  twitter: { card: "summary", title: TITLE, description: DESCRIPTION, images: ["/og.png"] },
 };
 
 export default function RootPage() {

@@ -20,14 +20,14 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: SITE_URL,
     siteName: TITLE,
-    images: [{ url: "/logo.png", width: 512, height: 512 }],
+    images: [{ url: "/og.png", width: 512, height: 512 }],
     type: "website",
   },
   twitter: {
     card: "summary",
     title: TITLE,
     description: DESCRIPTION,
-    images: ["/logo.png"],
+    images: ["/og.png"],
   },
   robots: { index: true, follow: true },
 };
