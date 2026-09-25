@@ -9,7 +9,7 @@ build-backend = "hatchling.build"
 # consistent name instead of a confusing split between what you `pip
 # install` and what you `import`.
 name = "tracyn"
-version = "0.3.0"
+version = "0.4.0"
 description = "Drop-in logging, human approvals, and compliance evidence for AI agents."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -33,7 +33,8 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "mypy>=1.10", "types-PyYAML"]
+openai-agents = ["openai-agents>=0.2"]
+dev = ["pytest>=8.0", "mypy>=1.10", "types-PyYAML", "openai-agents>=0.2"]
 
 [project.urls]
 Homepage = "https://tracyn.online"

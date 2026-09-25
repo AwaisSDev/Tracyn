@@ -46,6 +46,40 @@ exit — e.g. before a health check reports ready, or between batches in a
 long-running worker — call `audit.flush()` or `audit.close()` yourself
 (both are safe to call more than once).
 
+## OpenAI Agents SDK
+
+```bash
+pip install 'tracyn[openai-agents]'
+```
+
+Register the tracing processor once and every tool call your agents make is
+logged, with no per-tool code:
+
+```python
+from agents import Agent, add_trace_processor, function_tool
+from tracyn import Tracyn
+from tracyn.integrations.openai_agents import TracynTracingProcessor
+
+audit = Tracyn(api_key="al_live_...", agent_name="support-bot")
+add_trace_processor(TracynTracingProcessor(audit))
+```
+
+A tracing processor only sees a tool call after it has run, so it can't
+pause one. For tools that need a human yes first, put `@audit.track` under
+`@function_tool`. The processor skips those, since the decorator already
+logs them:
+
+```python
+@function_tool
+@audit.track(action_type="external", action_name="refund")
+def refund(order_id: str, amount: float) -> str:
+    """Refund an order."""
+    ...
+```
+
+The same stacking works with LangChain's `@tool` and CrewAI's `@tool`: put
+`@audit.track` directly on the function.
+
 ## Policy
 
 By default the SDK fetches your workspace's active policy from the

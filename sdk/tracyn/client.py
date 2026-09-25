@@ -77,6 +77,11 @@ class Tracyn:
         # the repo-local YAML file instead of fetching the dashboard's copy.
         self.policy = Policy(policy_yaml) if policy_yaml else self._fetch_policy()
 
+        # Names of every action wrapped with track(), so framework
+        # integrations (tracyn.integrations.*) can skip tools this decorator
+        # already logs instead of recording them twice.
+        self.tracked_action_names: set[str] = set()
+
         self._queue: queue.Queue = queue.Queue()
         self._stop = threading.Event()
         self._closed = False
@@ -248,6 +253,9 @@ class Tracyn:
 
         def decorator(func: F) -> F:
             name = action_name or func.__name__
+            self.tracked_action_names.add(name)
+            # Frameworks name a tool after the function, not the action.
+            self.tracked_action_names.add(func.__name__)
 
             if inspect.iscoroutinefunction(func):
 
